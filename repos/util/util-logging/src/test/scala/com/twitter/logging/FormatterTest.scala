@@ -186,7 +186,8 @@ class FormatterTest extends WordSpec {
             "    at com.twitter.logging.FormatterTest$$.cycle(FormatterTest.scala:NNN)",
             "    at com.twitter.logging.FormatterTest$$.cycle(FormatterTest.scala:NNN)",
             "    at com.twitter.logging.FormatterTest$$.cycle(FormatterTest.scala:NNN)",
-            "    (...more...)"))
+            "    (...more...)"
+          ))
       }
 
       "nested" in {
@@ -204,7 +205,8 @@ class FormatterTest extends WordSpec {
             "Caused by java.lang.Exception: Aie!",
             "    at com.twitter.logging.FormatterTest$$.cycle(FormatterTest.scala:NNN)",
             "    at com.twitter.logging.FormatterTest$$.cycle(FormatterTest.scala:NNN)",
-            "    (...more...)"))
+            "    (...more...)"
+          ))
       }
 
       "log even blank exceptions" in {

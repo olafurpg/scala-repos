@@ -268,7 +268,8 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
             refactoring.RemoveDuplicates,
             refactoring.GroupImports(List("java", "scala"))
           )
-        ))
+        )
+      )
     }.result
 
   private def using[A, R <: { def close(): Unit }](r: R)(f: R => A): A = {

@@ -143,7 +143,8 @@ object MapGroups {
       encoderFor[U].namedExpressions,
       groupingAttributes,
       dataAttributes,
-      child)
+      child
+    )
   }
 }
 
@@ -185,18 +186,21 @@ object CoGroup {
       StructType.fromAttributes(leftGroup) == StructType.fromAttributes(
         rightGroup))
 
-    CoGroup(func.asInstanceOf[(Any, Iterator[Any],
-                               Iterator[Any]) => TraversableOnce[Any]],
-            encoderFor[Key].fromRowExpression,
-            encoderFor[Left].fromRowExpression,
-            encoderFor[Right].fromRowExpression,
-            encoderFor[Result].namedExpressions,
-            leftGroup,
-            rightGroup,
-            leftData,
-            rightData,
-            left,
-            right)
+    CoGroup(
+      func.asInstanceOf[(Any,
+                         Iterator[Any],
+                         Iterator[Any]) => TraversableOnce[Any]],
+      encoderFor[Key].fromRowExpression,
+      encoderFor[Left].fromRowExpression,
+      encoderFor[Right].fromRowExpression,
+      encoderFor[Result].namedExpressions,
+      leftGroup,
+      rightGroup,
+      leftData,
+      rightData,
+      left,
+      right
+    )
   }
 }
 
@@ -204,18 +208,18 @@ object CoGroup {
   * A relation produced by applying `func` to each grouping key and associated values from left and
   * right children.
   */
-case class CoGroup(func: (Any, Iterator[Any],
-                          Iterator[Any]) => TraversableOnce[Any],
-                   keyDeserializer: Expression,
-                   leftDeserializer: Expression,
-                   rightDeserializer: Expression,
-                   serializer: Seq[NamedExpression],
-                   leftGroup: Seq[Attribute],
-                   rightGroup: Seq[Attribute],
-                   leftAttr: Seq[Attribute],
-                   rightAttr: Seq[Attribute],
-                   left: LogicalPlan,
-                   right: LogicalPlan)
+case class CoGroup(
+    func: (Any, Iterator[Any], Iterator[Any]) => TraversableOnce[Any],
+    keyDeserializer: Expression,
+    leftDeserializer: Expression,
+    rightDeserializer: Expression,
+    serializer: Seq[NamedExpression],
+    leftGroup: Seq[Attribute],
+    rightGroup: Seq[Attribute],
+    leftAttr: Seq[Attribute],
+    rightAttr: Seq[Attribute],
+    left: LogicalPlan,
+    right: LogicalPlan)
     extends BinaryNode
     with ObjectOperator {
 

@@ -1063,11 +1063,13 @@ object DistributedLDAModel extends Loader[DistributedLDAModel] {
     require(
       model.docConcentration == docConcentration,
       s"DistributedLDAModel requires $docConcentration docConcentration, " +
-        s"got ${model.docConcentration} docConcentration")
+        s"got ${model.docConcentration} docConcentration"
+    )
     require(
       model.topicConcentration == topicConcentration,
       s"DistributedLDAModel requires $topicConcentration docConcentration, " +
-        s"got ${model.topicConcentration} docConcentration")
+        s"got ${model.topicConcentration} docConcentration"
+    )
     require(
       expectedK == model.k,
       s"DistributedLDAModel requires $expectedK topics, got ${model.k} topics")

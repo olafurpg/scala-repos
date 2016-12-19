@@ -297,17 +297,19 @@ private[serverset2] object ZkSession {
       sessionTimeout: Duration = DefaultSessionTimeout,
       statsReceiver: StatsReceiver
   )(implicit timer: Timer): ZkSession =
-    new ZkSession(retryStream,
-                  ClientBuilder()
-                    .hosts(hosts)
-                    .sessionTimeout(sessionTimeout)
-                    .statsReceiver(
-                      DefaultStatsReceiver
-                        .scope("zkclient")
-                        .scope(Zk2Resolver.statsOf(hosts)))
-                    .readOnlyOK()
-                    .reader(),
-                  statsReceiver.scope(Zk2Resolver.statsOf(hosts)))
+    new ZkSession(
+      retryStream,
+      ClientBuilder()
+        .hosts(hosts)
+        .sessionTimeout(sessionTimeout)
+        .statsReceiver(
+          DefaultStatsReceiver
+            .scope("zkclient")
+            .scope(Zk2Resolver.statsOf(hosts)))
+        .readOnlyOK()
+        .reader(),
+      statsReceiver.scope(Zk2Resolver.statsOf(hosts))
+    )
 
   /**
     * Produce a `Var[ZkSession]` representing a ZooKeeper session that automatically

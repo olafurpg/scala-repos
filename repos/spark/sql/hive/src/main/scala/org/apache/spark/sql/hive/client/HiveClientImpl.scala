@@ -754,6 +754,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
         outputFormat = Option(apiPartition.getSd.getOutputFormat),
         serde = Option(apiPartition.getSd.getSerdeInfo.getSerializationLib),
         serdeProperties =
-          apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap))
+          apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap
+      )
+    )
   }
 }

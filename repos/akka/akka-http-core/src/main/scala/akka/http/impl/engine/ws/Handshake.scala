@@ -101,7 +101,8 @@ private[http] object Handshake {
               subprotocol.forall(chosen ⇒
                 clientSupportedSubprotocols.contains(chosen)),
               s"Tried to choose invalid subprotocol '$subprotocol' which wasn't offered by the client: [${requestedProtocols
-                .mkString(", ")}]")
+                .mkString(", ")}]"
+            )
             buildResponse(key.get, handler, subprotocol)
           }
 
@@ -149,7 +150,8 @@ private[http] object Handshake {
           UpgradeHeader,
           ConnectionUpgradeHeader,
           `Sec-WebSocket-Accept`.forKey(key),
-          UpgradeToWebSocketResponseHeader(handler)))
+          UpgradeToWebSocketResponseHeader(handler))
+      )
   }
 
   object Client {
@@ -269,7 +271,8 @@ private[http] object Handshake {
             case Some(_) ⇒ s"response with invalid `${candidate.name}` header."
             case None ⇒
               s"response that was missing required `${candidate.name}` header."
-          })
+          }
+        )
 
       val expectations: Expectation =
         check(_.status)(_ == StatusCodes.SwitchingProtocols,

@@ -53,12 +53,14 @@ trait GracefulStopSupport {
                               stopMessage.getClass.getName)
     internalTarget.sendSystemMessage(Watch(internalTarget, ref))
     target.tell(stopMessage, Actor.noSender)
-    ref.result.future.transform({
-      case Terminated(t) if t.path == target.path ⇒ true
-      case _ ⇒ {
-        internalTarget.sendSystemMessage(Unwatch(target, ref)); false
-      }
-    }, t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t })(
-      ref.internalCallingThreadExecutionContext)
+    ref.result.future.transform(
+      {
+        case Terminated(t) if t.path == target.path ⇒ true
+        case _ ⇒ {
+          internalTarget.sendSystemMessage(Unwatch(target, ref)); false
+        }
+      },
+      t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t }
+    )(ref.internalCallingThreadExecutionContext)
   }
 }

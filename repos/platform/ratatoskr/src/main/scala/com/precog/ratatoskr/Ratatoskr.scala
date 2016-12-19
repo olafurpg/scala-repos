@@ -166,14 +166,16 @@ object KafkaTools extends Command {
   def run(args: Array[String]) {
     val config = new Config
     val parser = new OptionParser("yggutils kafka") {
-      opt("r",
-          "range",
-          "<start:stop>",
-          "show message range, e.g.: 5:10 :100 10:", { s: String =>
-            val range = MessageRange.parse(s)
-            config.range =
-              range.getOrElse(sys.error("Invalid range specification: " + s))
-          })
+      opt(
+        "r",
+        "range",
+        "<start:stop>",
+        "show message range, e.g.: 5:10 :100 10:", { s: String =>
+          val range = MessageRange.parse(s)
+          config.range =
+            range.getOrElse(sys.error("Invalid range specification: " + s))
+        }
+      )
       intOpt(
         "i",
         "trackInterval",
@@ -211,7 +213,8 @@ object KafkaTools extends Command {
         "centralToLocal",
         "convert central kafka file(s) to local kafka format (.local is appended to the new filenames)", {
           config.operation = Some(ConvertCentral)
-        })
+        }
+      )
       opt(
         "f",
         "reportFormat",
@@ -221,7 +224,8 @@ object KafkaTools extends Command {
               case format @ ("csv" | "json") => config.reportFormat = format
               case other => sys.error("Invalid report format: " + other)
             }
-        })
+        }
+      )
       arglist("<files>", "The files to process", { (s: String) =>
         config.files = config.files :+ (new File(s))
       })
@@ -429,12 +433,15 @@ object KafkaTools extends Command {
           implicit val queryTimeout = Timeout(30000)
 
           Await
-            .result(database(selectAll.from("accounts")).map { results =>
-              val built = results.toList
-              built.map(_.deserialize[Account]).map { account =>
-                (account.accountId, account.email)
-              }
-            }, queryTimeout.duration)
+            .result(
+              database(selectAll.from("accounts")).map { results =>
+                val built = results.toList
+                built.map(_.deserialize[Account]).map { account =>
+                  (account.accountId, account.email)
+                }
+              },
+              queryTimeout.duration
+            )
             .toMap
         }
         .getOrElse {

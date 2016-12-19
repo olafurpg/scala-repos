@@ -369,7 +369,8 @@ object TopicCommand extends Logging {
         "A topic configuration override for the topic being created or altered." +
           "The following is a list of valid configurations: " +
           nl + LogConfig.configNames.map("\t" + _).mkString(nl) + nl +
-          "See the Kafka documentation for full details on the topic configs.")
+          "See the Kafka documentation for full details on the topic configs."
+      )
       .withRequiredArg
       .describedAs("name=value")
       .ofType(classOf[String])
@@ -384,7 +385,8 @@ object TopicCommand extends Logging {
       .accepts(
         "partitions",
         "The number of partitions for the topic being created or " +
-          "altered (WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected")
+          "altered (WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected"
+      )
       .withRequiredArg
       .describedAs("# of partitions")
       .ofType(classOf[java.lang.Integer])

@@ -19,7 +19,7 @@ trait AnyValReps { self: AnyVals =>
     private def companionCoercions(tos: AnyValRep*) = {
       tos.toList map
         (to =>
-           s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
+          s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
     }
     def coercionComment =
       """/** Language mandated coercions from @name@ to "wider" types. */
@@ -44,40 +44,50 @@ import scala.language.implicitConversions"""
                      Op("-", "/** Returns the negation of this value. */"))
 
       if (isCardinal)
-        Op("~",
-           "/**\n" + " * Returns the bitwise negation of this value.\n" +
-             " * @example {{{\n" +
-             " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
-             " * //             11111010\n" + " * }}}\n" + " */") :: ops
+        Op(
+          "~",
+          "/**\n" + " * Returns the bitwise negation of this value.\n" +
+            " * @example {{{\n" +
+            " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
+            " * //             11111010\n" + " * }}}\n" + " */"
+        ) :: ops
       else ops
     }
 
     def bitwiseOps =
       if (isCardinal)
-        List(Op("|",
-                "/**\n" +
-                  "  * Returns the bitwise OR of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 | 0xaa) == 0xfa\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            | 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              11111010\n" + "  * }}}\n" + "  */"),
-             Op("&",
-                "/**\n" +
-                  "  * Returns the bitwise AND of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 & 0xaa) == 0xa0\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            & 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              10100000\n" + "  * }}}\n" + "  */"),
-             Op("^",
-                "/**\n" +
-                  "  * Returns the bitwise XOR of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 ^ 0xaa) == 0x5a\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            ^ 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              01011010\n" + "  * }}}\n" + "  */"))
+        List(
+          Op(
+            "|",
+            "/**\n" +
+              "  * Returns the bitwise OR of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 | 0xaa) == 0xfa\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            | 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              11111010\n" + "  * }}}\n" + "  */"
+          ),
+          Op(
+            "&",
+            "/**\n" +
+              "  * Returns the bitwise AND of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 & 0xaa) == 0xa0\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            & 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              10100000\n" + "  * }}}\n" + "  */"
+          ),
+          Op(
+            "^",
+            "/**\n" +
+              "  * Returns the bitwise XOR of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 ^ 0xaa) == 0x5a\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            ^ 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              01011010\n" + "  * }}}\n" + "  */"
+          )
+        )
       else Nil
 
     def shiftOps =
@@ -89,7 +99,8 @@ import scala.language.implicitConversions"""
               "  * Returns this value bit-shifted left by the specified number of bits,\n" +
               "  *         filling in the new right bits with zeroes.\n" +
               "  * @example {{{ 6 << 3 == 48 // in binary: 0110 << 3 == 0110000 }}}\n" +
-              "  */"),
+              "  */"
+          ),
           Op(
             ">>>",
             "/**\n" +
@@ -99,7 +110,8 @@ import scala.language.implicitConversions"""
               "  * @example {{{\n" + "  * -21 >>> 3 == 536870909\n" +
               "  * // in binary: 11111111 11111111 11111111 11101011 >>> 3 ==\n" +
               "  * //            00011111 11111111 11111111 11111101\n" +
-              "  * }}}\n" + "  */"),
+              "  * }}}\n" + "  */"
+          ),
           Op(
             ">>",
             "/**\n" +
@@ -109,7 +121,9 @@ import scala.language.implicitConversions"""
               "  * @example {{{\n" + "  * -21 >> 3 == -3\n" +
               "  * // in binary: 11111111 11111111 11111111 11101011 >> 3 ==\n" +
               "  * //            11111111 11111111 11111111 11111101\n" +
-              "  * }}}\n" + "  */"))
+              "  * }}}\n" + "  */"
+          )
+        )
       else Nil
 
     def comparisonOps =
@@ -142,7 +156,8 @@ import scala.language.implicitConversions"""
         Op("/", "/** Returns the quotient of this value and `x`. */"),
         Op(
           "%",
-          "/** Returns the remainder of the division of this value by `x`. */"))
+          "/** Returns the remainder of the division of this value by `x`. */")
+      )
 
     // Given two numeric value types S and T , the operation type of S and T is defined as follows:
     // If both S and T are subrange types then the operation type of S and T is Int.
@@ -206,10 +221,9 @@ import scala.language.implicitConversions"""
                       resultFn: AnyValNum => AnyValRep): List[String] =
       (ops flatMap
         (op =>
-           args.map(
-             arg =>
-               "%s\n  def %s(x: %s): %s"
-                 .format(op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
+          args.map(arg =>
+            "%s\n  def %s(x: %s): %s"
+              .format(op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
   }
 
   sealed abstract class AnyValRep(val name: String,

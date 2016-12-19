@@ -278,7 +278,8 @@ trait BlockSortSpec[M[+ _]]
               JPath(".f") -> CBoolean,
               JPath(".u") -> CDouble,
               JPath(".q") -> CNum,
-              JPath(".vxu") -> CEmptyArray))))
+              JPath(".vxu") -> CEmptyArray)))
+    )
     testSortDense(sampleData, SortAscending, false, JPath("q"))
   }
 
@@ -291,7 +292,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -303,7 +305,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -315,7 +318,8 @@ trait BlockSortSpec[M[+ _]]
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+      None
+    )
 
     testSortDense(sampleData, SortAscending, false, JPath(".y"))
   }
@@ -351,14 +355,16 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (3,
-         List(JPath(".uid") -> CLong,
-              JPath(".uid") -> CDouble,
-              JPath(".f.bn[0]") -> CNull,
-              JPath(".f.wei") -> CDouble,
-              JPath(".ljz[0]") -> CNull,
-              JPath(".ljz[1][0]") -> CString,
-              JPath(".ljz[2]") -> CBoolean,
-              JPath(".jmy") -> CDouble))
+         List(
+           JPath(".uid") -> CLong,
+           JPath(".uid") -> CDouble,
+           JPath(".f.bn[0]") -> CNull,
+           JPath(".f.wei") -> CDouble,
+           JPath(".ljz[0]") -> CNull,
+           JPath(".ljz[1][0]") -> CString,
+           JPath(".ljz[2]") -> CBoolean,
+           JPath(".jmy") -> CDouble
+         ))
       )
     )
 

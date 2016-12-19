@@ -507,7 +507,8 @@ class MetastoreDataSourcesSuite
             intercept[AnalysisException] {
               createExternalTable("createdJsonTable", jsonFilePath.toString)
             }.getMessage.contains("Table createdJsonTable already exists."),
-            "We should complain that createdJsonTable already exists")
+            "We should complain that createdJsonTable already exists"
+          )
         }
 
         // Data should not be deleted.
@@ -533,14 +534,16 @@ class MetastoreDataSourcesSuite
   }
 
   test("path required error") {
-    assert(intercept[AnalysisException] {
-             createExternalTable("createdJsonTable",
-                                 "org.apache.spark.sql.json",
-                                 Map.empty[String, String])
+    assert(
+      intercept[AnalysisException] {
+        createExternalTable("createdJsonTable",
+                            "org.apache.spark.sql.json",
+                            Map.empty[String, String])
 
-             table("createdJsonTable")
-           }.getMessage.contains("Unable to infer schema"),
-           "We should complain that path is not specified.")
+        table("createdJsonTable")
+      }.getMessage.contains("Unable to infer schema"),
+      "We should complain that path is not specified."
+    )
 
     sql("DROP TABLE createdJsonTable")
   }
@@ -696,7 +699,8 @@ class MetastoreDataSourcesSuite
           bucketSpec = None,
           provider = "json",
           options = Map("path" -> "just a dummy path"),
-          isExternal = false)
+          isExternal = false
+        )
 
         invalidateTable("wide_schema")
 
@@ -711,21 +715,23 @@ class MetastoreDataSourcesSuite
     withTable(tableName) {
       val schema = StructType(StructField("int", IntegerType, true) :: Nil)
       val hiveTable =
-        CatalogTable(name = TableIdentifier(tableName, Some("default")),
-                     tableType = CatalogTableType.MANAGED_TABLE,
-                     schema = Seq.empty,
-                     storage = CatalogStorageFormat(
-                       locationUri = None,
-                       inputFormat = None,
-                       outputFormat = None,
-                       serde = None,
-                       serdeProperties = Map("path" -> sessionState.catalog
-                         .hiveDefaultTableFilePath(TableIdentifier(tableName)))
-                     ),
-                     properties =
-                       Map("spark.sql.sources.provider" -> "json",
+        CatalogTable(
+          name = TableIdentifier(tableName, Some("default")),
+          tableType = CatalogTableType.MANAGED_TABLE,
+          schema = Seq.empty,
+          storage = CatalogStorageFormat(
+            locationUri = None,
+            inputFormat = None,
+            outputFormat = None,
+            serde = None,
+            serdeProperties = Map(
+              "path" -> sessionState.catalog
+                .hiveDefaultTableFilePath(TableIdentifier(tableName)))
+          ),
+          properties = Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,
-                           "EXTERNAL" -> "FALSE"))
+                           "EXTERNAL" -> "FALSE")
+        )
 
       sessionState.catalog.client
         .createTable(hiveTable, ignoreIfExists = false)
@@ -764,7 +770,8 @@ class MetastoreDataSourcesSuite
       assert(
         expectedPartitionColumns.sameType(actualPartitionColumns),
         s"Partitions columns stored in metastore $actualPartitionColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedPartitionColumns.")
+          s"partition columns defined by the saveAsTable operation $expectedPartitionColumns."
+      )
 
       // Check the content of the saved table.
       checkAnswer(table(tableName).select("c", "b", "d", "a"),
@@ -814,7 +821,8 @@ class MetastoreDataSourcesSuite
       assert(
         expectedBucketByColumns.sameType(actualBucketByColumns),
         s"Partitions columns stored in metastore $actualBucketByColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedBucketByColumns.")
+          s"partition columns defined by the saveAsTable operation $expectedBucketByColumns."
+      )
 
       val actualSortByColumns = StructType((0 until numSortCols).map { index =>
         df.schema(
@@ -825,7 +833,8 @@ class MetastoreDataSourcesSuite
       assert(
         expectedSortByColumns.sameType(actualSortByColumns),
         s"Partitions columns stored in metastore $actualSortByColumns is not the " +
-          s"partition columns defined by the saveAsTable operation $expectedSortByColumns.")
+          s"partition columns defined by the saveAsTable operation $expectedSortByColumns."
+      )
 
       // Check the content of the saved table.
       checkAnswer(table(tableName).select("c", "b", "d", "a"),
@@ -924,7 +933,8 @@ class MetastoreDataSourcesSuite
       provider = "parquet",
       options =
         Map("path" -> "just a dummy path", "skipHiveMetadata" -> "false"),
-      isExternal = false)
+      isExternal = false
+    )
 
     // As a proxy for verifying that the table was stored in Hive compatible format, we verify that
     // each column of the table is of native type StringType.
@@ -943,7 +953,8 @@ class MetastoreDataSourcesSuite
       provider = "parquet",
       options =
         Map("path" -> "just a dummy path", "skipHiveMetadata" -> "true"),
-      isExternal = false)
+      isExternal = false
+    )
 
     // As a proxy for verifying that the table was stored in SparkSQL format, we verify that
     // the table has a column type as array of StringType.

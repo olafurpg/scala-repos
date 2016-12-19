@@ -91,13 +91,15 @@ object GameRepo {
   )
 
   def unrate(gameId: String) =
-    $update($select(gameId),
-            BSONDocument(
-              "$unset" -> BSONDocument(
-                F.rated -> true,
-                s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> true,
-                s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> true
-              )))
+    $update(
+      $select(gameId),
+      BSONDocument(
+        "$unset" -> BSONDocument(
+          F.rated -> true,
+          s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> true,
+          s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> true
+        ))
+    )
 
   def goBerserk(pov: Pov): Funit =
     $update(
@@ -131,7 +133,8 @@ object GameRepo {
           s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
             white),
           s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-            black))))
+            black)))
+    )
 
   // used by RatingFest
   def setRatingAndDiffs(id: ID, white: (Int, Int), black: (Int, Int)) =
@@ -146,7 +149,9 @@ object GameRepo {
           s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
             white._2),
           s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> BSONInteger(
-            black._2))))
+            black._2)
+        ))
+    )
 
   def urgentGames(user: User): Fu[List[Pov]] =
     $find(Query nowPlaying user.id, 100) map { games =>
@@ -240,7 +245,8 @@ object GameRepo {
       ("p0." + Player.BSONFields.isOfferingDraw) -> true,
       ("p1." + Player.BSONFields.isOfferingDraw) -> true,
       ("p0." + Player.BSONFields.proposeTakebackAt) -> true,
-      ("p1." + Player.BSONFields.proposeTakebackAt) -> true)
+      ("p1." + Player.BSONFields.proposeTakebackAt) -> true
+    )
     // keep the checkAt field when game is aborted,
     // so it gets deleted in 24h
     val unsets =
@@ -366,7 +372,9 @@ object GameRepo {
           Match(BSONDocument(F.playerUids -> BSONDocument("$ne" -> userId))),
           GroupField(F.playerUids)("gs" -> SumValue(1)),
           Sort(Descending("gs")),
-          Limit(limit)))
+          Limit(limit)
+        )
+      )
       .map(_.documents.flatMap { obj =>
         obj.getAs[String]("_id") flatMap { id =>
           obj.getAs[Int]("gs") map { id -> _ }
@@ -460,20 +468,24 @@ object GameRepo {
     }
 
     gameTube.coll
-      .aggregate(Match(
-                   BSONDocument(
-                     F.createdAt -> BSONDocument("$gt" -> since),
-                     F.status -> BSONDocument("$gte" -> chess.Status.Mate.id),
-                     s"${F.playerUids}.0" -> BSONDocument("$exists" -> true)
-                   )),
-                 List(Unwind(F.playerUids),
-                      Match(
-                        BSONDocument(
-                          F.playerUids -> BSONDocument("$ne" -> "")
-                        )),
-                      GroupField(F.playerUids)("nb" -> SumValue(1)),
-                      Sort(Descending("nb")),
-                      Limit(max)))
+      .aggregate(
+        Match(
+          BSONDocument(
+            F.createdAt -> BSONDocument("$gt" -> since),
+            F.status -> BSONDocument("$gte" -> chess.Status.Mate.id),
+            s"${F.playerUids}.0" -> BSONDocument("$exists" -> true)
+          )),
+        List(
+          Unwind(F.playerUids),
+          Match(
+            BSONDocument(
+              F.playerUids -> BSONDocument("$ne" -> "")
+            )),
+          GroupField(F.playerUids)("nb" -> SumValue(1)),
+          Sort(Descending("nb")),
+          Limit(max)
+        )
+      )
       .map(_.documents.flatMap { obj =>
         obj.getAs[Int]("nb") map { nb =>
           UidNb(~obj.getAs[String]("_id"), nb)

@@ -39,7 +39,8 @@ trait ScInfixExpr extends ScExpression with ScSugarCallExpr {
     assert(
       exprs.length > 2,
       s"Infix expression contains less than 3 expressions: ${exprs
-        .mkString("(", ", ", ")")}, exprssion: $getText, full code: ${getContainingFile.getText}")
+        .mkString("(", ", ", ")")}, exprssion: $getText, full code: ${getContainingFile.getText}"
+    )
     exprs.apply(2)
   }
 

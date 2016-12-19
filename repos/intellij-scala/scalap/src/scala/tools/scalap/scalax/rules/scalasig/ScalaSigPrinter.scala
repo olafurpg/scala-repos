@@ -356,18 +356,20 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
 
       // Print parameter clauses
       print(
-        paramEntries.mkString("(" +
-                                (mt match {
-                                  case _: ImplicitMethodType => "implicit "
-                                  //for Scala 2.9
-                                  case mt: MethodType
-                                      if mt.paramSymbols.nonEmpty &&
-                                        mt.paramSymbols.head.isImplicit =>
-                                    "implicit "
-                                  case _ => ""
-                                }),
-                              ", ",
-                              ")"))
+        paramEntries.mkString(
+          "(" +
+            (mt match {
+              case _: ImplicitMethodType => "implicit "
+              //for Scala 2.9
+              case mt: MethodType
+                  if mt.paramSymbols.nonEmpty &&
+                    mt.paramSymbols.head.isImplicit =>
+                "implicit "
+              case _ => ""
+            }),
+          ", ",
+          ")"
+        ))
 
       // Print result type
       mt.resultType match {
@@ -747,67 +749,71 @@ class ScalaSigPrinter(stream: PrintStream, verbosity: Verbosity) {
     if (params.isEmpty) ""
     else params.map(toString).mkString("[", ", ", "]")
 
-  val _syms = Map("\\$bar" -> "|",
-                  "\\$tilde" -> "~",
-                  "\\$bang" -> "!",
-                  "\\$up" -> "^",
-                  "\\$plus" -> "+",
-                  "\\$minus" -> "-",
-                  "\\$eq" -> "=",
-                  "\\$less" -> "<",
-                  "\\$times" -> "*",
-                  "\\$div" -> "/",
-                  "\\$bslash" -> "\\\\",
-                  "\\$greater" -> ">",
-                  "\\$qmark" -> "?",
-                  "\\$percent" -> "%",
-                  "\\$amp" -> "&",
-                  "\\$colon" -> ":",
-                  "\\$u2192" -> "→",
-                  "\\$hash" -> "#")
+  val _syms = Map(
+    "\\$bar" -> "|",
+    "\\$tilde" -> "~",
+    "\\$bang" -> "!",
+    "\\$up" -> "^",
+    "\\$plus" -> "+",
+    "\\$minus" -> "-",
+    "\\$eq" -> "=",
+    "\\$less" -> "<",
+    "\\$times" -> "*",
+    "\\$div" -> "/",
+    "\\$bslash" -> "\\\\",
+    "\\$greater" -> ">",
+    "\\$qmark" -> "?",
+    "\\$percent" -> "%",
+    "\\$amp" -> "&",
+    "\\$colon" -> ":",
+    "\\$u2192" -> "→",
+    "\\$hash" -> "#"
+  )
   val pattern = Pattern.compile(
     _syms.keys.foldLeft("")((x, y) => if (x == "") y else x + "|" + y))
   val placeholderPattern = "_\\$(\\d)+"
 
-  private val keywordList = Set("true",
-                                "false",
-                                "null",
-                                "abstract",
-                                "case",
-                                "catch",
-                                "class",
-                                "def",
-                                "do",
-                                "else",
-                                "extends",
-                                "final",
-                                "finally",
-                                "for",
-                                "forSome",
-                                "if",
-                                "implicit",
-                                "import",
-                                "lazy",
-                                "match",
-                                "new",
-                                "object",
-                                "override",
-                                "package",
-                                "private",
-                                "protected",
-                                "return",
-                                "sealed",
-                                "super",
-                                "this",
-                                "throw",
-                                "trait",
-                                "try",
-                                "type",
-                                "val",
-                                "var",
-                                "while",
-                                "with",
-                                "yield")
+  private val keywordList = Set(
+    "true",
+    "false",
+    "null",
+    "abstract",
+    "case",
+    "catch",
+    "class",
+    "def",
+    "do",
+    "else",
+    "extends",
+    "final",
+    "finally",
+    "for",
+    "forSome",
+    "if",
+    "implicit",
+    "import",
+    "lazy",
+    "match",
+    "new",
+    "object",
+    "override",
+    "package",
+    "private",
+    "protected",
+    "return",
+    "sealed",
+    "super",
+    "this",
+    "throw",
+    "trait",
+    "try",
+    "type",
+    "val",
+    "var",
+    "while",
+    "with",
+    "yield"
+  )
 
   private def stripPrivatePrefix(name: String) = {
     val i = name.lastIndexOf("$$")

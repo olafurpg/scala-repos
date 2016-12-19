@@ -307,9 +307,9 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
     */
   protected def transformChildren(
       rule: PartialFunction[BaseType, BaseType],
-      nextOperation: (BaseType,
-                      PartialFunction[BaseType, BaseType]) => BaseType)
-    : BaseType = {
+      nextOperation: (
+          BaseType,
+          PartialFunction[BaseType, BaseType]) => BaseType): BaseType = {
     var changed = false
     val newArgs = productIterator
       .map {
@@ -407,15 +407,17 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
         }
       } catch {
         case e: java.lang.IllegalArgumentException =>
-          throw new TreeNodeException(this,
-                                      s"""
+          throw new TreeNodeException(
+            this,
+            s"""
              |Failed to copy node.
              |Is otherCopyArgs specified correctly for $nodeName.
              |Exception message: ${e.getMessage}
              |ctor: $defaultCtor?
              |types: ${newArgs.map(_.getClass).mkString(", ")}
              |args: ${newArgs.mkString(", ")}
-           """.stripMargin)
+           """.stripMargin
+          )
       }
     }
 
@@ -607,9 +609,11 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
   protected def jsonFields: List[JField] = {
     val fieldNames = getConstructorParameterNames(getClass)
     val fieldValues = productIterator.toSeq ++ otherCopyArgs
-    assert(fieldNames.length == fieldValues.length,
-           s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
-             s", values: " + fieldValues.map(_.toString).mkString(", "))
+    assert(
+      fieldNames.length == fieldValues.length,
+      s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
+        s", values: " + fieldValues.map(_.toString).mkString(", ")
+    )
 
     fieldNames
       .zip(fieldValues)
@@ -730,13 +734,15 @@ object TreeNode {
             maybeCtor.get.newInstance(parameters: _*).asInstanceOf[TreeNode[_]]
           } catch {
             case e: java.lang.IllegalArgumentException =>
-              throw new RuntimeException(s"""
+              throw new RuntimeException(
+                s"""
                   |Failed to construct tree node: ${cls.getName}
                   |ctor: ${maybeCtor.get}
                   |types: ${parameters.map(_.getClass).mkString(", ")}
                   |args: ${parameters.mkString(", ")}
                 """.stripMargin,
-                                         e)
+                e
+              )
           }
         }
       }

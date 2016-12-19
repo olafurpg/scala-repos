@@ -175,21 +175,24 @@ object Player {
                 blurs = r intD blurs,
                 holdAlert = r.getO[HoldAlert](holdAlert),
                 berserk = r boolD berserk,
-                name = r strO name)
+                name = r strO name
+      )
 
     def writes(w: BSON.Writer, o: Builder) =
       o(chess.White)("0000")(none)(none) |> { p =>
-        BSONDocument(aiLevel -> p.aiLevel,
-                     isOfferingDraw -> w.boolO(p.isOfferingDraw),
-                     isOfferingRematch -> w.boolO(p.isOfferingRematch),
-                     lastDrawOffer -> p.lastDrawOffer,
-                     proposeTakebackAt -> w.intO(p.proposeTakebackAt),
-                     rating -> p.rating,
-                     ratingDiff -> p.ratingDiff,
-                     provisional -> w.boolO(p.provisional),
-                     blurs -> w.intO(p.blurs),
-                     holdAlert -> p.holdAlert,
-                     name -> p.name)
+        BSONDocument(
+          aiLevel -> p.aiLevel,
+          isOfferingDraw -> w.boolO(p.isOfferingDraw),
+          isOfferingRematch -> w.boolO(p.isOfferingRematch),
+          lastDrawOffer -> p.lastDrawOffer,
+          proposeTakebackAt -> w.intO(p.proposeTakebackAt),
+          rating -> p.rating,
+          ratingDiff -> p.ratingDiff,
+          provisional -> w.boolO(p.provisional),
+          blurs -> w.intO(p.blurs),
+          holdAlert -> p.holdAlert,
+          name -> p.name
+        )
       }
   }
 }

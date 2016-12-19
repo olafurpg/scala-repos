@@ -60,7 +60,8 @@ private[ml] trait VectorIndexerParams
     "maxCategories",
     "Threshold for the number of values a categorical feature can take (>= 2)." +
       " If a feature is found to have > maxCategories values, then it is declared continuous.",
-    ParamValidators.gtEq(2))
+    ParamValidators.gtEq(2)
+  )
 
   setDefault(maxCategories -> 20)
 
@@ -339,7 +340,8 @@ class VectorIndexerModel private[ml] (
     require(
       categoricalFeatureCount == categoryMaps.size,
       "VectorIndexerModel given categoryMaps" +
-        s" with keys outside expected range [0,...,numFeatures), where numFeatures=$numFeatures")
+        s" with keys outside expected range [0,...,numFeatures), where numFeatures=$numFeatures"
+    )
     attrs
   }
 
@@ -422,7 +424,8 @@ class VectorIndexerModel private[ml] (
       origNumFeatures.forall(_ == numFeatures),
       "VectorIndexerModel expected" +
         s" $numFeatures features, but input column ${$(inputCol)} had metadata specifying" +
-        s" ${origAttrGroup.numAttributes.get} features.")
+        s" ${origAttrGroup.numAttributes.get} features."
+    )
 
     val newField = prepOutputField(schema)
     val outputFields = schema.fields :+ newField

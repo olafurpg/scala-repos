@@ -55,7 +55,8 @@ final class BaseLinker(semantics: Semantics,
   @deprecated(
     "Bypassing linking errors will not be possible in the next major version. " +
       "Use the overload without the bypassLinkingError parameter instead.",
-    "0.6.6")
+    "0.6.6"
+  )
   def link(irInput: Seq[VirtualScalaJSIRFile],
            logger: Logger,
            symbolRequirements: SymbolRequirement,
@@ -314,25 +315,27 @@ final class BaseLinker(semantics: Semantics,
 
     val ancestors = analyzerInfo.ancestors.map(_.encodedName)
 
-    new LinkedClass(classDef.name,
-                    kind,
-                    classDef.superClass,
-                    classDef.interfaces,
-                    classDef.jsName,
-                    fields.toList,
-                    staticMethods.toList,
-                    memberMethods.toList,
-                    abstractMethods.toList,
-                    exportedMembers.toList,
-                    classExports.toList,
-                    classExportInfo,
-                    classDef.optimizerHints,
-                    classDef.pos,
-                    ancestors.toList,
-                    hasInstances = analyzerInfo.isAnySubclassInstantiated,
-                    hasInstanceTests = analyzerInfo.areInstanceTestsUsed,
-                    hasRuntimeTypeInfo = analyzerInfo.isDataAccessed,
-                    version)
+    new LinkedClass(
+      classDef.name,
+      kind,
+      classDef.superClass,
+      classDef.interfaces,
+      classDef.jsName,
+      fields.toList,
+      staticMethods.toList,
+      memberMethods.toList,
+      abstractMethods.toList,
+      exportedMembers.toList,
+      classExports.toList,
+      classExportInfo,
+      classDef.optimizerHints,
+      classDef.pos,
+      ancestors.toList,
+      hasInstances = analyzerInfo.isAnySubclassInstantiated,
+      hasInstanceTests = analyzerInfo.areInstanceTestsUsed,
+      hasRuntimeTypeInfo = analyzerInfo.isDataAccessed,
+      version
+    )
   }
 
   private def synthesizeInheritedConstructor(

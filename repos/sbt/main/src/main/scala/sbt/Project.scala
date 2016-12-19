@@ -140,16 +140,18 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
       ds map resolveDep
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ResolvedClasspathDependency(resolveRef(d.project), d.configuration)
-    resolved(id,
-             base,
-             aggregate = resolveRefs(aggregate),
-             dependencies = resolveDeps(dependencies),
-             delegates = resolveRefs(delegates),
-             settings,
-             configurations,
-             auto,
-             plugins,
-             autoPlugins)
+    resolved(
+      id,
+      base,
+      aggregate = resolveRefs(aggregate),
+      dependencies = resolveDeps(dependencies),
+      delegates = resolveRefs(delegates),
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins
+    )
   }
   def resolveBuild(resolveRef: ProjectReference => ProjectReference): Project = {
     def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
@@ -157,16 +159,18 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
       ds map resolveDep
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ClasspathDependency(resolveRef(d.project), d.configuration)
-    unresolved(id,
-               base,
-               aggregate = resolveRefs(aggregate),
-               dependencies = resolveDeps(dependencies),
-               delegates = resolveRefs(delegates),
-               settings,
-               configurations,
-               auto,
-               plugins,
-               autoPlugins)
+    unresolved(
+      id,
+      base,
+      aggregate = resolveRefs(aggregate),
+      dependencies = resolveDeps(dependencies),
+      delegates = resolveRefs(delegates),
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins
+    )
   }
 
   /**

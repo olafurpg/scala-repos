@@ -53,7 +53,8 @@ class LinearRegressionSuite
                                                 nPoints = 10000,
                                                 seed,
                                                 eps = 0.1),
-        2))
+        2
+      ))
     /*
        datasetWithDenseFeatureWithoutIntercept is not needed for correctness testing
        but is useful for illustrating training model without intercept
@@ -67,23 +68,27 @@ class LinearRegressionSuite
                                                 nPoints = 10000,
                                                 seed,
                                                 eps = 0.1),
-        2))
+        2
+      ))
 
     val r = new Random(seed)
     // When feature size is larger than 4096, normal optimizer is choosed
     // as the solver of linear regression in the case of "auto" mode.
     val featureSize = 4100
     datasetWithSparseFeature = sqlContext.createDataFrame(
-      sc.parallelize(LinearDataGenerator.generateLinearInput(
-                       intercept = 0.0,
-                       weights = Seq.fill(featureSize)(r.nextDouble).toArray,
-                       xMean = Seq.fill(featureSize)(r.nextDouble).toArray,
-                       xVariance = Seq.fill(featureSize)(r.nextDouble).toArray,
-                       nPoints = 200,
-                       seed,
-                       eps = 0.1,
-                       sparsity = 0.7),
-                     2))
+      sc.parallelize(
+        LinearDataGenerator.generateLinearInput(
+          intercept = 0.0,
+          weights = Seq.fill(featureSize)(r.nextDouble).toArray,
+          xMean = Seq.fill(featureSize)(r.nextDouble).toArray,
+          xVariance = Seq.fill(featureSize)(r.nextDouble).toArray,
+          nPoints = 200,
+          seed,
+          eps = 0.1,
+          sparsity = 0.7
+        ),
+        2
+      ))
 
     /*
        R code:
@@ -94,13 +99,15 @@ class LinearRegressionSuite
        df <- as.data.frame(cbind(A, b))
      */
     datasetWithWeight = sqlContext.createDataFrame(
-      sc.parallelize(Seq(
-                       Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-                       Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
-                       Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
-                       Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
-                     ),
-                     2))
+      sc.parallelize(
+        Seq(
+          Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+          Instance(19.0, 2.0, Vectors.dense(1.0, 7.0)),
+          Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
+          Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
+        ),
+        2
+      ))
 
     /*
        R code:
@@ -111,21 +118,25 @@ class LinearRegressionSuite
        df.const.label <- as.data.frame(cbind(A, b.const))
      */
     datasetWithWeightConstantLabel = sqlContext.createDataFrame(
-      sc.parallelize(Seq(
-                       Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-                       Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
-                       Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
-                       Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
-                     ),
-                     2))
+      sc.parallelize(
+        Seq(
+          Instance(17.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+          Instance(17.0, 2.0, Vectors.dense(1.0, 7.0)),
+          Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
+          Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
+        ),
+        2
+      ))
     datasetWithWeightZeroLabel = sqlContext.createDataFrame(
-      sc.parallelize(Seq(
-                       Instance(0.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-                       Instance(0.0, 2.0, Vectors.dense(1.0, 7.0)),
-                       Instance(0.0, 3.0, Vectors.dense(2.0, 11.0)),
-                       Instance(0.0, 4.0, Vectors.dense(3.0, 13.0))
-                     ),
-                     2))
+      sc.parallelize(
+        Seq(
+          Instance(0.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+          Instance(0.0, 2.0, Vectors.dense(1.0, 7.0)),
+          Instance(0.0, 3.0, Vectors.dense(2.0, 11.0)),
+          Instance(0.0, 4.0, Vectors.dense(3.0, 13.0))
+        ),
+        2
+      ))
   }
 
   /**

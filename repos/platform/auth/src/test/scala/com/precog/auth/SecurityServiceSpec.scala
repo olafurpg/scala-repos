@@ -575,7 +575,8 @@ class SecurityServiceSpec
           Set.empty[GrantId],
           Set(
             ReadPermission(Path("/user1/secret"), WrittenByAccount("user1"))),
-          None)) must awaited(to) {
+          None)
+      ) must awaited(to) {
         beLike {
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
             val id = jid.deserialize[v1.GrantDetails]
@@ -594,7 +595,8 @@ class SecurityServiceSpec
                              Set.empty[GrantId],
                              Set(ReadPermission(Path("/user1/secret"),
                                                 WrittenByAccount("user1"))),
-                             None))
+                             None)
+        )
         details = jid.deserialize[v1.GrantDetails]
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
           user1.apiKey,

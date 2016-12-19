@@ -377,16 +377,19 @@ case class AhcWSRequest(
     import org.asynchttpclient.AsyncCompletionHandler
     val result = Promise[AhcWSResponse]()
 
-    client.executeRequest(request, new AsyncCompletionHandler[AHCResponse]() {
-      override def onCompleted(response: AHCResponse) = {
-        result.success(AhcWSResponse(response))
-        response
-      }
+    client.executeRequest(
+      request,
+      new AsyncCompletionHandler[AHCResponse]() {
+        override def onCompleted(response: AHCResponse) = {
+          result.success(AhcWSResponse(response))
+          response
+        }
 
-      override def onThrowable(t: Throwable) = {
-        result.failure(t)
+        override def onThrowable(t: Throwable) = {
+          result.failure(t)
+        }
       }
-    })
+    )
     result.future
   }
 

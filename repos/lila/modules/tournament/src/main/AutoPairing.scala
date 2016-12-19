@@ -51,7 +51,8 @@ final class AutoPairing(roundMap: ActorRef,
           if (tour.position.initial) tour.variant
           else chess.variant.FromPosition,
         source = Source.Tournament,
-        pgnImport = None)
+        pgnImport = None
+      )
       game2 = game1
         .updatePlayer(Color.White,
                       _.withUser(user1.id,

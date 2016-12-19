@@ -59,8 +59,7 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
           .setClazz(props.clazz.getName)
           .setDeploy(deployProto(props.deploy))
         props.args map serialize foreach builder.addArgs
-        props.args map (a ⇒
-                          if (a == null) "null" else a.getClass.getName) foreach builder.addClasses
+        props.args map (a ⇒ if (a == null) "null" else a.getClass.getName) foreach builder.addClasses
         builder.build
       }
 

@@ -345,7 +345,8 @@ class MacroExpandAction extends AnAction {
         .createNotification(
           """Macro debugging options have been enabled for current module
             |Please recompile the file to gather macro expansions""".stripMargin,
-          NotificationType.INFORMATION)
+          NotificationType.INFORMATION
+        )
         .notify(e.getProject)
     }
   }

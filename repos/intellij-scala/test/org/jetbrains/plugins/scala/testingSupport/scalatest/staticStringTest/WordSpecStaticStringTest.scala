@@ -11,8 +11,9 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
   val wordSpecFileName = wordSpecClassName + ".scala"
 
   def addWordSpec() = {
-    addFileToProject(wordSpecFileName,
-                     """
+    addFileToProject(
+      wordSpecFileName,
+      """
         |import org.scalatest._
         |
         |class WordSpecStringTest extends WordSpec {
@@ -37,7 +38,8 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
         |  }
         |}
         |
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testWordSpecSum() = {

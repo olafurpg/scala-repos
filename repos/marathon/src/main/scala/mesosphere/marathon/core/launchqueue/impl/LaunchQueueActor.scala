@@ -37,9 +37,9 @@ private[launchqueue] object LaunchQueueActor {
   *
   * The methods of that interface are translated to messages in the [[LaunchQueueDelegate]] implementation.
   */
-private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
-                                     appActorProps: (AppDefinition,
-                                                     Int) => Props)
+private[impl] class LaunchQueueActor(
+    launchQueueConfig: LaunchQueueConfig,
+    appActorProps: (AppDefinition, Int) => Props)
     extends Actor
     with ActorLogging {
   import LaunchQueueDelegate._

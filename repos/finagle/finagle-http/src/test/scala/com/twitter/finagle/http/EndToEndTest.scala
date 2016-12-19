@@ -642,8 +642,8 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
   // before we run into the requeue limit.
   private val failureAccrualFailures = 19
 
-  def status(name: String)(connect: (HttpService, StatsReceiver,
-                                     String) => (HttpService)): Unit = {
+  def status(name: String)(
+      connect: (HttpService, StatsReceiver, String) => (HttpService)): Unit = {
     test(name + ": Status.busy propagates along the Stack") {
       val st = new InMemoryStatsReceiver
       val clientName = "http"

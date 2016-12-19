@@ -649,26 +649,29 @@ object ScalaRefactoringUtil {
     }
     val list = JListCompatibility.createJListFromModel(model)
     JListCompatibility
-      .setCellRenderer(list, new DefaultListCellRendererAdapter {
-        def getListCellRendererComponentAdapter(
-            container: JListCompatibility.JListContainer,
-            value: Object,
-            index: Int,
-            isSelected: Boolean,
-            cellHasFocus: Boolean): Component = {
-          val rendererComponent: Component =
-            getSuperListCellRendererComponent(container.getList,
-                                              value,
-                                              index,
-                                              isSelected,
-                                              cellHasFocus)
-          val element: T = value.asInstanceOf[T]
-          if (element.isValid) {
-            setText(elementName(element))
+      .setCellRenderer(
+        list,
+        new DefaultListCellRendererAdapter {
+          def getListCellRendererComponentAdapter(
+              container: JListCompatibility.JListContainer,
+              value: Object,
+              index: Int,
+              isSelected: Boolean,
+              cellHasFocus: Boolean): Component = {
+            val rendererComponent: Component =
+              getSuperListCellRendererComponent(container.getList,
+                                                value,
+                                                index,
+                                                isSelected,
+                                                cellHasFocus)
+            val element: T = value.asInstanceOf[T]
+            if (element.isValid) {
+              setText(elementName(element))
+            }
+            rendererComponent
           }
-          rendererComponent
         }
-      })
+      )
     list.addListSelectionListener(new ListSelectionListener {
       def valueChanged(e: ListSelectionEvent) {
         highlighter.dropHighlight()
@@ -896,7 +899,8 @@ object ScalaRefactoringUtil {
           ScalaBundle.message("choose.expression.for", refactoringName),
           (expr: ScExpression) => {
             getShortText(expr)
-          })
+          }
+        )
         return
       }
     }
@@ -958,7 +962,8 @@ object ScalaRefactoringUtil {
           ScalaBundle.message("choose.type.element.for", refactoringName),
           (value: ScTypeElement) => {
             getShortText(value)
-          })
+          }
+        )
         return
       }
     }

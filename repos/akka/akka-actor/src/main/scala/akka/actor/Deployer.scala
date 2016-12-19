@@ -62,13 +62,15 @@ final case class Deploy(path: String = "",
     * other members are merged using `X.withFallback(other.X)`.
     */
   def withFallback(other: Deploy): Deploy = {
-    Deploy(path,
-           config.withFallback(other.config),
-           routerConfig.withFallback(other.routerConfig),
-           scope.withFallback(other.scope),
-           if (dispatcher == Deploy.NoDispatcherGiven) other.dispatcher
-           else dispatcher,
-           if (mailbox == Deploy.NoMailboxGiven) other.mailbox else mailbox)
+    Deploy(
+      path,
+      config.withFallback(other.config),
+      routerConfig.withFallback(other.routerConfig),
+      scope.withFallback(other.scope),
+      if (dispatcher == Deploy.NoDispatcherGiven) other.dispatcher
+      else dispatcher,
+      if (mailbox == Deploy.NoMailboxGiven) other.mailbox else mailbox
+    )
   }
 }
 
@@ -218,7 +220,8 @@ private[akka] class Deployer(val settings: ActorSystem.Settings,
           s"Cannot instantiate router [$fqn], defined in [$key], " +
             s"make sure it extends [${classOf[RouterConfig]}] and has constructor with " +
             s"[${args(0)._1.getName}] and optional [${args(1)._1.getName}] parameter",
-          cause)
+          cause
+        )
 
       // first try with Config param, and then with Config and DynamicAccess parameters
       val args1 = List(classOf[Config] -> deployment2)

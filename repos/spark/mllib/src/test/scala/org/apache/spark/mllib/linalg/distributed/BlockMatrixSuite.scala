@@ -47,7 +47,8 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
       ((0, 1), new DenseMatrix(2, 2, Array(0.0, 1.0, 0.0, 0.0))),
       ((1, 0), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
       ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
-      ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0))))
+      ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0)))
+    )
 
     gridBasedMat = new BlockMatrix(sc.parallelize(blocks, numPartitions),
                                    rowPerPart,
@@ -158,7 +159,8 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
         ((1, 0), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
         ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
         ((2, 0), new DenseMatrix(1, 2, Array(1.0, 0.0))), // Added block that doesn't exist in A
-        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0))))
+        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0)))
+      )
     val rdd = sc.parallelize(blocks, numPartitions)
     val B = new BlockMatrix(rdd, rowPerPart, colPerPart)
 
@@ -207,7 +209,8 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
         ((1, 0), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
         ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
         ((2, 0), new DenseMatrix(1, 2, Array(1.0, 0.0))), // Added block that doesn't exist in A
-        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0))))
+        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0)))
+      )
     val rdd = sc.parallelize(blocks, numPartitions)
     val B = new BlockMatrix(rdd, rowPerPart, colPerPart)
 
@@ -322,11 +325,13 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     gridBasedMat.validate()
     // Wrong MatrixBlock dimensions
     val blocks: Seq[((Int, Int), Matrix)] =
-      Seq(((0, 0), new DenseMatrix(2, 2, Array(1.0, 0.0, 0.0, 2.0))),
-          ((0, 1), new DenseMatrix(2, 2, Array(0.0, 1.0, 0.0, 0.0))),
-          ((1, 0), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
-          ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
-          ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0))))
+      Seq(
+        ((0, 0), new DenseMatrix(2, 2, Array(1.0, 0.0, 0.0, 2.0))),
+        ((0, 1), new DenseMatrix(2, 2, Array(0.0, 1.0, 0.0, 0.0))),
+        ((1, 0), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
+        ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
+        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0)))
+      )
     val rdd = sc.parallelize(blocks, numPartitions)
     val wrongRowPerParts = new BlockMatrix(rdd, rowPerPart + 1, colPerPart)
     val wrongColPerParts = new BlockMatrix(rdd, rowPerPart, colPerPart + 1)
@@ -347,11 +352,13 @@ class BlockMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     }
     // Duplicate indices
     val duplicateBlocks: Seq[((Int, Int), Matrix)] =
-      Seq(((0, 0), new DenseMatrix(2, 2, Array(1.0, 0.0, 0.0, 2.0))),
-          ((0, 0), new DenseMatrix(2, 2, Array(0.0, 1.0, 0.0, 0.0))),
-          ((1, 1), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
-          ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
-          ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0))))
+      Seq(
+        ((0, 0), new DenseMatrix(2, 2, Array(1.0, 0.0, 0.0, 2.0))),
+        ((0, 0), new DenseMatrix(2, 2, Array(0.0, 1.0, 0.0, 0.0))),
+        ((1, 1), new DenseMatrix(2, 2, Array(3.0, 0.0, 1.0, 1.0))),
+        ((1, 1), new DenseMatrix(2, 2, Array(1.0, 2.0, 0.0, 1.0))),
+        ((2, 1), new DenseMatrix(1, 2, Array(1.0, 5.0)))
+      )
     val dupMatrix =
       new BlockMatrix(sc.parallelize(duplicateBlocks, numPartitions), 2, 2)
     intercept[SparkException] {

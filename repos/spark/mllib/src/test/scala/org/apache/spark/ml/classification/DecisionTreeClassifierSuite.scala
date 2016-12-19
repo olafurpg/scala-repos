@@ -127,10 +127,12 @@ class DecisionTreeClassifierSuite
   }
 
   test("Binary classification stump with 2 continuous features") {
-    val arr = Array(LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
-                    LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0)))))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0))))
+    )
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier().setImpurity("Gini").setMaxDepth(4)
     val numClasses = 2
@@ -218,10 +220,12 @@ class DecisionTreeClassifierSuite
     "do not choose split that does not satisfy min instance per node requirements") {
     // if a split does not satisfy min instances per node requirements,
     // this split is invalid, even though the information gain of split is large.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0))
+    )
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")
@@ -299,18 +303,20 @@ class DecisionTreeClassifierSuite
     "Use soft prediction for binary classification with ordered categorical features") {
     // The following dataset is set up such that the best split is {1} vs. {0, 2}.
     // If the hard prediction is used to order the categories, then {0} vs. {1, 2} is chosen.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(1.0, Vectors.dense(2.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(1.0, Vectors.dense(2.0))
+    )
     val data = sc.parallelize(arr)
     val df = TreeTests.setMetadata(data, Map(0 -> 3), 2)
 

@@ -113,15 +113,18 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
             (part, (e.srcId, e.dstId, e.attr))
           }
           .partitionBy(new HashPartitioner(numPartitions))
-          .mapPartitionsWithIndex({ (pid, iter) =>
-            val builder = new EdgePartitionBuilder[ED, VD]()(edTag, vdTag)
-            iter.foreach { message =>
-              val data = message._2
-              builder.add(data._1, data._2, data._3)
-            }
-            val edgePartition = builder.toEdgePartition
-            Iterator((pid, edgePartition))
-          }, preservesPartitioning = true))
+          .mapPartitionsWithIndex(
+            { (pid, iter) =>
+              val builder = new EdgePartitionBuilder[ED, VD]()(edTag, vdTag)
+              iter.foreach { message =>
+                val data = message._2
+                builder.add(data._1, data._2, data._3)
+              }
+              val edgePartition = builder.toEdgePartition
+              Iterator((pid, edgePartition))
+            },
+            preservesPartitioning = true
+          ))
       .cache()
     GraphImpl.fromExistingRDDs(vertices.withEdges(newEdges), newEdges)
   }
@@ -152,8 +155,8 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
   }
 
   override def mapEdges[ED2: ClassTag](
-      f: (PartitionID,
-          Iterator[Edge[ED]]) => Iterator[ED2]): Graph[VD, ED2] = {
+      f: (PartitionID, Iterator[Edge[ED]]) => Iterator[ED2])
+    : Graph[VD, ED2] = {
     val newEdges = replicatedVertexView.edges.mapEdgePartitions((pid, part) =>
       part.map(f(pid, part.iterator)))
     new GraphImpl(vertices, replicatedVertexView.withEdges(newEdges))

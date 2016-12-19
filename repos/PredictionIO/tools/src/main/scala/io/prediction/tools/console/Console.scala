@@ -841,11 +841,13 @@ object Console extends Logging {
     // only add pioVersion to sbt if project/pio.sbt exists
     if (new File("project", "pio-build.sbt").exists ||
         ca.build.forceGeneratePIOSbt) {
-      FileUtils.writeLines(new File("pio.sbt"),
-                           Seq("// Generated automatically by pio build.",
-                               "// Changes in this file will be overridden.",
-                               "",
-                               "pioVersion := \"" + BuildInfo.version + "\""))
+      FileUtils.writeLines(
+        new File("pio.sbt"),
+        Seq("// Generated automatically by pio build.",
+            "// Changes in this file will be overridden.",
+            "",
+            "pioVersion := \"" + BuildInfo.version + "\"")
+      )
     }
     implicit val formats = Utils.json4sDefaultFormats
     try {

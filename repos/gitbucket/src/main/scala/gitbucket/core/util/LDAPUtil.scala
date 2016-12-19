@@ -83,17 +83,19 @@ object LDAPUtil {
     ) { conn =>
       if (ldapSettings.mailAttribute.getOrElse("").isEmpty) {
         Right(
-          LDAPUserInfo(userName = userName,
-                       fullName = ldapSettings.fullNameAttribute
-                         .flatMap { fullNameAttribute =>
-                           findFullName(conn,
-                                        userDN,
-                                        ldapSettings.userNameAttribute,
-                                        userName,
-                                        fullNameAttribute)
-                         }
-                         .getOrElse(userName),
-                       mailAddress = createDummyMailAddress(userName)))
+          LDAPUserInfo(
+            userName = userName,
+            fullName = ldapSettings.fullNameAttribute
+              .flatMap { fullNameAttribute =>
+                findFullName(conn,
+                             userDN,
+                             ldapSettings.userNameAttribute,
+                             userName,
+                             fullNameAttribute)
+              }
+              .getOrElse(userName),
+            mailAddress = createDummyMailAddress(userName)
+          ))
       } else {
         findMailAddress(conn,
                         userDN,
@@ -102,17 +104,19 @@ object LDAPUtil {
                         ldapSettings.mailAttribute.get) match {
           case Some(mailAddress) =>
             Right(
-              LDAPUserInfo(userName = getUserNameFromMailAddress(userName),
-                           fullName = ldapSettings.fullNameAttribute
-                             .flatMap { fullNameAttribute =>
-                               findFullName(conn,
-                                            userDN,
-                                            ldapSettings.userNameAttribute,
-                                            userName,
-                                            fullNameAttribute)
-                             }
-                             .getOrElse(userName),
-                           mailAddress = mailAddress))
+              LDAPUserInfo(
+                userName = getUserNameFromMailAddress(userName),
+                fullName = ldapSettings.fullNameAttribute
+                  .flatMap { fullNameAttribute =>
+                    findFullName(conn,
+                                 userDN,
+                                 ldapSettings.userNameAttribute,
+                                 userName,
+                                 fullNameAttribute)
+                  }
+                  .getOrElse(userName),
+                mailAddress = mailAddress
+              ))
           case None => Left("Can't find mail address.")
         }
       }
@@ -202,7 +206,8 @@ object LDAPUtil {
             } catch {
               case ex: LDAPReferralException =>
                 None // NOTE(tanacasino): Referral follow is off. so ignores it.(for AD)
-            }))
+            })
+        )
       } else {
         entries.flatten
       }

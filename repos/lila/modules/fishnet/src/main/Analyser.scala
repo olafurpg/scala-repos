@@ -50,17 +50,18 @@ final class Analyser(repo: FishnetRepo,
   private def makeWork(game: Game, sender: Work.Sender): Fu[Work.Analysis] =
     GameRepo.initialFen(game) zip uciMemo.get(game) map {
       case (initialFen, moves) =>
-        Work.Analysis(_id = Work.makeId,
-                      sender = sender,
-                      game =
-                        Work.Game(id = game.id,
-                                  initialFen = initialFen map FEN.apply,
-                                  variant = game.variant,
-                                  moves = moves.take(maxPlies) mkString " "),
-                      startPly = game.startedAtTurn,
-                      nbPly = game.turns,
-                      tries = 0,
-                      acquired = None,
-                      createdAt = DateTime.now)
+        Work.Analysis(
+          _id = Work.makeId,
+          sender = sender,
+          game = Work.Game(id = game.id,
+                           initialFen = initialFen map FEN.apply,
+                           variant = game.variant,
+                           moves = moves.take(maxPlies) mkString " "),
+          startPly = game.startedAtTurn,
+          nbPly = game.turns,
+          tries = 0,
+          acquired = None,
+          createdAt = DateTime.now
+        )
     }
 }

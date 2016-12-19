@@ -384,7 +384,8 @@ private[camel] trait ActorProducerFixture
             }
           }
         """).withFallback(config),
-        sys.dynamicAccess)
+        sys.dynamicAccess
+      )
     }
     camel = camelWithMocks
 

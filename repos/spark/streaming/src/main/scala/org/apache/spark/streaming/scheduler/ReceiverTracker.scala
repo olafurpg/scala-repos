@@ -292,7 +292,8 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
         scheduledLocations = None,
         runningExecutor = Some(ExecutorCacheTaskLocation(host, executorId)),
         name = Some(name),
-        endpoint = Some(receiverEndpoint))
+        endpoint = Some(receiverEndpoint)
+      )
       receiverTrackingInfos.put(streamId, receiverTrackingInfo)
       listenerBus.post(
         StreamingListenerReceiverStarted(receiverTrackingInfo.toReceiverInfo))

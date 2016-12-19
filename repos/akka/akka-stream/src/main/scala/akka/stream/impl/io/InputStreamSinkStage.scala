@@ -71,22 +71,25 @@ final private[stream] class InputStreamSinkStage(readTimeout: FiniteDuration)
         pull(in)
       }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          //1 is buffer for Finished or Failed callback
-          require(dataQueue.remainingCapacity() > 1)
-          dataQueue.add(Data(grab(in)))
-          if (dataQueue.remainingCapacity() > 1) sendPullIfAllowed()
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            //1 is buffer for Finished or Failed callback
+            require(dataQueue.remainingCapacity() > 1)
+            dataQueue.add(Data(grab(in)))
+            if (dataQueue.remainingCapacity() > 1) sendPullIfAllowed()
+          }
+          override def onUpstreamFinish(): Unit = {
+            dataQueue.add(Finished)
+            completeStage()
+          }
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            dataQueue.add(Failed(ex))
+            failStage(ex)
+          }
         }
-        override def onUpstreamFinish(): Unit = {
-          dataQueue.add(Finished)
-          completeStage()
-        }
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          dataQueue.add(Failed(ex))
-          failStage(ex)
-        }
-      })
+      )
     }
     (logic, new InputStreamAdapter(dataQueue, logic.wakeUp, readTimeout))
   }

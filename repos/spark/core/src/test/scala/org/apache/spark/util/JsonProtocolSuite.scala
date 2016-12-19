@@ -779,7 +779,8 @@ private[spark] object JsonProtocolSuite extends Assertions {
             assertSeqEquals[AccumulableInfo](updates1,
                                              updates2,
                                              (a, b) => a.equals(b))
-          })
+          }
+        )
       case (e1, e2) =>
         assert(e1 === e2)
       case _ => fail("Events don't match in types!")

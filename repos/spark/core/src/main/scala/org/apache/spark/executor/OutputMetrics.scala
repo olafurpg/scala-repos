@@ -48,7 +48,8 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
       TaskMetrics
         .getAccum[Long](accumMap, InternalAccumulator.output.RECORDS_WRITTEN),
       TaskMetrics
-        .getAccum[String](accumMap, InternalAccumulator.output.WRITE_METHOD))
+        .getAccum[String](accumMap, InternalAccumulator.output.WRITE_METHOD)
+    )
   }
 
   /**

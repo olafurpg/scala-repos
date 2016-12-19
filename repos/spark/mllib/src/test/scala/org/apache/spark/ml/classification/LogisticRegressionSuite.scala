@@ -193,9 +193,11 @@ class LogisticRegressionSuite
       .select("prediction", "myProbability")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
-    assert(predAllZero.forall(_ === 0),
-           s"With threshold=1.0, expected predictions to be all 0, but only" +
-             s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
+    assert(
+      predAllZero.forall(_ === 0),
+      s"With threshold=1.0, expected predictions to be all 0, but only" +
+        s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0."
+    )
     // Call transform with params, and check that the params worked.
     val predNotAllZero = model
       .transform(dataset,
@@ -849,7 +851,8 @@ class LogisticRegressionSuite
             case (classSummarizer1: MultiClassSummarizer,
                   classSummarizer2: MultiClassSummarizer) =>
               classSummarizer1.merge(classSummarizer2)
-        })
+        }
+      )
       .histogram
 
     /*

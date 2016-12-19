@@ -1242,10 +1242,12 @@ private[spark] object SparkSubmitUtils {
           throw new RuntimeException(rr.getAllProblemMessages.toString)
         }
         // retrieve all resolved dependencies
-        ivy.retrieve(rr.getModuleDescriptor.getModuleRevisionId,
-                     packagesDirectory.getAbsolutePath + File.separator +
-                       "[organization]_[artifact]-[revision].[ext]",
-                     retrieveOptions.setConfs(Array(ivyConfName)))
+        ivy.retrieve(
+          rr.getModuleDescriptor.getModuleRevisionId,
+          packagesDirectory.getAbsolutePath + File.separator +
+            "[organization]_[artifact]-[revision].[ext]",
+          retrieveOptions.setConfs(Array(ivyConfName))
+        )
         resolveDependencyPaths(rr.getArtifacts.toArray, packagesDirectory)
       } finally {
         System.setOut(sysOut)

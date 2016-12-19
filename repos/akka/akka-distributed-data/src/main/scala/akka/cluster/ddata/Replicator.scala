@@ -67,7 +67,8 @@ object ReplicatorSettings {
       pruningInterval =
         config.getDuration("pruning-interval", MILLISECONDS).millis,
       maxPruningDissemination =
-        config.getDuration("max-pruning-dissemination", MILLISECONDS).millis)
+        config.getDuration("max-pruning-dissemination", MILLISECONDS).millis
+    )
   }
 
   /**

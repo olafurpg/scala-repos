@@ -117,9 +117,11 @@ object ResourceServer {
             "Date" -> Helpers.nowAsInternetDate,
             "Pragma" -> "",
             "Cache-Control" -> "",
-            "Content-Type" -> detectContentType(rw.last)),
+            "Content-Type" -> detectContentType(rw.last)
+          ),
           Nil,
-          200)
+          200
+        )
       }
 
   /**

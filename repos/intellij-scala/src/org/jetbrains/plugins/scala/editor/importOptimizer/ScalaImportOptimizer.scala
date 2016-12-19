@@ -116,7 +116,8 @@ class ScalaImportOptimizer extends ImportOptimizer {
 
               true
             }
-          })
+          }
+        )
     }
 
     processAllElementsConcurrentlyUnderProgress { element =>

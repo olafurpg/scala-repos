@@ -462,13 +462,15 @@ class BlockManagerReplicationSuite
               blockStatus.storageLevel.useMemory === storageLevel.useMemory &&
               blockStatus.storageLevel.useOffHeap === storageLevel.useOffHeap &&
               blockStatus.storageLevel.deserialized === storageLevel.deserialized,
-            s"master does not know correct storage level for ${blockId.name} in $testStoreName")
+            s"master does not know correct storage level for ${blockId.name} in $testStoreName"
+          )
 
           // Assert that the block status in the master for this store has correct memory usage info
           assert(
             !blockStatus.storageLevel.useMemory ||
               blockStatus.memSize >= blockSize,
-            s"master does not know size of ${blockId.name} stored in memory of $testStoreName")
+            s"master does not know size of ${blockId.name} stored in memory of $testStoreName"
+          )
 
           // If the block is supposed to be in memory, then drop the copy of the block in
           // this store test whether master is updated with zero memory usage this store
@@ -504,7 +506,8 @@ class BlockManagerReplicationSuite
                 .getBlockStatus(blockId)(testStore.blockManagerId)
                 .diskSize >= blockSize,
               s"after dropping, master does not know size of ${blockId.name} " +
-                s"stored in disk of $testStoreName")
+                s"stored in disk of $testStoreName"
+            )
           }
         }
       master.removeBlock(blockId)

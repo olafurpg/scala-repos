@@ -232,17 +232,22 @@ trait ShardServiceCombinators
   type Query = String
 
   def query[B](next: HttpService[ByteChunk,
-                                 (APIKey, AccountDetails, Path, Query,
+                                 (APIKey,
+                                  AccountDetails,
+                                  Path,
+                                  Query,
                                   QueryOptions) => Future[HttpResponse[B]]])(
-      implicit executor: ExecutionContext)
-    : HttpService[ByteChunk,
-                  ((APIKey, AccountDetails),
-                   Path) => Future[HttpResponse[B]]] = {
+      implicit executor: ExecutionContext): HttpService[
+    ByteChunk,
+    ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] = {
     new DelegatingService[ByteChunk,
                           ((APIKey, AccountDetails),
                            Path) => Future[HttpResponse[B]],
                           ByteChunk,
-                          (APIKey, AccountDetails, Path, Query,
+                          (APIKey,
+                           AccountDetails,
+                           Path,
+                           Query,
                            QueryOptions) => Future[HttpResponse[B]]] {
       val delegate = next
       val metadata = NoMetadata
@@ -294,7 +299,10 @@ trait ShardServiceCombinators
 
   def asyncQuery[B](
       next: HttpService[ByteChunk,
-                        (APIKey, AccountDetails, Path, Query,
+                        (APIKey,
+                         AccountDetails,
+                         Path,
+                         Query,
                          QueryOptions) => Future[HttpResponse[B]]])(
       implicit executor: ExecutionContext)
     : HttpService[ByteChunk,

@@ -142,7 +142,8 @@ trait CogroupSpec[M[+ _]]
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
           OuterObjectConcat(WrapObject(SourceValue.Left, "valueLeft"),
-                            WrapObject(SourceValue.Right, "valueRight"))))
+                            WrapObject(SourceValue.Right, "valueRight")))
+      )
 
     val jsonResult = toJson(result)
 
@@ -611,7 +612,9 @@ trait CogroupSpec[M[+ _]]
         WrapObject(DerefObjectStatic(Leaf(SourceLeft), CPathField("val")),
                    "left"),
         WrapObject(DerefObjectStatic(Leaf(SourceRight), CPathField("val")),
-                   "right")))
+                   "right")
+      )
+    )
 
     toJson(result).copoint must_== expected
   }

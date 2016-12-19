@@ -462,7 +462,8 @@ object PlayDocsValidation {
         validationConfig.downstreamWikiPages(link.link) ||
         combinedRepo.findFileWithName(link.link + ".md").nonEmpty
       },
-      "Could not find link")
+      "Could not find link"
+    )
 
     def relativeLinkOk(link: LinkRef) = {
       link match {
@@ -519,10 +520,14 @@ object PlayDocsValidation {
       }
     }
 
-    assertLinksNotMissing("Missing source segments test", existing.collect {
-      case sample if !segmentExists(sample) =>
-        LinkRef(sample.segment, sample.file, sample.segmentPosition)
-    }, "Could not find source segment")
+    assertLinksNotMissing(
+      "Missing source segments test",
+      existing.collect {
+        case sample if !segmentExists(sample) =>
+          LinkRef(sample.segment, sample.file, sample.segmentPosition)
+      },
+      "Could not find source segment"
+    )
 
     val allLinks = report.wikiLinks.map(_.link).toSet
 

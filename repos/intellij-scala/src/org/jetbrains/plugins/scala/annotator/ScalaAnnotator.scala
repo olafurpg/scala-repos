@@ -500,16 +500,18 @@ class ScalaAnnotator
                             templateDefinition.nameId,
                             templateDefinition.nameId,
                             ScTypeParam.Covariant)
-        val tdParts = Seq(AbstractInstantiation,
-                          FinalClassInheritance,
-                          IllegalInheritance,
-                          ObjectCreationImpossible,
-                          MultipleInheritance,
-                          NeedsToBeAbstract,
-                          NeedsToBeMixin,
-                          NeedsToBeTrait,
-                          SealedClassInheritance,
-                          UndefinedMember)
+        val tdParts = Seq(
+          AbstractInstantiation,
+          FinalClassInheritance,
+          IllegalInheritance,
+          ObjectCreationImpossible,
+          MultipleInheritance,
+          NeedsToBeAbstract,
+          NeedsToBeMixin,
+          NeedsToBeTrait,
+          SealedClassInheritance,
+          UndefinedMember
+        )
         tdParts.foreach(_.annotate(templateDefinition, holder, typeAware))
         templateDefinition match {
           case cls: ScClass =>

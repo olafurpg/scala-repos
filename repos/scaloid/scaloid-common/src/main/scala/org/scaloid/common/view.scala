@@ -1897,7 +1897,8 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def onCreateContextMenu[U](
-      f: (android.view.ContextMenu, android.view.View,
+      f: (android.view.ContextMenu,
+          android.view.View,
           android.view.ContextMenu.ContextMenuInfo) => U): This = {
     basis.setOnCreateContextMenuListener(
       new android.view.View.OnCreateContextMenuListener {
@@ -2025,8 +2026,8 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def onLayoutChange[U](
-      f: (android.view.View, Int, Int, Int, Int, Int, Int, Int,
-          Int) => U): This = {
+      f: (android.view.View, Int, Int, Int, Int, Int, Int, Int, Int) => U)
+    : This = {
     basis.addOnLayoutChangeListener(
       new android.view.View.OnLayoutChangeListener {
         def onLayoutChange(p1: android.view.View,

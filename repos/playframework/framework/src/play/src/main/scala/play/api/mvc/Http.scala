@@ -978,19 +978,18 @@ package play.api.mvc {
         val decoder = config.clientDecoder
         SetCookieHeaderSeparatorRegex.split(cookieHeader).toSeq.flatMap {
           cookieString =>
-            Option(decoder.decode(cookieString.trim)).map(
-              cookie =>
-                Cookie(
-                  cookie.name,
-                  cookie.value,
-                  if (cookie.maxAge == Integer.MIN_VALUE)
-                    None
-                  else Some(cookie.maxAge),
-                  Option(cookie.path).getOrElse("/"),
-                  Option(cookie.domain),
-                  cookie.isSecure,
-                  cookie.isHttpOnly
-              ))
+            Option(decoder.decode(cookieString.trim)).map(cookie =>
+              Cookie(
+                cookie.name,
+                cookie.value,
+                if (cookie.maxAge == Integer.MIN_VALUE)
+                  None
+                else Some(cookie.maxAge),
+                Option(cookie.path).getOrElse("/"),
+                Option(cookie.domain),
+                cookie.isSecure,
+                cookie.isHttpOnly
+            ))
         }
       }.getOrElse {
         logger.debug(

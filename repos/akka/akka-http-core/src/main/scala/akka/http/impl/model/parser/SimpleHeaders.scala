@@ -41,11 +41,9 @@ private[parser] trait SimpleHeaders {
 
   // http://www.w3.org/TR/cors/#access-control-allow-origin-response-header
   def `access-control-allow-origin` =
-    rule(
-      ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`) | `origin-list-or-null` ~ EOI ~>
-        (origins ⇒
-           `Access-Control-Allow-Origin`.forRange(
-             HttpOriginRange(origins: _*))))
+    rule(ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`) | `origin-list-or-null` ~ EOI ~>
+      (origins ⇒
+        `Access-Control-Allow-Origin`.forRange(HttpOriginRange(origins: _*))))
 
   // http://www.w3.org/TR/cors/#access-control-expose-headers-response-header
   def `access-control-expose-headers` = rule {
@@ -91,8 +89,8 @@ private[parser] trait SimpleHeaders {
     oneOrMore(
       token ~>
         (x ⇒
-           HttpEncodings.getForKeyCaseInsensitive(x) getOrElse HttpEncoding
-             .custom(x))).separatedBy(listSep) ~ EOI ~>
+          HttpEncodings.getForKeyCaseInsensitive(x) getOrElse HttpEncoding
+            .custom(x))).separatedBy(listSep) ~ EOI ~>
       (`Content-Encoding`(_))
   }
 

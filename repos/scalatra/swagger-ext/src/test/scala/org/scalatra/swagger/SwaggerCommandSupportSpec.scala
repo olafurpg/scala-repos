@@ -94,12 +94,14 @@ class SwaggerCommandSupportSpec extends MutableScalatraSpec {
                   paramType = ParamType.Query,
                   defaultValue = Some("0"),
                   required = false),
-        Parameter("API-TOKEN",
-                  DataType.String,
-                  Some("The API token for this request"),
-                  notes = Some("Invalid data kills kittens"),
-                  paramType = ParamType.Header,
-                  allowableValues = AllowableValues("123"))
+        Parameter(
+          "API-TOKEN",
+          DataType.String,
+          Some("The API token for this request"),
+          notes = Some("Invalid data kills kittens"),
+          paramType = ParamType.Header,
+          allowableValues = AllowableValues("123")
+        )
       )
       val (parameters, model) =
         SwaggerCommandSupport.parametersFromCommand(new FullCommand)

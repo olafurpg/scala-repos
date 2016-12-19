@@ -140,13 +140,21 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
 
     assert(listener.getExecutionMetrics(0).isEmpty)
 
-    listener.onExecutorMetricsUpdate(SparkListenerExecutorMetricsUpdate(
-      "",
-      Seq(
-        // (task id, stage id, stage attempt, accum updates)
-        (0L, 0, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
-        (1L, 0, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
-      )))
+    listener.onExecutorMetricsUpdate(
+      SparkListenerExecutorMetricsUpdate(
+        "",
+        Seq(
+          // (task id, stage id, stage attempt, accum updates)
+          (0L,
+           0,
+           0,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
+          (1L,
+           0,
+           0,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+        )
+      ))
 
     checkAnswer(listener.getExecutionMetrics(0),
                 accumulatorUpdates.mapValues(_ * 2))
@@ -165,7 +173,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
            0,
            createTaskMetrics(accumulatorUpdates.mapValues(_ * 2))
              .accumulatorUpdates())
-        )))
+        )
+      ))
 
     checkAnswer(listener.getExecutionMetrics(0),
                 accumulatorUpdates.mapValues(_ * 3))
@@ -174,13 +183,21 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     listener.onStageSubmitted(
       SparkListenerStageSubmitted(createStageInfo(0, 1)))
 
-    listener.onExecutorMetricsUpdate(SparkListenerExecutorMetricsUpdate(
-      "",
-      Seq(
-        // (task id, stage id, stage attempt, accum updates)
-        (0L, 0, 1, createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
-        (1L, 0, 1, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
-      )))
+    listener.onExecutorMetricsUpdate(
+      SparkListenerExecutorMetricsUpdate(
+        "",
+        Seq(
+          // (task id, stage id, stage attempt, accum updates)
+          (0L,
+           0,
+           1,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
+          (1L,
+           0,
+           1,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+        )
+      ))
 
     checkAnswer(listener.getExecutionMetrics(0),
                 accumulatorUpdates.mapValues(_ * 2))
@@ -223,13 +240,21 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     listener.onStageSubmitted(
       SparkListenerStageSubmitted(createStageInfo(1, 0)))
 
-    listener.onExecutorMetricsUpdate(SparkListenerExecutorMetricsUpdate(
-      "",
-      Seq(
-        // (task id, stage id, stage attempt, accum updates)
-        (0L, 1, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
-        (1L, 1, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
-      )))
+    listener.onExecutorMetricsUpdate(
+      SparkListenerExecutorMetricsUpdate(
+        "",
+        Seq(
+          // (task id, stage id, stage attempt, accum updates)
+          (0L,
+           1,
+           0,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates()),
+          (1L,
+           1,
+           0,
+           createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
+        )
+      ))
 
     checkAnswer(listener.getExecutionMetrics(0),
                 accumulatorUpdates.mapValues(_ * 7))

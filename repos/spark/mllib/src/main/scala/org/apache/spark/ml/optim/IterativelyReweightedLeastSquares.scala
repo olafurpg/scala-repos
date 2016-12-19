@@ -57,8 +57,7 @@ private[ml] class IterativelyReweightedLeastSquaresModel(
   */
 private[ml] class IterativelyReweightedLeastSquares(
     val initialModel: WeightedLeastSquaresModel,
-    val reweightFunc: (Instance,
-                       WeightedLeastSquaresModel) => (Double, Double),
+    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double, Double),
     val fitIntercept: Boolean,
     val regParam: Double,
     val maxIter: Int,

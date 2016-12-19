@@ -62,7 +62,8 @@ object DeployerSpec {
         }
       }
       """,
-    ConfigParseOptions.defaults)
+    ConfigParseOptions.defaults
+  )
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }
@@ -140,7 +141,8 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     "detect invalid number-of-instances" in {
       intercept[com.typesafe.config.ConfigException.WrongType] {
         val invalidDeployerConf = ConfigFactory
-          .parseString("""
+          .parseString(
+            """
             akka.actor.deployment {
               /service-invalid-number-of-instances {
                 router = round-robin-pool
@@ -148,7 +150,8 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
               }
             }
             """,
-                       ConfigParseOptions.defaults)
+            ConfigParseOptions.defaults
+          )
           .withFallback(AkkaSpec.testConf)
 
         shutdown(
@@ -159,7 +162,8 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     "detect invalid deployment path" in {
       val e = intercept[InvalidActorNameException] {
         val invalidDeployerConf = ConfigFactory
-          .parseString("""
+          .parseString(
+            """
             akka.actor.deployment {
               /gul/ubåt {
                 router = round-robin-pool
@@ -167,7 +171,8 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
               }
             }
             """,
-                       ConfigParseOptions.defaults)
+            ConfigParseOptions.defaults
+          )
           .withFallback(AkkaSpec.testConf)
 
         shutdown(ActorSystem("invalid-path", invalidDeployerConf))

@@ -40,7 +40,8 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
           TokenRequestEndpoint("http://localhost:8002/oauth/requestToken",
                                "client_id",
                                "client_secret"),
-          TokenEndpoint("http://localhost:8002/oauth/token", "access_code"))
+          TokenEndpoint("http://localhost:8002/oauth/token", "access_code")
+        )
       )
     ))
   val testServlet = new SwaggerTestServlet(swagger)
@@ -228,21 +229,23 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     val exp = findOperation(expected, name)
     (op must beSome[JValue])
       .setMessage("Couldn't find operation: " + name) and {
-      val m = verifyFields(op.get,
-                           exp.get,
-                           "method",
-                           "nickname",
-                           "type",
-                           "$ref",
-                           "items",
-                           "summary",
-                           "parameters",
-                           "notes",
-                           "responseMessages",
-                           "consumes",
-                           "produces",
-                           "protocols",
-                           "authorizations")
+      val m = verifyFields(
+        op.get,
+        exp.get,
+        "method",
+        "nickname",
+        "type",
+        "$ref",
+        "items",
+        "summary",
+        "parameters",
+        "notes",
+        "responseMessages",
+        "consumes",
+        "produces",
+        "protocols",
+        "authorizations"
+      )
       m setMessage (m.message + " of the operation " + name)
     }
   }

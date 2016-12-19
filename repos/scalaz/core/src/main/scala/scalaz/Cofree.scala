@@ -245,7 +245,8 @@ private trait CofreeZipApply[F[_]]
                   F.apply2(Tags.Zip.subst(fat), Tags.Zip.subst(fab)) {
                     (a, b) =>
                       Tag.unwrap(ap(a)(b))
-                })))
+                }))
+      )
     )
 }
 
@@ -291,8 +292,8 @@ private trait CofreeFoldable[F[_]] extends Foldable1[Cofree[F, ?]] {
       f: (A, => B) => B): B =
     f(fa.head, F.foldRight(fa.tail, z)(foldRight(_, _)(f)))
 
-  override final def foldLeft[A, B](fa: Cofree[F, A], z: B)(f: (B,
-                                                                A) => B): B =
+  override final def foldLeft[A, B](fa: Cofree[F, A], z: B)(
+      f: (B, A) => B): B =
     F.foldLeft(fa.tail, f(z, fa.head))((b, c) => foldLeft(c, b)(f))
 
   override final def foldMapLeft1[A, B](fa: Cofree[F, A])(z: A => B)(

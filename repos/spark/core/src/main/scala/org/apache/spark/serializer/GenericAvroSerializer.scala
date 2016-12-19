@@ -70,27 +70,31 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
     * same schema is compressed many times over
     */
   def compress(schema: Schema): Array[Byte] =
-    compressCache.getOrElseUpdate(schema, {
-      val bos = new ByteArrayOutputStream()
-      val out = codec.compressedOutputStream(bos)
-      out.write(schema.toString.getBytes(StandardCharsets.UTF_8))
-      out.close()
-      bos.toByteArray
-    })
+    compressCache.getOrElseUpdate(
+      schema, {
+        val bos = new ByteArrayOutputStream()
+        val out = codec.compressedOutputStream(bos)
+        out.write(schema.toString.getBytes(StandardCharsets.UTF_8))
+        out.close()
+        bos.toByteArray
+      }
+    )
 
   /**
     * Decompresses the schema into the actual in-memory object. Keeps an internal cache of already
     * seen values so to limit the number of times that decompression has to be done.
     */
   def decompress(schemaBytes: ByteBuffer): Schema =
-    decompressCache.getOrElseUpdate(schemaBytes, {
-      val bis = new ByteArrayInputStream(
-        schemaBytes.array(),
-        schemaBytes.arrayOffset() + schemaBytes.position(),
-        schemaBytes.remaining())
-      val bytes = IOUtils.toByteArray(codec.compressedInputStream(bis))
-      new Schema.Parser().parse(new String(bytes, StandardCharsets.UTF_8))
-    })
+    decompressCache.getOrElseUpdate(
+      schemaBytes, {
+        val bis = new ByteArrayInputStream(
+          schemaBytes.array(),
+          schemaBytes.arrayOffset() + schemaBytes.position(),
+          schemaBytes.remaining())
+        val bytes = IOUtils.toByteArray(codec.compressedInputStream(bis))
+        new Schema.Parser().parse(new String(bytes, StandardCharsets.UTF_8))
+      }
+    )
 
   /**
     * Serializes a record to the given output stream. It caches a lot of the internal data as
@@ -128,16 +132,18 @@ private[serializer] class GenericAvroSerializer(schemas: Map[Long, String])
     val schema = {
       if (input.readBoolean()) {
         val fingerprint = input.readLong()
-        schemaCache.getOrElseUpdate(fingerprint, {
-          schemas.get(fingerprint) match {
-            case Some(s) => new Schema.Parser().parse(s)
-            case None =>
-              throw new SparkException(
-                "Error reading attempting to read avro data -- encountered an unknown " +
-                  s"fingerprint: $fingerprint, not sure what schema to use.  This could happen " +
-                  "if you registered additional schemas after starting your spark context.")
+        schemaCache.getOrElseUpdate(
+          fingerprint, {
+            schemas.get(fingerprint) match {
+              case Some(s) => new Schema.Parser().parse(s)
+              case None =>
+                throw new SparkException(
+                  "Error reading attempting to read avro data -- encountered an unknown " +
+                    s"fingerprint: $fingerprint, not sure what schema to use.  This could happen " +
+                    "if you registered additional schemas after starting your spark context.")
+            }
           }
-        })
+        )
       } else {
         val length = input.readInt()
         decompress(ByteBuffer.wrap(input.readBytes(length)))

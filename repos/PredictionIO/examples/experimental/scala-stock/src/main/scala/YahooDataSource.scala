@@ -53,13 +53,15 @@ case class HistoricalData(val ticker: String,
 object HistoricalData {
   def apply(ticker: String, timeIndex: Array[DateTime]): HistoricalData = {
     val n = timeIndex.size
-    HistoricalData(ticker,
-                   timeIndex,
-                   close = Array.fill(n)(0.0),
-                   adjClose = Array.fill(n)(0.0),
-                   adjReturn = Array.fill(n)(0.0),
-                   volume = Array.fill(n)(0.0),
-                   active = Array.fill(n)(false))
+    HistoricalData(
+      ticker,
+      timeIndex,
+      close = Array.fill(n)(0.0),
+      adjClose = Array.fill(n)(0.0),
+      adjReturn = Array.fill(n)(0.0),
+      volume = Array.fill(n)(0.0),
+      active = Array.fill(n)(false)
+    )
   }
 }
 
@@ -150,19 +152,22 @@ class YahooDataSource(val params: YahooDataSource.Params)
           s"Time must be continuous. " +
             s"For ticker $ticker, there is a gap between " +
             s"${timeIndex(idx - 1)} and ${timeIndex(idx)}. " +
-            s"Please import data to cover the gap or use a shorter range.")
+            s"Please import data to cover the gap or use a shorter range."
+        )
       }
     }
 
     val adjReturn = timeIndex.map(t => dailyMap(t).adjReturn)
 
-    HistoricalData(ticker = ticker,
-                   timeIndex = timeIndex,
-                   close = timeIndex.map(t => dailyMap(t).close),
-                   adjClose = return2Close(adjReturn),
-                   adjReturn = adjReturn,
-                   volume = timeIndex.map(t => dailyMap(t).volume),
-                   active = Array.fill(timeIndex.size)(true))
+    HistoricalData(
+      ticker = ticker,
+      timeIndex = timeIndex,
+      close = timeIndex.map(t => dailyMap(t).close),
+      adjClose = return2Close(adjReturn),
+      adjReturn = adjReturn,
+      volume = timeIndex.map(t => dailyMap(t).volume),
+      active = Array.fill(timeIndex.size)(true)
+    )
   }
 
   def return2Close(returns: Array[Double],
@@ -214,7 +219,8 @@ class YahooDataSource(val params: YahooDataSource.Params)
       adjClose = return2Close(adjReturn),
       adjReturn = adjReturn,
       volume = activeFilter[Double](dailyMap, _.adjReturn, _ => 0.0),
-      active = activeFilter[Boolean](dailyMap, _.active, _ => false))
+      active = activeFilter[Boolean](dailyMap, _.active, _ => false)
+    )
   }
 
   def getTimeIndex(): HistoricalData = {
@@ -381,39 +387,46 @@ object PredefinedDSP {
     appId = 2,
     entityType = "yahoo",
     untilTime = None,
-    windowParams = DataSourceParams(baseDate = new DateTime(2000, 1, 1, 0, 0),
-                                    fromIdx = 250,
-                                    untilIdx = 3500,
-                                    trainingWindowSize = 200,
-                                    maxTestingWindowSize = 30,
-                                    marketTicker = "SPY",
-                                    tickerList = Run.sp500List))
+    windowParams = DataSourceParams(
+      baseDate = new DateTime(2000, 1, 1, 0, 0),
+      fromIdx = 250,
+      untilIdx = 3500,
+      trainingWindowSize = 200,
+      maxTestingWindowSize = 30,
+      marketTicker = "SPY",
+      tickerList = Run.sp500List
+    )
+  )
 
   val SmallSP500 = YahooDataSource.Params(
     appId = 4,
     entityType = "yahoo",
     untilTime = None,
-    windowParams = DataSourceParams(baseDate = new DateTime(2000, 1, 1, 0, 0),
-                                    fromIdx = 250,
-                                    untilIdx = 3500,
-                                    trainingWindowSize = 200,
-                                    maxTestingWindowSize = 30,
-                                    marketTicker = "SPY",
-                                    tickerList = Run.sp500List.take(25)))
+    windowParams = DataSourceParams(
+      baseDate = new DateTime(2000, 1, 1, 0, 0),
+      fromIdx = 250,
+      untilIdx = 3500,
+      trainingWindowSize = 200,
+      maxTestingWindowSize = 30,
+      marketTicker = "SPY",
+      tickerList = Run.sp500List.take(25)
+    )
+  )
 
   val Test = YahooDataSource.Params(
     appId = 4,
     entityType = "yahoo",
     untilTime = Some(new DateTime(2014, 5, 1, 0, 0)),
-    windowParams =
-      DataSourceParams(baseDate = new DateTime(2014, 1, 1, 0, 0),
-                       fromIdx = 20,
-                       untilIdx = 50,
-                       trainingWindowSize = 15,
-                       maxTestingWindowSize = 10,
-                       marketTicker = "SPY",
-                       tickerList =
-                         Seq("AAPL", "MSFT", "IBM", "FB", "AMZN", "IRONMAN")))
+    windowParams = DataSourceParams(
+      baseDate = new DateTime(2014, 1, 1, 0, 0),
+      fromIdx = 20,
+      untilIdx = 50,
+      trainingWindowSize = 15,
+      maxTestingWindowSize = 10,
+      marketTicker = "SPY",
+      tickerList = Seq("AAPL", "MSFT", "IBM", "FB", "AMZN", "IRONMAN")
+    )
+  )
 }
 
 object YahooDataSourceRun {

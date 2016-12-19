@@ -163,7 +163,8 @@ private[streaming] object WriteAheadLogUtils extends Logging {
           fileWalHadoopConf,
           getRollingIntervalSecs(sparkConf, isDriver),
           getMaxFailures(sparkConf, isDriver),
-          shouldCloseFileAfterWrite(sparkConf, isDriver))
+          shouldCloseFileAfterWrite(sparkConf, isDriver)
+        )
       }
     if (isBatchingEnabled(sparkConf, isDriver)) {
       new BatchedWriteAheadLog(wal, sparkConf)

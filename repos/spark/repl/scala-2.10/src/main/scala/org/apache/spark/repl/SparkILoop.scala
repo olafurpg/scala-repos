@@ -394,7 +394,8 @@ class SparkILoop(
       """
                            |disable/enable advanced repl changes, these fix some issues but may introduce others.
                            |This mode will be removed once these fixes stablize""".stripMargin,
-      toggleFallbackMode),
+      toggleFallbackMode
+    ),
     cmd("type",
         "[-v] <expr>",
         "display the type of an expression without evaluating it",
@@ -1009,12 +1010,15 @@ class SparkILoop(
     scala.reflect.runtime.universe
   private val m = u.runtimeMirror(Utils.getSparkClassLoader)
   private def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
-    u.TypeTag[T](m, new TypeCreator {
-      def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
-        m.staticClass(classTag[T].runtimeClass.getName)
-          .toTypeConstructor
-          .asInstanceOf[U#Type]
-    })
+    u.TypeTag[T](
+      m,
+      new TypeCreator {
+        def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
+          m.staticClass(classTag[T].runtimeClass.getName)
+            .toTypeConstructor
+            .asInstanceOf[U#Type]
+      }
+    )
 
   private def process(settings: Settings): Boolean = savingContextLoader {
     if (getMaster() == "yarn-client")

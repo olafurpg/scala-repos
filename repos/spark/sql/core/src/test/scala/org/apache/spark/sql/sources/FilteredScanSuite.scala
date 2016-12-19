@@ -369,15 +369,17 @@ class FilteredScanSuite
                Set("a", "b", "c"))
 
   // A query with an inconvertible filter, an unhandled filter, and a handled filter.
-  testPushDown("""SELECT a
+  testPushDown(
+    """SELECT a
       |  FROM oneToTenFiltered
       | WHERE a + b > 9
       |   AND b < 16
       |   AND c IN ('bbbbbBBBBB', 'cccccCCCCC', 'dddddDDDDD', 'foo')
     """.stripMargin.split("\n").map(_.trim).mkString(" "),
-               3,
-               Set("a", "b"),
-               Set(LessThan("b", 16)))
+    3,
+    Set("a", "b"),
+    Set(LessThan("b", 16))
+  )
 
   def testPushDown(sqlString: String,
                    expectedCount: Int,

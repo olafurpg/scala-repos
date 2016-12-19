@@ -23,19 +23,19 @@ case class AiConfig(variant: chess.variant.Variant,
   def game =
     fenGame { chessGame =>
       val realVariant = chessGame.board.variant
-      Game.make(game = chessGame,
-                whitePlayer =
-                  Player.make(color = ChessColor.White,
-                              aiLevel = creatorColor.black option level),
-                blackPlayer =
-                  Player.make(color = ChessColor.Black,
-                              aiLevel = creatorColor.white option level),
-                mode = Mode.Casual,
-                variant = realVariant,
-                source = (realVariant == chess.variant.FromPosition)
-                  .fold(Source.Position, Source.Ai),
-                daysPerTurn = makeDaysPerTurn,
-                pgnImport = None)
+      Game.make(
+        game = chessGame,
+        whitePlayer = Player.make(color = ChessColor.White,
+                                  aiLevel = creatorColor.black option level),
+        blackPlayer = Player.make(color = ChessColor.Black,
+                                  aiLevel = creatorColor.white option level),
+        mode = Mode.Casual,
+        variant = realVariant,
+        source = (realVariant == chess.variant.FromPosition)
+          .fold(Source.Position, Source.Ai),
+        daysPerTurn = makeDaysPerTurn,
+        pgnImport = None
+      )
     } start
 
   def pov = Pov(game, creatorColor)
@@ -59,7 +59,8 @@ object AiConfig extends BaseConfig {
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen)
+      fen = fen
+    )
 
   val default = AiConfig(variant = variantDefault,
                          timeMode = TimeMode.Unlimited,
@@ -82,14 +83,16 @@ object AiConfig extends BaseConfig {
   private[setup] implicit val aiConfigBSONHandler = new BSON[AiConfig] {
 
     def reads(r: BSON.Reader): AiConfig =
-      AiConfig(variant = chess.variant.Variant orDefault (r int "v"),
-               timeMode = TimeMode orDefault (r int "tm"),
-               time = r double "t",
-               increment = r int "i",
-               days = r int "d",
-               level = r int "l",
-               color = Color.White,
-               fen = r strO "f" filter (_.nonEmpty))
+      AiConfig(
+        variant = chess.variant.Variant orDefault (r int "v"),
+        timeMode = TimeMode orDefault (r int "tm"),
+        time = r double "t",
+        increment = r int "i",
+        days = r int "d",
+        level = r int "l",
+        color = Color.White,
+        fen = r strO "f" filter (_.nonEmpty)
+      )
 
     def writes(w: BSON.Writer, o: AiConfig) =
       BSONDocument("v" -> o.variant.id,

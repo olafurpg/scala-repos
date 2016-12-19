@@ -404,15 +404,17 @@ class TcpSpec
           Sink.ignore,
           Source.single(ByteString("Early response")))(Keep.right)
 
-      val binding = Await.result(Tcp()
-                                   .bind(serverAddress.getHostName,
-                                         serverAddress.getPort,
-                                         halfClose = false)
-                                   .toMat(Sink.foreach { conn ⇒
-                                     conn.flow.join(writeButIgnoreRead).run()
-                                   })(Keep.left)
-                                   .run(),
-                                 3.seconds)
+      val binding = Await.result(
+        Tcp()
+          .bind(serverAddress.getHostName,
+                serverAddress.getPort,
+                halfClose = false)
+          .toMat(Sink.foreach { conn ⇒
+            conn.flow.join(writeButIgnoreRead).run()
+          })(Keep.left)
+          .run(),
+        3.seconds
+      )
 
       val (promise, result) = Source
         .maybe[ByteString]
@@ -430,15 +432,17 @@ class TcpSpec
     "Echo should work even if server is in full close mode" in {
       val serverAddress = temporaryServerAddress()
 
-      val binding = Await.result(Tcp()
-                                   .bind(serverAddress.getHostName,
-                                         serverAddress.getPort,
-                                         halfClose = false)
-                                   .toMat(Sink.foreach { conn ⇒
-                                     conn.flow.join(Flow[ByteString]).run()
-                                   })(Keep.left)
-                                   .run(),
-                                 3.seconds)
+      val binding = Await.result(
+        Tcp()
+          .bind(serverAddress.getHostName,
+                serverAddress.getPort,
+                halfClose = false)
+          .toMat(Sink.foreach { conn ⇒
+            conn.flow.join(Flow[ByteString]).run()
+          })(Keep.left)
+          .run(),
+        3.seconds
+      )
 
       val result = Source(immutable.Iterable.fill(1000)(ByteString(0)))
         .via(Tcp().outgoingConnection(serverAddress, halfClose = true))

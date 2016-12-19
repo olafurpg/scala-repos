@@ -100,16 +100,18 @@ object JGitUtil {
                         committerEmailAddress: String) {
 
     def this(rev: org.eclipse.jgit.revwalk.RevCommit) =
-      this(rev.getName,
-           rev.getShortMessage,
-           rev.getFullMessage,
-           rev.getParents().map(_.name).toList,
-           rev.getAuthorIdent.getWhen,
-           rev.getAuthorIdent.getName,
-           rev.getAuthorIdent.getEmailAddress,
-           rev.getCommitterIdent.getWhen,
-           rev.getCommitterIdent.getName,
-           rev.getCommitterIdent.getEmailAddress)
+      this(
+        rev.getName,
+        rev.getShortMessage,
+        rev.getFullMessage,
+        rev.getParents().map(_.name).toList,
+        rev.getAuthorIdent.getWhen,
+        rev.getAuthorIdent.getName,
+        rev.getAuthorIdent.getEmailAddress,
+        rev.getCommitterIdent.getWhen,
+        rev.getCommitterIdent.getName,
+        rev.getCommitterIdent.getEmailAddress
+      )
 
     val summary = getSummaryMessage(fullMessage, shortMessage)
 
@@ -392,16 +394,17 @@ object JGitUtil {
         .map(simplifyPath)
         .map {
           case (objectId, fileMode, name, linkUrl, commit) =>
-            FileInfo(objectId,
-                     fileMode == FileMode.TREE || fileMode == FileMode.GITLINK,
-                     name,
-                     getSummaryMessage(commit.getFullMessage,
-                                       commit.getShortMessage),
-                     commit.getName,
-                     commit.getAuthorIdent.getWhen,
-                     commit.getAuthorIdent.getName,
-                     commit.getAuthorIdent.getEmailAddress,
-                     linkUrl)
+            FileInfo(
+              objectId,
+              fileMode == FileMode.TREE || fileMode == FileMode.GITLINK,
+              name,
+              getSummaryMessage(commit.getFullMessage, commit.getShortMessage),
+              commit.getName,
+              commit.getAuthorIdent.getWhen,
+              commit.getAuthorIdent.getName,
+              commit.getAuthorIdent.getEmailAddress,
+              linkUrl
+            )
         }
         .sortWith { (file1, file2) =>
           (file1.isDirectory, file2.isDirectory) match {
@@ -1021,8 +1024,8 @@ object JGitUtil {
       existIds.toSeq
     }
 
-  def processTree(git: Git, id: ObjectId)(f: (String,
-                                              CanonicalTreeParser) => Unit) = {
+  def processTree(git: Git, id: ObjectId)(
+      f: (String, CanonicalTreeParser) => Unit) = {
     using(new RevWalk(git.getRepository)) { revWalk =>
       using(new TreeWalk(git.getRepository)) { treeWalk =>
         val index = treeWalk.addTree(revWalk.parseTree(id))
@@ -1154,7 +1157,8 @@ object JGitUtil {
                 BranchMergeInfo(
                   ahead = RevWalkUtils.count(walk, branchCommit, mergeBase),
                   behind = RevWalkUtils.count(walk, defaultCommit, mergeBase),
-                  isMerged = walk.isMergedInto(branchCommit, defaultCommit)))
+                  isMerged = walk.isMergedInto(branchCommit, defaultCommit)
+                ))
             }
           BranchInfo(branchName,
                      committer,
@@ -1203,7 +1207,8 @@ object JGitUtil {
                 },
                 c.getCommitterIdent.getWhen,
                 c.getShortMessage,
-                Set.empty)
+                Set.empty
+              )
           }
           idLine :+= (c.name, i)
         }

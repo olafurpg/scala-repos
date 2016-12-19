@@ -305,39 +305,45 @@ final class RhinoJSEnv private (
       case _ => sys.error(errMsg)
     }
 
-    scope.addFunction("setTimeout", args => {
-      val cb =
-        ensure[Function](args(0),
-                         "First argument to setTimeout must be a function")
+    scope.addFunction(
+      "setTimeout",
+      args => {
+        val cb =
+          ensure[Function](args(0),
+                           "First argument to setTimeout must be a function")
 
-      val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
+        val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
 
-      val task = new TimeoutTask(
-        deadline,
-        () => cb.call(context, scope, scope, args.slice(2, args.length)))
+        val task = new TimeoutTask(
+          deadline,
+          () => cb.call(context, scope, scope, args.slice(2, args.length)))
 
-      taskQ += task
+        taskQ += task
 
-      task
-    })
+        task
+      }
+    )
 
-    scope.addFunction("setInterval", args => {
-      val cb =
-        ensure[Function](args(0),
-                         "First argument to setInterval must be a function")
+    scope.addFunction(
+      "setInterval",
+      args => {
+        val cb =
+          ensure[Function](args(0),
+                           "First argument to setInterval must be a function")
 
-      val interval = Context.toNumber(args(1)).toInt.millis
-      val firstDeadline = interval.fromNow
+        val interval = Context.toNumber(args(1)).toInt.millis
+        val firstDeadline = interval.fromNow
 
-      val task = new IntervalTask(
-        firstDeadline,
-        interval,
-        () => cb.call(context, scope, scope, args.slice(2, args.length)))
+        val task = new IntervalTask(
+          firstDeadline,
+          interval,
+          () => cb.call(context, scope, scope, args.slice(2, args.length)))
 
-      taskQ += task
+        taskQ += task
 
-      task
-    })
+        task
+      }
+    )
 
     scope.addFunction("clearTimeout", args => {
       val task = ensure[TimeoutTask](
@@ -347,13 +353,16 @@ final class RhinoJSEnv private (
       task.cancel()
     })
 
-    scope.addFunction("clearInterval", args => {
-      val task = ensure[IntervalTask](
-        args(0),
-        "First argument to " +
-          "clearInterval must be a value returned by setInterval")
-      task.cancel()
-    })
+    scope.addFunction(
+      "clearInterval",
+      args => {
+        val task = ensure[IntervalTask](
+          args(0),
+          "First argument to " +
+            "clearInterval must be a value returned by setInterval")
+        task.cancel()
+      }
+    )
 
     taskQ
   }
@@ -378,7 +387,8 @@ final class RhinoJSEnv private (
             setCallback(cb)
           case _ =>
             sys.error("First argument to init must be a function")
-      })
+      }
+    )
 
     comObj.addFunction("close", _ => {
       // Tell JVM side we won't send anything

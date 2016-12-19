@@ -87,11 +87,13 @@ final class Env(config: Config,
 
   lazy val emailConfirm: EmailConfirm =
     if (EmailConfirmEnabled)
-      new EmailConfirmMailGun(apiUrl = EmailConfirmMailgunApiUrl,
-                              apiKey = EmailConfirmMailgunApiKey,
-                              sender = EmailConfirmMailgunSender,
-                              baseUrl = EmailConfirmMailgunBaseUrl,
-                              secret = EmailConfirmSecret)
+      new EmailConfirmMailGun(
+        apiUrl = EmailConfirmMailgunApiUrl,
+        apiKey = EmailConfirmMailgunApiKey,
+        sender = EmailConfirmMailgunSender,
+        baseUrl = EmailConfirmMailgunBaseUrl,
+        secret = EmailConfirmSecret
+      )
     else EmailConfirmSkip
 
   lazy val passwordReset = new PasswordReset(
@@ -99,7 +101,8 @@ final class Env(config: Config,
     apiKey = PasswordResetMailgunApiKey,
     sender = PasswordResetMailgunSender,
     baseUrl = PasswordResetMailgunBaseUrl,
-    secret = PasswordResetSecret)
+    secret = PasswordResetSecret
+  )
 
   lazy val emailAddress = new EmailAddress(disposableEmailDomain)
 
@@ -128,10 +131,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "security" boot new Env(config = lila.common.PlayApp loadConfig "security",
-                            db = lila.db.Env.current,
-                            system = lila.common.PlayApp.system,
-                            scheduler = lila.common.PlayApp.scheduler,
-                            captcher = lila.hub.Env.current.actor.captcher,
-                            messenger = lila.hub.Env.current.actor.messenger)
+    "security" boot new Env(
+      config = lila.common.PlayApp loadConfig "security",
+      db = lila.db.Env.current,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      captcher = lila.hub.Env.current.actor.captcher,
+      messenger = lila.hub.Env.current.actor.messenger
+    )
 }

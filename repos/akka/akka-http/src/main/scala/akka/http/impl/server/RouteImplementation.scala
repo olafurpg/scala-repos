@@ -106,57 +106,61 @@ private[http] object RouteImplementation
         }
 
       case BasicAuthentication(authenticator) ⇒
-        authenticateBasicAsync(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
-            case Credentials.Missing ⇒
-              new BasicCredentials {
-                def available: Boolean = false
-                def identifier: String =
-                  throw new IllegalStateException("Credentials missing")
-                def verify(secret: String): Boolean =
-                  throw new IllegalStateException("Credentials missing")
-              }
-            case p @ Credentials.Provided(name) ⇒
-              new BasicCredentials {
-                def available: Boolean = true
-                def identifier: String = name
-                def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
+        authenticateBasicAsync(
+          authenticator.realm, { creds ⇒
+            val javaCreds = creds match {
+              case Credentials.Missing ⇒
+                new BasicCredentials {
+                  def available: Boolean = false
+                  def identifier: String =
+                    throw new IllegalStateException("Credentials missing")
+                  def verify(secret: String): Boolean =
+                    throw new IllegalStateException("Credentials missing")
+                }
+              case p @ Credentials.Provided(name) ⇒
+                new BasicCredentials {
+                  def available: Boolean = true
+                  def identifier: String = name
+                  def verify(secret: String): Boolean = p.verify(secret)
+                }
+            }
 
-          authenticator
-            .authenticate(javaCreds)
-            .toScala
-            .map(_.asScala)(
-              akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
-        }).flatMap { user ⇒
+            authenticator
+              .authenticate(javaCreds)
+              .toScala
+              .map(_.asScala)(
+                akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
+          }
+        ).flatMap { user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
         }
 
       case OAuth2Authentication(authenticator) ⇒
-        authenticateOAuth2Async(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
-            case Credentials.Missing ⇒
-              new OAuth2Credentials {
-                def available: Boolean = false
-                def identifier: String =
-                  throw new IllegalStateException("Credentials missing")
-                def verify(secret: String): Boolean =
-                  throw new IllegalStateException("Credentials missing")
-              }
-            case p @ Credentials.Provided(name) ⇒
-              new OAuth2Credentials {
-                def available: Boolean = true
-                def identifier: String = name
-                def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
+        authenticateOAuth2Async(
+          authenticator.realm, { creds ⇒
+            val javaCreds = creds match {
+              case Credentials.Missing ⇒
+                new OAuth2Credentials {
+                  def available: Boolean = false
+                  def identifier: String =
+                    throw new IllegalStateException("Credentials missing")
+                  def verify(secret: String): Boolean =
+                    throw new IllegalStateException("Credentials missing")
+                }
+              case p @ Credentials.Provided(name) ⇒
+                new OAuth2Credentials {
+                  def available: Boolean = true
+                  def identifier: String = name
+                  def verify(secret: String): Boolean = p.verify(secret)
+                }
+            }
 
-          authenticator
-            .authenticate(javaCreds)
-            .toScala
-            .map(_.asScala)(sameThreadExecutionContext)
-        }).flatMap { user ⇒
+            authenticator
+              .authenticate(javaCreds)
+              .toScala
+              .map(_.asScala)(sameThreadExecutionContext)
+          }
+        ).flatMap { user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
         }
 
@@ -235,9 +239,9 @@ private[http] object RouteImplementation
 
       case o: OpaqueRoute ⇒
         (ctx ⇒
-           o.handle(new RequestContextImpl(ctx))
-             .asInstanceOf[RouteResultImpl]
-             .underlying)
+          o.handle(new RequestContextImpl(ctx))
+            .asInstanceOf[RouteResultImpl]
+            .underlying)
       case p: Product ⇒
         extractExecutionContext { implicit ec ⇒
           complete((500, s"Not implemented: ${p.productPrefix}"))

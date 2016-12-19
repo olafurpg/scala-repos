@@ -694,10 +694,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
       "monitor" in {
         val znode = zkClient("/characters")
         val results =
-          List(Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
-               Seq("Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Spike")) map {
+          List(
+            Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
+            Seq("Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Spike")
+          ) map {
             ZNode.Children(znode, new Stat, _)
           }
         results foreach { r =>

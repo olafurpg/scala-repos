@@ -19,10 +19,8 @@ trait Enumeratee2TFunctions {
       iter: IterateeT[K, F, A]): IterateeT[J, IterateeT[K, F, ?], A] =
     IterateeT.IterateeTMonadTrans[J].liftM[IterateeT[K, F, ?], A](iter)
 
-  def cogroupI[J, K, F[_]](
-      implicit M: Monad[F],
-      order: (J,
-              K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
+  def cogroupI[J, K, F[_]](implicit M: Monad[F], order: (J, K) => Ordering)
+    : Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
     new Enumeratee2T[J, K, Either3[J, (J, K), K], F] {
       def apply[A] = {
         // Used to 'replay' values from the right for when values from the left order equal
@@ -92,9 +90,9 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def joinI[J, K, F[_]](implicit M: Monad[F],
-                        ord: (J,
-                              K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
+  def joinI[J, K, F[_]](
+      implicit M: Monad[F],
+      ord: (J, K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
     new Enumeratee2T[J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[(J, K), F, A])

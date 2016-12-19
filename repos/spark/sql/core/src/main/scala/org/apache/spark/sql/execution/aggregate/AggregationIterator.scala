@@ -39,8 +39,8 @@ abstract class AggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression],
-                           Seq[Attribute]) => (() => MutableProjection))
+    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (
+        () => MutableProjection))
     extends Iterator[UnsafeRow]
     with Logging {
 
@@ -68,7 +68,8 @@ abstract class AggregationIterator(
     require(
       modes.subsetOf(Set(Partial, PartialMerge)) ||
         modes.subsetOf(Set(Final, Complete)),
-      s"$aggregateExpressions can't have Partial/PartialMerge and Final/Complete in the same time.")
+      s"$aggregateExpressions can't have Partial/PartialMerge and Final/Complete in the same time."
+    )
   }
 
   // Initialize all AggregateFunctions by binding references if necessary,

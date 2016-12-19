@@ -121,9 +121,9 @@ trait GenTypes { self: Reifier =>
     def isSynthetic(manifest: Tree) =
       manifest exists
         (sub =>
-           sub.symbol != null &&
-             (sub.symbol == FullManifestModule ||
-               sub.symbol.owner == FullManifestModule))
+          sub.symbol != null &&
+            (sub.symbol == FullManifestModule ||
+              sub.symbol.owner == FullManifestModule))
     def searchForManifest(typer: analyzer.Typer): Tree =
       analyzer.inferImplicit(
         EmptyTree,
@@ -132,7 +132,8 @@ trait GenTypes { self: Reifier =>
         isView = false,
         context = typer.context,
         saveAmbiguousDivergent = false,
-        pos = defaultErrorPosition) match {
+        pos = defaultErrorPosition
+      ) match {
         case success if !success.tree.isEmpty && !isSynthetic(success.tree) =>
           val manifestInScope = success.tree
           // todo. write a test for this

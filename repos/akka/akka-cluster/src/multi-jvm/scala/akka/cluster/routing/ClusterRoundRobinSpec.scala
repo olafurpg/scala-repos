@@ -116,7 +116,8 @@ abstract class ClusterRoundRobinSpec
                                 maxInstancesPerNode = 1,
                                 allowLocalRoutees = true,
                                 useRole = None)).props(Props[SomeActor]),
-    "router2")
+    "router2"
+  )
   lazy val router3 =
     system.actorOf(FromConfig.props(Props[SomeActor]), "router3")
   lazy val router4 = system.actorOf(FromConfig.props(), "router4")

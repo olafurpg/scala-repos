@@ -80,7 +80,8 @@ class InlineParsersTest
     "AT&T" -> "AT&amp;T",
     "<ATT" -> "&lt;ATT",
     "test&nbsp;hello" -> "test&nbsp;hello",
-    "test &nbsp; hello&nbsp;;" -> "test &nbsp; hello&nbsp;;")
+    "test &nbsp; hello&nbsp;;" -> "test &nbsp; hello&nbsp;;"
+  )
 
   val linkTests = List(
     ("""[link text](http://example.com "link title")""",

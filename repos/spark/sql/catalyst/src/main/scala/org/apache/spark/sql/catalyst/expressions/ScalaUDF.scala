@@ -162,11 +162,13 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child4.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input))
+          )
         }
 
     case 6 =>
@@ -191,12 +193,14 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child5.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input))
+          )
         }
 
     case 7 =>
@@ -225,13 +229,15 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child6.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input))
+          )
         }
 
     case 8 =>
@@ -263,14 +269,16 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child7.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input))
+          )
         }
 
     case 9 =>
@@ -305,20 +313,22 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child8.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input))
+          )
         }
 
     case 10 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -351,21 +361,23 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child9.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input))
+          )
         }
 
     case 11 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -401,22 +413,24 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child10.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input))
+          )
         }
 
     case 12 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -455,23 +469,37 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child11.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input))
+          )
         }
 
     case 13 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -513,24 +541,39 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child12.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input))
+          )
         }
 
     case 14 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -575,26 +618,42 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child13.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input))
+          )
         }
 
     case 15 =>
       val func =
-        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                               Any, Any, Any, Any, Any, Any) => Any]
+        function.asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -642,27 +701,44 @@ case class ScalaUDF(function: AnyRef,
         CatalystTypeConverters.createToScalaConverter(child14.dataType)
       (input: InternalRow) =>
         {
-          func(converter0(child0.eval(input)),
-               converter1(child1.eval(input)),
-               converter2(child2.eval(input)),
-               converter3(child3.eval(input)),
-               converter4(child4.eval(input)),
-               converter5(child5.eval(input)),
-               converter6(child6.eval(input)),
-               converter7(child7.eval(input)),
-               converter8(child8.eval(input)),
-               converter9(child9.eval(input)),
-               converter10(child10.eval(input)),
-               converter11(child11.eval(input)),
-               converter12(child12.eval(input)),
-               converter13(child13.eval(input)),
-               converter14(child14.eval(input)))
+          func(
+            converter0(child0.eval(input)),
+            converter1(child1.eval(input)),
+            converter2(child2.eval(input)),
+            converter3(child3.eval(input)),
+            converter4(child4.eval(input)),
+            converter5(child5.eval(input)),
+            converter6(child6.eval(input)),
+            converter7(child7.eval(input)),
+            converter8(child8.eval(input)),
+            converter9(child9.eval(input)),
+            converter10(child10.eval(input)),
+            converter11(child11.eval(input)),
+            converter12(child12.eval(input)),
+            converter13(child13.eval(input)),
+            converter14(child14.eval(input))
+          )
         }
 
     case 16 =>
       val func =
-        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                               Any, Any, Any, Any, Any, Any, Any) => Any]
+        function.asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -735,8 +811,24 @@ case class ScalaUDF(function: AnyRef,
 
     case 17 =>
       val func =
-        function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                               Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+        function.asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -813,8 +905,25 @@ case class ScalaUDF(function: AnyRef,
 
     case 18 =>
       val func = function
-        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                       Any, Any, Any, Any, Any, Any, Any) => Any]
+        .asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -895,8 +1004,26 @@ case class ScalaUDF(function: AnyRef,
 
     case 19 =>
       val func = function
-        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                       Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+        .asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -981,8 +1108,27 @@ case class ScalaUDF(function: AnyRef,
 
     case 20 =>
       val func = function
-        .asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-                       Any, Any, Any, Any, Any, Any, Any, Any, Any) => Any]
+        .asInstanceOf[
+          (Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any,
+           Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1070,9 +1216,28 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 21 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1164,9 +1329,29 @@ case class ScalaUDF(function: AnyRef,
         }
 
     case 22 =>
-      val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any, Any, Any, Any,
-                                        Any, Any, Any, Any, Any, Any) => Any]
+      val func = function.asInstanceOf[
+        (Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any,
+         Any) => Any]
       val child0 = children(0)
       val child1 = children(1)
       val child2 = children(2)
@@ -1280,7 +1465,8 @@ case class ScalaUDF(function: AnyRef,
       converterTerm,
       s"this.$converterTerm = ($converterClassName)$typeConvertersClassName" +
         s".createToScalaConverter(((${expressionClassName})((($scalaUDFClassName)" +
-        s"references[$expressionIdx]).getChildren().apply($index))).dataType());")
+        s"references[$expressionIdx]).getChildren().apply($index))).dataType());"
+    )
     converterTerm
   }
 
@@ -1302,7 +1488,8 @@ case class ScalaUDF(function: AnyRef,
       catalystConverterTerm,
       s"this.$catalystConverterTerm = ($converterClassName)$typeConvertersClassName" +
         s".createToCatalystConverter((($scalaUDFClassName)references" +
-        s"[$catalystConverterTermIdx]).dataType());")
+        s"[$catalystConverterTermIdx]).dataType());"
+    )
 
     val resultTerm = ctx.freshName("result")
 

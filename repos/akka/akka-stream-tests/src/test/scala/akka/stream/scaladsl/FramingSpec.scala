@@ -202,7 +202,8 @@ class FramingSpec extends AkkaSpec {
               .lengthField(fieldLength, fieldOffset, Int.MaxValue, byteOrder))
             .grouped(10000)
             .runWith(Sink.head),
-          3.seconds) should ===(encodedFrames)
+          3.seconds
+        ) should ===(encodedFrames)
       }
     }
 
@@ -222,7 +223,8 @@ class FramingSpec extends AkkaSpec {
               encode(referenceChunk.take(100), 0, 1, ByteOrder.BIG_ENDIAN))
             .via(Framing.lengthField(1, 0, 99, ByteOrder.BIG_ENDIAN))
             .runFold(Vector.empty[ByteString])(_ :+ _),
-          3.seconds)
+          3.seconds
+        )
       }
 
       an[FramingException] should be thrownBy {
@@ -232,7 +234,8 @@ class FramingSpec extends AkkaSpec {
               encode(referenceChunk.take(100), 49, 1, ByteOrder.BIG_ENDIAN))
             .via(Framing.lengthField(1, 0, 100, ByteOrder.BIG_ENDIAN))
             .runFold(Vector.empty[ByteString])(_ :+ _),
-          3.seconds)
+          3.seconds
+        )
       }
     }
 
@@ -253,16 +256,18 @@ class FramingSpec extends AkkaSpec {
         val partialFrame = fullFrame.dropRight(1)
 
         an[FramingException] should be thrownBy {
-          Await.result(Source(List(fullFrame, partialFrame))
-                         .via(rechunk)
-                         .via(
-                           Framing.lengthField(fieldLength,
-                                               fieldOffset,
-                                               Int.MaxValue,
-                                               byteOrder))
-                         .grouped(10000)
-                         .runWith(Sink.head),
-                       3.seconds)
+          Await.result(
+            Source(List(fullFrame, partialFrame))
+              .via(rechunk)
+              .via(
+                Framing.lengthField(fieldLength,
+                                    fieldOffset,
+                                    Int.MaxValue,
+                                    byteOrder))
+              .grouped(10000)
+              .runWith(Sink.head),
+            3.seconds
+          )
         }
       }
     }

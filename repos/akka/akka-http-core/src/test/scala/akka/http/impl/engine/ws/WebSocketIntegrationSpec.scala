@@ -34,15 +34,19 @@ class WebSocketIntegrationSpec
     "not reset the connection when no data are flowing" in Utils
       .assertAllStagesStopped {
         val source = TestPublisher.probe[Message]()
-        val bindingFuture = Http().bindAndHandleSync({
-          case HttpRequest(_, _, headers, _, _) ⇒
-            val upgrade =
-              headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
-            upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
-              None)
-        }, interface = "localhost", port = 0)
+        val bindingFuture = Http().bindAndHandleSync(
+          {
+            case HttpRequest(_, _, headers, _, _) ⇒
+              val upgrade =
+                headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
+              upgrade.handleMessages(
+                Flow.fromSinkAndSource(Sink.ignore,
+                                       Source.fromPublisher(source)),
+                None)
+          },
+          interface = "localhost",
+          port = 0
+        )
         val binding = Await.result(bindingFuture, 3.seconds)
         val myPort = binding.localAddress.getPort
 
@@ -63,15 +67,19 @@ class WebSocketIntegrationSpec
     "not reset the connection when no data are flowing and the connection is closed from the client" in Utils
       .assertAllStagesStopped {
         val source = TestPublisher.probe[Message]()
-        val bindingFuture = Http().bindAndHandleSync({
-          case HttpRequest(_, _, headers, _, _) ⇒
-            val upgrade =
-              headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
-            upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
-              None)
-        }, interface = "localhost", port = 0)
+        val bindingFuture = Http().bindAndHandleSync(
+          {
+            case HttpRequest(_, _, headers, _, _) ⇒
+              val upgrade =
+                headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
+              upgrade.handleMessages(
+                Flow.fromSinkAndSource(Sink.ignore,
+                                       Source.fromPublisher(source)),
+                None)
+          },
+          interface = "localhost",
+          port = 0
+        )
         val binding = Await.result(bindingFuture, 3.seconds)
         val myPort = binding.localAddress.getPort
 
@@ -105,12 +113,16 @@ class WebSocketIntegrationSpec
     "echo 100 elements and then shut down without error" in Utils
       .assertAllStagesStopped {
 
-        val bindingFuture = Http().bindAndHandleSync({
-          case HttpRequest(_, _, headers, _, _) ⇒
-            val upgrade =
-              headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
-            upgrade.handleMessages(Flow.apply, None)
-        }, interface = "localhost", port = 0)
+        val bindingFuture = Http().bindAndHandleSync(
+          {
+            case HttpRequest(_, _, headers, _, _) ⇒
+              val upgrade =
+                headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
+              upgrade.handleMessages(Flow.apply, None)
+          },
+          interface = "localhost",
+          port = 0
+        )
         val binding = Await.result(bindingFuture, 3.seconds)
         val myPort = binding.localAddress.getPort
 
@@ -123,7 +135,8 @@ class WebSocketIntegrationSpec
             WebSocketRequest("ws://127.0.0.1:" + myPort),
             Flow.fromSinkAndSourceMat(
               Sink.fold(0)((n, _: Message) ⇒ n + 1),
-              Source.repeat(TextMessage("hello")).take(N))(Keep.left))
+              Source.repeat(TextMessage("hello")).take(N))(Keep.left)
+          )
           count.futureValue should ===(N)
         }
 
@@ -151,12 +164,16 @@ class WebSocketIntegrationSpec
           FlowShape(mapMsgToInt.in, mapIntToMsg.out)
         })
 
-        val bindingFuture = Http().bindAndHandleSync({
-          case HttpRequest(_, _, headers, _, _) ⇒
-            val upgrade =
-              headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
-            upgrade.handleMessages(handler, None)
-        }, interface = "localhost", port = 0)
+        val bindingFuture = Http().bindAndHandleSync(
+          {
+            case HttpRequest(_, _, headers, _, _) ⇒
+              val upgrade =
+                headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
+              upgrade.handleMessages(handler, None)
+          },
+          interface = "localhost",
+          port = 0
+        )
         val binding = Await.result(bindingFuture, 3.seconds)
         val myPort = binding.localAddress.getPort
 

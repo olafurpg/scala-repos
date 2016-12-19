@@ -16,7 +16,8 @@ object Serbench extends Benchmark {
          Team("Impl",
               List(Employee("Mark", 4),
                    Employee("Mary", 5),
-                   Employee("Nick Noob", 1)))))
+                   Employee("Nick Noob", 1))))
+  )
 
   val jvalueProject = {
     ("name" -> "test") ~ ("startDate" -> new Date().getTime) ~

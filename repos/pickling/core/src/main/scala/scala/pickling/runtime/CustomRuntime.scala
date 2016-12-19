@@ -73,14 +73,16 @@ object CustomRuntime {
                                        |elemTag: '${elemTag.key}'
                                        |message:
                                        |$msg""".stripMargin,
-                cause)
+                cause
+              )
             case e: Exception =>
               e.printStackTrace()
               throw PicklingException(
                 s"""exception in unpickle of 'mkRuntimeTravPickler':
                                        |collTag: '${collTag.key}'
                                        |elemTag: '${elemTag.key}'""".stripMargin,
-                Some(e))
+                Some(e)
+              )
           }
         }
 
@@ -173,7 +175,8 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
                                        |field tag: '${tag1}'
                                        |message:
                                        |$msg""".stripMargin,
-              cause)
+              cause
+            )
         }
       }
     }

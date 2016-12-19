@@ -291,7 +291,8 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
     33 -~ nameRef,
     34 -^ null,
     35 -~ typeRef,
-    36 -~ symbolRef)
+    36 -~ symbolRef
+  )
 
   //for now, support only constants and arrays of constants
   lazy val annotArgArray =

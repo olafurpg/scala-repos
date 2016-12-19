@@ -81,7 +81,8 @@ more text
           "foo" -> new LinkDefinition("foo",
                                       "http://www.example.com",
                                       Some("A Title"))
-        )))
+        )
+      ))
   }
 
   it should "parse different line types" in {

@@ -29,7 +29,8 @@ object Test extends App {
             Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY),
                          termNames.CONSTRUCTOR),
                   List())),
-          Literal(Constant(()))))
+          Literal(Constant(())))
+  )
   val module = ModuleDef(NoMods,
                          TermName("Macros"),
                          Template(Nil, noSelfType, List(modulector, macrodef)))

@@ -131,7 +131,8 @@ private[ml] object RandomForest extends Logging {
       maxMemoryPerNode <= maxMemoryUsage,
       s"RandomForest/DecisionTree given maxMemoryInMB = ${strategy.maxMemoryInMB}," +
         " which is too small for the given features." +
-        s"  Minimum value = ${maxMemoryPerNode / (1024L * 1024L)}")
+        s"  Minimum value = ${maxMemoryPerNode / (1024L * 1024L)}"
+    )
 
     timer.stop("init")
 
@@ -1138,7 +1139,8 @@ private[ml] object RandomForest extends Logging {
     assert(
       splits.length > 0,
       s"DecisionTree could not handle feature $featureIndex since it had only 1 unique value." +
-        "  Please remove this feature and then try again.")
+        "  Please remove this feature and then try again."
+    )
 
     splits
   }

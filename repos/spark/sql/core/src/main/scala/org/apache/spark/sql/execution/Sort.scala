@@ -144,12 +144,14 @@ case class Sort(sortOrder: Seq[SortOrder],
                         "")
 
     val addToSorter = ctx.freshName("addToSorter")
-    ctx.addNewFunction(addToSorter,
-                       s"""
+    ctx.addNewFunction(
+      addToSorter,
+      s"""
         | private void $addToSorter() throws java.io.IOException {
         |   ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
         | }
-      """.stripMargin.trim)
+      """.stripMargin.trim
+    )
 
     // The child could change `copyResult` to true, but we had already consumed all the rows,
     // so `copyResult` should be reset to `false`.

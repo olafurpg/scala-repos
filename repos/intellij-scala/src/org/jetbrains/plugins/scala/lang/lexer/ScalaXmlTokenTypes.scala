@@ -119,7 +119,8 @@ object ScalaXmlTokenTypes {
     XmlTokenType.XML_TAG_CHARACTERS,
     XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN,
     XmlTokenType.XML_PI_TARGET,
-    XmlTokenType.XML_COMMENT_CHARACTERS)
+    XmlTokenType.XML_COMMENT_CHARACTERS
+  )
 
   class PatchedXmlLexer
       extends MergingLexerAdapter(

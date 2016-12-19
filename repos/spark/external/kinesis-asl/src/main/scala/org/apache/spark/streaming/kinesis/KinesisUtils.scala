@@ -145,7 +145,8 @@ object KinesisUtils {
         checkpointInterval,
         storageLevel,
         cleanedHandler,
-        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
+        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey))
+      )
     }
   }
 
@@ -187,16 +188,18 @@ object KinesisUtils {
       storageLevel: StorageLevel): ReceiverInputDStream[Array[Byte]] = {
     // Setting scope to override receiver stream's scope of "receiver stream"
     ssc.withNamedScope("kinesis stream") {
-      new KinesisInputDStream[Array[Byte]](ssc,
-                                           streamName,
-                                           endpointUrl,
-                                           validateRegion(regionName),
-                                           initialPositionInStream,
-                                           kinesisAppName,
-                                           checkpointInterval,
-                                           storageLevel,
-                                           defaultMessageHandler,
-                                           None)
+      new KinesisInputDStream[Array[Byte]](
+        ssc,
+        streamName,
+        endpointUrl,
+        validateRegion(regionName),
+        initialPositionInStream,
+        kinesisAppName,
+        checkpointInterval,
+        storageLevel,
+        defaultMessageHandler,
+        None
+      )
     }
   }
 
@@ -250,7 +253,8 @@ object KinesisUtils {
         checkpointInterval,
         storageLevel,
         defaultMessageHandler,
-        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey)))
+        Some(SerializableAWSCredentials(awsAccessKeyId, awsSecretKey))
+      )
     }
   }
 
@@ -355,17 +359,19 @@ object KinesisUtils {
     // scalastyle:on
     implicit val recordCmt: ClassTag[T] = ClassTag(recordClass)
     val cleanedHandler = jssc.sparkContext.clean(messageHandler.call(_))
-    createStream[T](jssc.ssc,
-                    kinesisAppName,
-                    streamName,
-                    endpointUrl,
-                    regionName,
-                    initialPositionInStream,
-                    checkpointInterval,
-                    storageLevel,
-                    cleanedHandler,
-                    awsAccessKeyId,
-                    awsSecretKey)
+    createStream[T](
+      jssc.ssc,
+      kinesisAppName,
+      streamName,
+      endpointUrl,
+      regionName,
+      initialPositionInStream,
+      checkpointInterval,
+      storageLevel,
+      cleanedHandler,
+      awsAccessKeyId,
+      awsSecretKey
+    )
   }
 
   /**
@@ -456,17 +462,19 @@ object KinesisUtils {
       storageLevel: StorageLevel,
       awsAccessKeyId: String,
       awsSecretKey: String): JavaReceiverInputDStream[Array[Byte]] = {
-    createStream[Array[Byte]](jssc.ssc,
-                              kinesisAppName,
-                              streamName,
-                              endpointUrl,
-                              regionName,
-                              initialPositionInStream,
-                              checkpointInterval,
-                              storageLevel,
-                              defaultMessageHandler(_),
-                              awsAccessKeyId,
-                              awsSecretKey)
+    createStream[Array[Byte]](
+      jssc.ssc,
+      kinesisAppName,
+      streamName,
+      endpointUrl,
+      regionName,
+      initialPositionInStream,
+      checkpointInterval,
+      storageLevel,
+      defaultMessageHandler(_),
+      awsAccessKeyId,
+      awsSecretKey
+    )
   }
 
   private def getRegionByEndpoint(endpointUrl: String): String = {
@@ -548,7 +556,8 @@ private class KinesisUtilsPythonHelper {
         checkpointInterval,
         storageLevel,
         awsAccessKeyId,
-        awsSecretKey)
+        awsSecretKey
+      )
     }
   }
 }

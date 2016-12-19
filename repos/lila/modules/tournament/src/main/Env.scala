@@ -49,23 +49,24 @@ final class Env(config: Config,
   lazy val cached =
     new Cached(createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
 
-  lazy val api = new TournamentApi(cached = cached,
-                                   scheduleJsonView = scheduleJsonView,
-                                   system = system,
-                                   sequencers = sequencerMap,
-                                   autoPairing = autoPairing,
-                                   clearJsonViewCache = jsonView.clearCache,
-                                   router = hub.actor.router,
-                                   renderer = hub.actor.renderer,
-                                   timeline = hub.actor.timeline,
-                                   socketHub = socketHub,
-                                   site = hub.socket.site,
-                                   lobby = hub.socket.lobby,
-                                   trophyApi = trophyApi,
-                                   indexLeaderboard =
-                                     leaderboardIndexer.indexOne _,
-                                   roundMap = roundMap,
-                                   roundSocketHub = roundSocketHub)
+  lazy val api = new TournamentApi(
+    cached = cached,
+    scheduleJsonView = scheduleJsonView,
+    system = system,
+    sequencers = sequencerMap,
+    autoPairing = autoPairing,
+    clearJsonViewCache = jsonView.clearCache,
+    router = hub.actor.router,
+    renderer = hub.actor.renderer,
+    timeline = hub.actor.timeline,
+    socketHub = socketHub,
+    site = hub.socket.site,
+    lobby = hub.socket.lobby,
+    trophyApi = trophyApi,
+    indexLeaderboard = leaderboardIndexer.indexOne _,
+    roundMap = roundMap,
+    roundSocketHub = roundSocketHub
+  )
 
   val tourAndRanks = api tourAndRanks _
 
@@ -91,15 +92,20 @@ final class Env(config: Config,
     leaderboardColl = leaderboardColl)
 
   private val socketHub =
-    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
-      def mkActor(tournamentId: String) =
-        new Socket(tournamentId = tournamentId,
-                   history = new History(ttl = HistoryMessageTtl),
-                   jsonView = jsonView,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout,
-                   lightUser = lightUser)
-    }), name = SocketName)
+    system.actorOf(
+      Props(new lila.socket.SocketHubActor.Default[Socket] {
+        def mkActor(tournamentId: String) =
+          new Socket(
+            tournamentId = tournamentId,
+            history = new History(ttl = HistoryMessageTtl),
+            jsonView = jsonView,
+            uidTimeout = UidTimeout,
+            socketTimeout = SocketTimeout,
+            lightUser = lightUser
+          )
+      }),
+      name = SocketName
+    )
 
   private val sequencerMap = system.actorOf(Props(ActorMap { id =>
     new Sequencer(receiveTimeout = SequencerTimeout.some,

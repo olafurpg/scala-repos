@@ -44,12 +44,14 @@ final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] priva
   def this(size: Int, default: ConfigurableDefault[V], initialSize: Int)(
       implicit manElem: ClassTag[V],
       zero: Zero[V]) = {
-    this(OpenAddressHashArray.emptyIndexArray(
-           OpenAddressHashArray.calculateSize(initialSize)),
-         default.makeArray(OpenAddressHashArray.calculateSize(initialSize)),
-         0,
-         size,
-         default)
+    this(
+      OpenAddressHashArray.emptyIndexArray(
+        OpenAddressHashArray.calculateSize(initialSize)),
+      default.makeArray(OpenAddressHashArray.calculateSize(initialSize)),
+      0,
+      size,
+      default
+    )
   }
 
   def this(size: Int, default: ConfigurableDefault[V])(

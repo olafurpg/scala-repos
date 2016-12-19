@@ -257,7 +257,8 @@ private[akka] object GraphInterpreter {
                      inletsSize,
                      connectionCount),
         add(outlets.iterator, Array.ofDim(connectionCount), inletsSize),
-        markBoundary(Array.ofDim(connectionCount), 0, inletsSize))
+        markBoundary(Array.ofDim(connectionCount), 0, inletsSize)
+      )
 
       assembly
     }

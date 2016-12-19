@@ -129,11 +129,11 @@ trait ThriftTest { self: FunSuite =>
   )
 
   // For some reason, the compiler needs some help here.
-  private type NewClient = (TProtocolFactory, SocketAddress,
-                            Option[ClientId]) => {
-    def close()
-    val client: Iface
-  }
+  private type NewClient =
+    (TProtocolFactory, SocketAddress, Option[ClientId]) => {
+      def close()
+      val client: Iface
+    }
 
   private type NewServer = (TProtocolFactory) => {
     def close()

@@ -293,7 +293,8 @@ object JavaTypeInference {
                      Invoke(getPath, "valueArray", ArrayType(valueDataType)),
                      valueDataType),
           "array",
-          ObjectType(classOf[Array[Any]]))
+          ObjectType(classOf[Array[Any]])
+        )
 
         StaticInvoke(ArrayBasedMapData.getClass,
                      ObjectType(classOf[JMap[_, _]]),

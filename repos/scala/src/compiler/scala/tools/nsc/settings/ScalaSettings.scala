@@ -377,11 +377,13 @@ trait ScalaSettings
     "policy",
     "Control expansion of macros, useful for scaladoc and presentation compiler",
     List(MacroExpand.Normal, MacroExpand.None, MacroExpand.Discard),
-    MacroExpand.Normal)
+    MacroExpand.Normal
+  )
   val Ymacronoexpand =
     BooleanSetting(
       "-Ymacro-no-expand",
-      "Don't expand macros. Might be useful for scaladoc and presentation compiler, but will crash anything which uses macros and gets past typer.") withDeprecationMessage
+      "Don't expand macros. Might be useful for scaladoc and presentation compiler, but will crash anything which uses macros and gets past typer."
+    ) withDeprecationMessage
       (s"Use ${Ymacroexpand.name}:${MacroExpand.None}") withPostSetHook
       (_ => Ymacroexpand.value = MacroExpand.None)
   val Yreplsync = BooleanSetting(
@@ -412,7 +414,8 @@ trait ScalaSettings
     "Choose classpath scanning method.",
     List(ClassPathRepresentationType.Recursive,
          ClassPathRepresentationType.Flat),
-    ClassPathRepresentationType.Recursive)
+    ClassPathRepresentationType.Recursive
+  )
   val YdisableFlatCpCaching = BooleanSetting(
     "-YdisableFlatCpCaching",
     "Do not cache flat classpath representation of classpath elements from jars across compiler instances.")
@@ -536,7 +539,8 @@ trait ScalaSettings
     helpArg = "strategy",
     descr = "Set the heuristics for inlining decisions.",
     choices = List("at-inline-annotated", "everything", "default"),
-    default = "default")
+    default = "default"
+  )
 
   object YoptWarningsChoices extends MultiChoiceEnumeration {
     val none = Choice("none", "No optimizer warnings.")
@@ -554,7 +558,8 @@ trait ScalaSettings
       "In mixed compilation, warn at callsites methods defined in java sources (the inlining decision cannot be made without bytecode).")
     val noInlineMissingBytecode = Choice(
       "no-inline-missing-bytecode",
-      "Warn if an inlining decision cannot be made because a the bytecode of a class or member cannot be found on the compilation classpath.")
+      "Warn if an inlining decision cannot be made because a the bytecode of a class or member cannot be found on the compilation classpath."
+    )
     val noInlineMissingScalaInlineInfoAttr = Choice(
       "no-inline-missing-attribute",
       "Warn if an inlining decision cannot be made because a Scala classfile does not have a ScalaInlineInfo attribute.")
@@ -565,7 +570,8 @@ trait ScalaSettings
     helpArg = "warning",
     descr = "Enable optimizer warnings",
     domain = YoptWarningsChoices,
-    default = Some(List(YoptWarningsChoices.atInlineFailed.name)))
+    default = Some(List(YoptWarningsChoices.atInlineFailed.name))
+  )
 
   def YoptWarningsSummaryOnly =
     YoptWarnings.value subsetOf Set(YoptWarningsChoices.none,

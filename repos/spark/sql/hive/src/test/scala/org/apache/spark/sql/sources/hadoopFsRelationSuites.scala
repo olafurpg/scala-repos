@@ -92,12 +92,14 @@ abstract class HadoopFsRelationTest
     // Self-join
     df.registerTempTable("t")
     withTempTable("t") {
-      checkAnswer(sql("""SELECT l.a, r.b, l.p1, r.p2
+      checkAnswer(
+        sql("""SELECT l.a, r.b, l.p1, r.p2
             |FROM t l JOIN t r
             |ON l.a = r.a AND l.p1 = r.p1 AND l.p2 = r.p2
           """.stripMargin),
-                  for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
-                    yield Row(i, s"val_$i", p1, p2))
+        for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+          yield Row(i, s"val_$i", p1, p2)
+      )
     }
   }
 
@@ -198,12 +200,14 @@ abstract class HadoopFsRelationTest
         .format(dataSourceName)
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath)
-                    .orderBy("a"),
-                  testDF.unionAll(testDF).orderBy("a").collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath)
+          .orderBy("a"),
+        testDF.unionAll(testDF).orderBy("a").collect()
+      )
     }
   }
 
@@ -283,11 +287,13 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath),
-                  partitionedTestDF.unionAll(partitionedTestDF).collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath),
+        partitionedTestDF.unionAll(partitionedTestDF).collect()
+      )
     }
   }
 
@@ -712,10 +718,11 @@ abstract class HadoopFsRelationTest
 
   test(
     "SPARK-8887: Explicitly define which data types can be used as dynamic partition columns") {
-    val df = Seq((1, "v1", Array(1, 2, 3), Map("k1" -> "v1"), Tuple2(1, "4")),
-                 (2, "v2", Array(4, 5, 6), Map("k2" -> "v2"), Tuple2(2, "5")),
-                 (3, "v3", Array(7, 8, 9), Map("k3" -> "v3"), Tuple2(3, "6")))
-      .toDF("a", "b", "c", "d", "e")
+    val df = Seq(
+      (1, "v1", Array(1, 2, 3), Map("k1" -> "v1"), Tuple2(1, "4")),
+      (2, "v2", Array(4, 5, 6), Map("k2" -> "v2"), Tuple2(2, "5")),
+      (3, "v3", Array(7, 8, 9), Map("k3" -> "v3"), Tuple2(3, "6"))
+    ).toDF("a", "b", "c", "d", "e")
     withTempDir { file =>
       intercept[AnalysisException] {
         df.write

@@ -135,7 +135,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       field,
       colAnnotation,
       isOptimisticCounter,
-      metaField) {
+      metaField
+    ) {
 
       override def length = {
         import java.math.MathContext

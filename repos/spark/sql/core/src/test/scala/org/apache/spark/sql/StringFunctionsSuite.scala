@@ -54,11 +54,11 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
                  ("100-200", "(\\d+)-(\\d+)", "400"),
                  ("100-200", "(\\d+)", "400")).toDF("a", "b", "c")
 
-    checkAnswer(df.select(regexp_replace($"a", "(\\d+)", "num"),
-                          regexp_extract($"a", "(\\d+)-(\\d+)", 1)),
-                Row("num-num", "100") :: Row("num-num", "100") :: Row(
-                  "num-num",
-                  "100") :: Nil)
+    checkAnswer(
+      df.select(regexp_replace($"a", "(\\d+)", "num"),
+                regexp_extract($"a", "(\\d+)-(\\d+)", 1)),
+      Row("num-num", "100") :: Row("num-num", "100") :: Row("num-num", "100") :: Nil
+    )
 
     // for testing the mutable state of the expression in code gen.
     // This is a hack way to enable the codegen, thus the codegen is enable by default,
@@ -68,7 +68,8 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
       df.filter("isnotnull(a)")
         .selectExpr("regexp_replace(a, b, c)", "regexp_extract(a, b, 1)"),
-      Row("300", "100") :: Row("400", "100") :: Row("400-400", "100") :: Nil)
+      Row("300", "100") :: Row("400", "100") :: Row("400-400", "100") :: Nil
+    )
   }
 
   test("string ascii function") {

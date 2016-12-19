@@ -39,7 +39,7 @@ object TraverseUsage extends App {
   val smallNumbers = List(1, 2, 3, 4, 5)
   val bigNumbers = List(10, 20, 30, 40, 50)
   val doubleSmall: Int => Option[Int] = (x =>
-                                           if (x < 30) Some(x * 2) else None)
+    if (x < 30) Some(x * 2) else None)
 
   assert(smallNumbers.traverse(doubleSmall) === Some(List(2, 4, 6, 8, 10)))
   assert(

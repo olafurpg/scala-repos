@@ -12,8 +12,8 @@ object SpecialPolynomials {
   def hornerScheme[C: Ring: Eq: ClassTag](
       zero: Polynomial[C],
       one: Polynomial[C],
-      fn: (Polynomial[C], Polynomial[C],
-           Int) => Polynomial[C]): Stream[Polynomial[C]] = {
+      fn: (Polynomial[C], Polynomial[C], Int) => Polynomial[C])
+    : Stream[Polynomial[C]] = {
     def loop(pnm1: Polynomial[C],
              pn: Polynomial[C],
              n: Int = 1): Stream[Polynomial[C]] = {

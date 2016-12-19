@@ -62,13 +62,17 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
     findAbstractFile(name) match {
       case null => null
       case file =>
-        new URL(null, s"memory:${file.path}", new URLStreamHandler {
-          override def openConnection(url: URL): URLConnection =
-            new URLConnection(url) {
-              override def connect() = ()
-              override def getInputStream = file.input
-            }
-        })
+        new URL(
+          null,
+          s"memory:${file.path}",
+          new URLStreamHandler {
+            override def openConnection(url: URL): URLConnection =
+              new URLConnection(url) {
+                override def connect() = ()
+                override def getInputStream = file.input
+              }
+          }
+        )
     }
   override protected def findResources(name: String): JEnumeration[URL] =
     findResource(name) match {
@@ -113,21 +117,31 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
     findAbstractDir(name) match {
       case null => super.getPackage(name)
       case file =>
-        packages.getOrElseUpdate(name, {
-          val ctor =
-            classOf[Package].getDeclaredConstructor(classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[URL],
-                                                    classOf[ClassLoader])
-          ctor.setAccessible(true)
-          ctor
-            .newInstance(name, null, null, null, null, null, null, null, this)
-        })
+        packages.getOrElseUpdate(
+          name, {
+            val ctor =
+              classOf[Package].getDeclaredConstructor(classOf[String],
+                                                      classOf[String],
+                                                      classOf[String],
+                                                      classOf[String],
+                                                      classOf[String],
+                                                      classOf[String],
+                                                      classOf[String],
+                                                      classOf[URL],
+                                                      classOf[ClassLoader])
+            ctor.setAccessible(true)
+            ctor
+              .newInstance(name,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           null,
+                           this)
+          }
+        )
     }
 
   override def getPackages(): Array[Package] =

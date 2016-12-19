@@ -345,7 +345,8 @@ abstract class Storm(options: Map[String, Options],
         maxEmitPerExecute,
         getOrElse(stormDag, node, IncludeSuccessHandler.default),
         new KeyValueInjection[Int, CMap[ExecutorKeyType, ExecutorValueType]],
-        new SingleItemInjection[ExecutorOutputType])
+        new SingleItemInjection[ExecutorOutputType]
+      )
     )
 
     val parallelism =

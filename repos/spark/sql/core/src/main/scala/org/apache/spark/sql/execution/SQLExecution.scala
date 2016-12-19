@@ -55,7 +55,8 @@ private[sql] object SQLExecution {
             callSite.longForm,
             queryExecution.toString,
             SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
-            System.currentTimeMillis()))
+            System.currentTimeMillis()
+          ))
         try {
           body
         } finally {

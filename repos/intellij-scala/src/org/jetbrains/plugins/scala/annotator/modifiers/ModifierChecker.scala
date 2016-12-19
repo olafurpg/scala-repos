@@ -276,7 +276,8 @@ private[annotator] object ModifierChecker {
                               "argument in first parameter list",
                             modifierPsi,
                             holder,
-                            new RemoveModifierQuickFix(owner, "implicit"))
+                            new RemoveModifierQuickFix(owner, "implicit")
+                          )
                         }
 
                         clazz.constructor match {

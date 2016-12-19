@@ -76,7 +76,8 @@ object ScalaJSPluginInternal {
     "usesScalaJSLinkerTag",
     "Scala.js internal: Tag to indicate that a task uses the link or " +
       "linkUnit method of the value of scalaJSLinker",
-    KeyRanks.Invisible)
+    KeyRanks.Invisible
+  )
 
   val scalaJSIRCacheHolder = SettingKey[globalIRCache.Cache](
     "scalaJSIRCacheHolder",
@@ -95,7 +96,8 @@ object ScalaJSPluginInternal {
     "scalaJSRequestsDOM",
     "Scala.js internal: Whether a project really wants the DOM. " +
       "Calculated using requiresDOM and jsDependencies",
-    KeyRanks.Invisible)
+    KeyRanks.Invisible
+  )
 
   /** All .sjsir files on the fullClasspath, used by scalajsp. */
   val sjsirFilesOnClasspath = TaskKey[Seq[String]](
@@ -403,15 +405,16 @@ object ScalaJSPluginInternal {
       scalaJSIR := {
         import IRFileCache.IRContainer
 
-        val rawIR = collectFromClasspath(fullClasspath.value,
-                                         "*.sjsir",
-                                         collectJar =
-                                           jar => IRContainer.Jar(jar) :: Nil,
-                                         collectFile = { (file, relPath) =>
-                                           IRContainer.File(
-                                             FileVirtualScalaJSIRFile
-                                               .relative(file, relPath))
-                                         })
+        val rawIR = collectFromClasspath(
+          fullClasspath.value,
+          "*.sjsir",
+          collectJar = jar => IRContainer.Jar(jar) :: Nil,
+          collectFile = { (file, relPath) =>
+            IRContainer.File(
+              FileVirtualScalaJSIRFile
+                .relative(file, relPath))
+          }
+        )
 
         val cache = scalaJSIRCache.value
         rawIR.map(cache.cached)
@@ -536,7 +539,8 @@ object ScalaJSPluginInternal {
           collectJar = _.jsDependencyManifests,
           collectFile = { (file, _) =>
             fromJSON[JSDependencyManifest](readJSON(IO.read(file)))
-          })
+          }
+        )
 
         rawManifests.map(manifests => filter(manifests.toTraversable))
       },

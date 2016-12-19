@@ -35,7 +35,8 @@ object PreferredReplicaLeaderElectionCommand extends Logging {
         "The JSON file with the list of partitions " +
           "for which preferred replica leader election should be done, in the following format - \n" +
           "{\"partitions\":\n\t[{\"topic\": \"foo\", \"partition\": 1},\n\t {\"topic\": \"foobar\", \"partition\": 2}]\n}\n" +
-          "Defaults to all existing partitions")
+          "Defaults to all existing partitions"
+      )
       .withRequiredArg
       .describedAs(
         "list of partitions for which preferred replica leader election needs to be triggered")
@@ -53,7 +54,8 @@ object PreferredReplicaLeaderElectionCommand extends Logging {
       CommandLineUtils.printUsageAndDie(
         parser,
         "This tool causes leadership for each partition to be transferred back to the 'preferred replica'," +
-          " it can be used to balance leadership among the servers.")
+          " it can be used to balance leadership among the servers."
+      )
 
     val options = parser.parse(args: _*)
 

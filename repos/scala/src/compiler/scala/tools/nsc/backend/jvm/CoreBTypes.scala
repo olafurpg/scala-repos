@@ -52,7 +52,8 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     IntClass -> INT,
     LongClass -> LONG,
     FloatClass -> FLOAT,
-    DoubleClass -> DOUBLE)
+    DoubleClass -> DOUBLE
+  )
 
   /**
     * Map from primitive types to their boxed class type. Useful when pushing class literals onto the
@@ -67,7 +68,8 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     INT -> classBTypeFromSymbol(BoxedIntClass),
     LONG -> classBTypeFromSymbol(BoxedLongClass),
     FLOAT -> classBTypeFromSymbol(BoxedFloatClass),
-    DOUBLE -> classBTypeFromSymbol(BoxedDoubleClass))
+    DOUBLE -> classBTypeFromSymbol(BoxedDoubleClass)
+  )
 
   lazy val boxedClasses: Set[ClassBType] = boxedClassOfPrimitive.values.toSet
 
@@ -340,10 +342,10 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
   lazy val String_valueOf: Symbol = {
     getMember(StringModule, nme.valueOf) filter
       (sym =>
-         sym.info.paramTypes match {
-           case List(pt) => pt.typeSymbol == ObjectClass
-           case _ => false
-         })
+        sym.info.paramTypes match {
+          case List(pt) => pt.typeSymbol == ObjectClass
+          case _ => false
+        })
   }
 
   lazy val lambdaMetaFactoryBootstrapHandle = new asm.Handle(
@@ -356,7 +358,8 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
            coreBTypes.jliMethodTypeRef,
            ArrayBType(ObjectRef)),
       coreBTypes.jliCallSiteRef
-    ).descriptor)
+    ).descriptor
+  )
 
   lazy val lambdaDeserializeBootstrapHandle = new scala.tools.asm.Handle(
     scala.tools.asm.Opcodes.H_INVOKESTATIC,
@@ -369,7 +372,8 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
         coreBTypes.jliMethodTypeRef
       ),
       coreBTypes.jliCallSiteRef
-    ).descriptor)
+    ).descriptor
+  )
 }
 
 /**

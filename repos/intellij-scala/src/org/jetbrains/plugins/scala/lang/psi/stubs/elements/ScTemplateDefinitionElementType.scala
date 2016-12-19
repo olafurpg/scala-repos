@@ -84,22 +84,24 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
       psi.containingClass == null &&
         PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
 
-    new ScTemplateDefinitionStubImpl[ParentPsi](parent,
-                                                this,
-                                                psi.name,
-                                                psi.qualifiedName,
-                                                psi.getQualifiedName,
-                                                fileName,
-                                                signs,
-                                                isPO,
-                                                isSFC,
-                                                isDepr,
-                                                isImplicitObject,
-                                                isImplicitClass,
-                                                javaName,
-                                                additionalJavaNames,
-                                                isLocal,
-                                                isOkForJava(psi))
+    new ScTemplateDefinitionStubImpl[ParentPsi](
+      parent,
+      this,
+      psi.name,
+      psi.qualifiedName,
+      psi.getQualifiedName,
+      fileName,
+      signs,
+      isPO,
+      isSFC,
+      isDepr,
+      isImplicitObject,
+      isImplicitClass,
+      javaName,
+      additionalJavaNames,
+      isLocal,
+      isOkForJava(psi)
+    )
   }
 
   def serialize(stub: ScTemplateDefinitionStub, dataStream: StubOutputStream) {
@@ -144,22 +146,24 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
     for (i <- 0 until lengthA) additionalNames(i) = dataStream.readName()
     val isLocal = dataStream.readBoolean()
     val visibleInJava = dataStream.readBoolean()
-    new ScTemplateDefinitionStubImpl(parent,
-                                     this,
-                                     name,
-                                     qualName,
-                                     javaQualName,
-                                     fileName,
-                                     methodNames,
-                                     isPO,
-                                     isSFC,
-                                     isDepr,
-                                     isImplcitObject,
-                                     isImplcitClass,
-                                     javaName,
-                                     additionalNames,
-                                     isLocal,
-                                     visibleInJava)
+    new ScTemplateDefinitionStubImpl(
+      parent,
+      this,
+      name,
+      qualName,
+      javaQualName,
+      fileName,
+      methodNames,
+      isPO,
+      isSFC,
+      isDepr,
+      isImplcitObject,
+      isImplcitClass,
+      javaName,
+      additionalNames,
+      isLocal,
+      visibleInJava
+    )
   }
 
   def indexStub(stub: ScTemplateDefinitionStub, sink: IndexSink) {

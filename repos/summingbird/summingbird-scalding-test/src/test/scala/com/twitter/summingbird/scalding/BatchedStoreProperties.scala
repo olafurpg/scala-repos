@@ -161,7 +161,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
        inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
                                               Batcher,
                                               TestStore[Int, Int]),
-       commutativity: Commutativity, mode: Mode) =>
+       commutativity: Commutativity,
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val mergeResult = testStore.merge(diskPipeFactory,
@@ -197,7 +198,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
        inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
                                               Batcher,
                                               TestStore[Int, Int]),
-       commutativity: Commutativity, mode: Mode) =>
+       commutativity: Commutativity,
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         (atLeast2MsBatcher(batcher)) ==> {

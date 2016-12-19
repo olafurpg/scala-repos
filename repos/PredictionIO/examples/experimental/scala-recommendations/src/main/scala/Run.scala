@@ -78,7 +78,8 @@ object PMatrixFactorizationModel
     new PMatrixFactorizationModel(
       rank = sc.get.objectFile[Int](s"/tmp/${id}/rank").first,
       userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
-      productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"))
+      productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures")
+    )
   }
 }
 

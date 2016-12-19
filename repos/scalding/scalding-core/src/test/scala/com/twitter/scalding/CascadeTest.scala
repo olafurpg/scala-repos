@@ -89,14 +89,16 @@ class TwoPhaseCascadeTest
     val output1 = File.createTempFile("cascading-job-output1-", "")
     output1.mkdir()
 
-    val args = Array[String]("com.twitter.scalding.CascadeTestJob",
-                             "--local",
-                             "--input0",
-                             input0.getAbsolutePath,
-                             "--output0",
-                             output0.getAbsolutePath,
-                             "--output1",
-                             output1.getAbsolutePath)
+    val args = Array[String](
+      "com.twitter.scalding.CascadeTestJob",
+      "--local",
+      "--input0",
+      input0.getAbsolutePath,
+      "--output0",
+      output0.getAbsolutePath,
+      "--output1",
+      output1.getAbsolutePath
+    )
 
     Tool.main(args)
 

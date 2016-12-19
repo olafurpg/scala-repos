@@ -23,21 +23,24 @@ object ScatterGatherFirstCompletedSpec {
 
   def newActor(id: Int, shudownLatch: Option[TestLatch] = None)(
       implicit system: ActorSystem) =
-    system.actorOf(Props(new Actor {
-      def receive = {
-        case Stop(None) ⇒ context.stop(self)
-        case Stop(Some(_id)) if (_id == id) ⇒ context.stop(self)
-        case _id: Int if (_id == id) ⇒
-        case x ⇒ {
-          Thread sleep 100 * id
-          sender() ! id
+    system.actorOf(
+      Props(new Actor {
+        def receive = {
+          case Stop(None) ⇒ context.stop(self)
+          case Stop(Some(_id)) if (_id == id) ⇒ context.stop(self)
+          case _id: Int if (_id == id) ⇒
+          case x ⇒ {
+            Thread sleep 100 * id
+            sender() ! id
+          }
         }
-      }
 
-      override def postStop = {
-        shudownLatch foreach (_.countDown())
-      }
-    }), "Actor:" + id)
+        override def postStop = {
+          shudownLatch foreach (_.countDown())
+        }
+      }),
+      "Actor:" + id
+    )
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])

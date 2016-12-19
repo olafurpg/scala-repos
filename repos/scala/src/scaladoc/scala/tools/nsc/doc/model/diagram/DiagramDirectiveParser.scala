@@ -273,7 +273,8 @@ trait DiagramDirectiveParser {
               hideSubclasses = hideSubclasses0,
               hideInheritedNodes = hideInheritedNodes0,
               hideNodesFilter = hideNodesFilter0,
-              hideEdgesFilter = hideEdgesFilter0)
+              hideEdgesFilter = hideEdgesFilter0
+            )
 
         if (settings.docDiagramsDebug && result != NoDiagramAtAll &&
             result != FullDiagram)

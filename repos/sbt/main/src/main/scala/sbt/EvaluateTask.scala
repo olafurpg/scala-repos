@@ -344,7 +344,8 @@ object EvaluateTask {
 
   @deprecated(
     "This method does not apply state changes requested during task execution and does not honor concurrent execution restrictions.  Use 'apply' instead.",
-    "0.11.1")
+    "0.11.1"
+  )
   def evaluateTask[T](structure: BuildStructure,
                       taskKey: ScopedKey[Task[T]],
                       state: State,

@@ -817,7 +817,8 @@ private[kafka] class KafkaUtilsPythonHelper {
     require(
       kafkaRDDs.length == 1,
       "Cannot get offset ranges, as there may be multiple Kafka RDDs or no Kafka RDD associated" +
-        "with this RDD, please call this method only on a Kafka RDD.")
+        "with this RDD, please call this method only on a Kafka RDD."
+    )
 
     val kafkaRDD = kafkaRDDs.head.asInstanceOf[KafkaRDD[_, _, _, _, _]]
     kafkaRDD.offsetRanges.toSeq.asJava

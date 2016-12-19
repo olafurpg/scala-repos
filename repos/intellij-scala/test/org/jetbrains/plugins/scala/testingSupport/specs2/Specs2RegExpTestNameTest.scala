@@ -9,8 +9,9 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
   protected val regExpFileName = regExpClassName + ".scala"
 
   def addRegExpTest() {
-    addFileToProject(regExpFileName,
-                     """
+    addFileToProject(
+      regExpFileName,
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecsRegExpTest extends Specification {
@@ -32,7 +33,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
         |    "run" ! { success }
         |  }
         |}
-      """.stripMargin.trim)
+      """.stripMargin.trim
+    )
   }
 
   def testInnerMost() = {
@@ -49,7 +51,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                          regExpClassName,
                                          "The RegExpTest should",
                                          "test") &&
-          checkResultTreeDoesNotHaveNodes(root, "testtest", "testtesttest"))
+          checkResultTreeDoesNotHaveNodes(root, "testtest", "testtesttest")
+    )
   }
 
   def testMiddle() = {
@@ -66,7 +69,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                          regExpClassName,
                                          "The RegExpTest should",
                                          "testtest") &&
-          checkResultTreeDoesNotHaveNodes(root, "test", "testtesttest"))
+          checkResultTreeDoesNotHaveNodes(root, "test", "testtesttest")
+    )
   }
 
   def testOuterMost() = {
@@ -83,7 +87,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                          regExpClassName,
                                          "The RegExpTest should",
                                          "testtesttest") &&
-          checkResultTreeDoesNotHaveNodes(root, "test", "testtest"))
+          checkResultTreeDoesNotHaveNodes(root, "test", "testtest")
+    )
   }
 
   //TODO: enable the test once I find a way to run different tests with same description in specs2
@@ -101,7 +106,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                          regExpClassName,
                                          "First should",
                                          "run") &&
-          checkResultTreeDoesNotHaveNodes(root, "Second should"))
+          checkResultTreeDoesNotHaveNodes(root, "Second should")
+    )
 
     runTestByLocation(
       18,
@@ -114,6 +120,7 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                          regExpClassName,
                                          "Second should",
                                          "run") &&
-          checkResultTreeDoesNotHaveNodes(root, "First should"))
+          checkResultTreeDoesNotHaveNodes(root, "First should")
+    )
   }
 }

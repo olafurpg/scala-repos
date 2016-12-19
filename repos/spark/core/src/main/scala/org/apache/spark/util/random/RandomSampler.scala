@@ -153,9 +153,11 @@ class BernoulliSampler[T: ClassTag](fraction: Double)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter */
-  require(fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
-            fraction <= (1.0 + RandomSampler.roundingEpsilon),
-          s"Sampling fraction ($fraction) must be on interval [0, 1]")
+  require(
+    fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
+      fraction <= (1.0 + RandomSampler.roundingEpsilon),
+    s"Sampling fraction ($fraction) must be on interval [0, 1]"
+  )
 
   private val rng: Random = RandomSampler.newDefaultRNG
 

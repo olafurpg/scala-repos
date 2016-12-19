@@ -126,7 +126,8 @@ private class RandomForest(private val strategy: Strategy,
     RandomForest.supportedFeatureSubsetStrategies.contains(
       featureSubsetStrategy),
     s"RandomForest given invalid featureSubsetStrategy: $featureSubsetStrategy." +
-      s" Supported values: ${RandomForest.supportedFeatureSubsetStrategies.mkString(", ")}.")
+      s" Supported values: ${RandomForest.supportedFeatureSubsetStrategies.mkString(", ")}."
+  )
 
   /**
     * Method to train a decision tree model over an RDD
@@ -208,7 +209,8 @@ private class RandomForest(private val strategy: Strategy,
       maxMemoryPerNode <= maxMemoryUsage,
       s"RandomForest/DecisionTree given maxMemoryInMB = ${strategy.maxMemoryInMB}," +
         " which is too small for the given features." +
-        s"  Minimum value = ${maxMemoryPerNode / (1024L * 1024L)}")
+        s"  Minimum value = ${maxMemoryPerNode / (1024L * 1024L)}"
+    )
 
     timer.stop("init")
 
@@ -387,18 +389,20 @@ object RandomForest extends Serializable with Logging {
       maxDepth: Int,
       maxBins: Int,
       seed: Int): RandomForestModel = {
-    trainClassifier(input.rdd,
-                    numClasses,
-                    categoricalFeaturesInfo
-                      .asInstanceOf[java.util.Map[Int, Int]]
-                      .asScala
-                      .toMap,
-                    numTrees,
-                    featureSubsetStrategy,
-                    impurity,
-                    maxDepth,
-                    maxBins,
-                    seed)
+    trainClassifier(
+      input.rdd,
+      numClasses,
+      categoricalFeaturesInfo
+        .asInstanceOf[java.util.Map[Int, Int]]
+        .asScala
+        .toMap,
+      numTrees,
+      featureSubsetStrategy,
+      impurity,
+      maxDepth,
+      maxBins,
+      seed
+    )
   }
 
   /**

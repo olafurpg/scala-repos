@@ -289,14 +289,16 @@ private[spark] object Utils extends Logging {
         // https://bugs.openjdk.java.net/browse/JDK-7052359
         // This will lead to stream corruption issue when using sort-based shuffle (SPARK-3948).
         val finalPos = outChannel.position()
-        assert(finalPos == initialPos + size,
-               s"""
+        assert(
+          finalPos == initialPos + size,
+          s"""
              |Current position $finalPos do not equal to expected position ${initialPos +
-                    size}
+               size}
              |after transferTo, please check your kernel version to see if it is 2.6.32,
              |this is a kernel bug which will lead to unexpected behavior when using transferTo.
              |You can set spark.file.transferTo = false to disable this NIO feature.
-           """.stripMargin)
+           """.stripMargin
+        )
       } else {
         val buf = new Array[Byte](8192)
         var n = 0

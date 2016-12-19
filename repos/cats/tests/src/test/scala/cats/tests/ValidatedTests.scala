@@ -58,9 +58,11 @@ class ValidatedTests extends CatsSuite {
     checkAll(
       "Validated[ListWrapper[String], ListWrapper[Int]]",
       OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].partialOrder)
-    checkAll("PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
-             SerializableTests.serializable(
-               PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]))
+    checkAll(
+      "PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
+      SerializableTests.serializable(
+        PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]])
+    )
   }
 
   {

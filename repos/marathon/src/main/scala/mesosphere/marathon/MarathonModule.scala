@@ -280,7 +280,8 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
         )
         .withRouter(
           RoundRobinPool(nrOfInstances = 1, supervisorStrategy = supervision)),
-      "MarathonScheduler")
+      "MarathonScheduler"
+    )
   }
 
   @Named(ModuleNames.HOST_PORT)
@@ -380,31 +381,40 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
       eventBus
     )
 
-    metrics.gauge("service.mesosphere.marathon.app.count", new Gauge[Int] {
-      override def getValue: Int = {
-        Await
-          .result(groupManager.rootGroup(), conf.zkTimeoutDuration)
-          .transitiveApps
-          .size
+    metrics.gauge(
+      "service.mesosphere.marathon.app.count",
+      new Gauge[Int] {
+        override def getValue: Int = {
+          Await
+            .result(groupManager.rootGroup(), conf.zkTimeoutDuration)
+            .transitiveApps
+            .size
+        }
       }
-    })
+    )
 
-    metrics.gauge("service.mesosphere.marathon.group.count", new Gauge[Int] {
-      override def getValue: Int = {
-        Await
-          .result(groupManager.rootGroup(), conf.zkTimeoutDuration)
-          .transitiveGroups
-          .size
+    metrics.gauge(
+      "service.mesosphere.marathon.group.count",
+      new Gauge[Int] {
+        override def getValue: Int = {
+          Await
+            .result(groupManager.rootGroup(), conf.zkTimeoutDuration)
+            .transitiveGroups
+            .size
+        }
       }
-    })
+    )
 
-    metrics.gauge("service.mesosphere.marathon.uptime", new Gauge[Long] {
-      val startedAt = System.currentTimeMillis()
+    metrics.gauge(
+      "service.mesosphere.marathon.uptime",
+      new Gauge[Long] {
+        val startedAt = System.currentTimeMillis()
 
-      override def getValue: Long = {
-        System.currentTimeMillis() - startedAt
+        override def getValue: Long = {
+          System.currentTimeMillis() - startedAt
+        }
       }
-    })
+    )
 
     groupManager
   }

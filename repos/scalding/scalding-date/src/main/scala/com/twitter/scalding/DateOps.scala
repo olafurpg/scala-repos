@@ -92,15 +92,17 @@ object DateOps extends java.io.Serializable {
     * Return the guessed format for this datestring
     */
   private[scalding] def getFormatObject(s: String): Option[Format] = {
-    val formats: List[Format] = List(Format.DATE_WITH_DASH,
-                                     Format.DATEHOUR_WITH_DASH,
-                                     Format.DATETIME_WITH_DASH,
-                                     Format.DATETIME_HMS_WITH_DASH,
-                                     Format.DATETIME_HMSM_WITH_DASH,
-                                     Format.DATE_WITHOUT_DASH,
-                                     Format.DATEHOUR_WITHOUT_DASH,
-                                     Format.DATETIME_WITHOUT_DASH,
-                                     Format.DATETIME_HMS_WITHOUT_DASH)
+    val formats: List[Format] = List(
+      Format.DATE_WITH_DASH,
+      Format.DATEHOUR_WITH_DASH,
+      Format.DATETIME_WITH_DASH,
+      Format.DATETIME_HMS_WITH_DASH,
+      Format.DATETIME_HMSM_WITH_DASH,
+      Format.DATE_WITHOUT_DASH,
+      Format.DATEHOUR_WITHOUT_DASH,
+      Format.DATETIME_WITHOUT_DASH,
+      Format.DATETIME_HMS_WITHOUT_DASH
+    )
 
     formats.find { _.matches(prepare(s)) }
   }

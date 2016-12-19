@@ -65,7 +65,8 @@ object ColumnDefinitionProviderImpl {
       c.abort(
         c.enclosingPosition,
         s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
-        This will mean the macro is operating on a non-resolved type.""")
+        This will mean the macro is operating on a non-resolved type."""
+      )
 
     // Field To JDBCColumn
     def matchField(
@@ -232,11 +233,13 @@ object ColumnDefinitionProviderImpl {
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
     if (duplicateFields.nonEmpty) {
-      c.abort(c.enclosingPosition,
-              s"""
+      c.abort(
+        c.enclosingPosition,
+        s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
-        """)
+        """
+      )
     } else {
       formats
     }

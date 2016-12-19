@@ -28,18 +28,20 @@ trait RepositoryService { self: AccountService =>
       originUserName: Option[String] = None,
       parentRepositoryName: Option[String] = None,
       parentUserName: Option[String] = None)(implicit s: Session): Unit = {
-    Repositories insert Repository(userName = userName,
-                                   repositoryName = repositoryName,
-                                   isPrivate = isPrivate,
-                                   description = description,
-                                   defaultBranch = "master",
-                                   registeredDate = currentDate,
-                                   updatedDate = currentDate,
-                                   lastActivityDate = currentDate,
-                                   originUserName = originUserName,
-                                   originRepositoryName = originRepositoryName,
-                                   parentUserName = parentUserName,
-                                   parentRepositoryName = parentRepositoryName)
+    Repositories insert Repository(
+      userName = userName,
+      repositoryName = repositoryName,
+      isPrivate = isPrivate,
+      description = description,
+      defaultBranch = "master",
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      lastActivityDate = currentDate,
+      originUserName = originUserName,
+      originRepositoryName = originRepositoryName,
+      parentUserName = parentUserName,
+      parentRepositoryName = parentRepositoryName
+    )
 
     IssueId insert (userName, repositoryName, 0)
   }
@@ -348,7 +350,8 @@ trait RepositoryService { self: AccountService =>
           repository.originUserName.getOrElse(repository.userName),
           repository.originRepositoryName.getOrElse(repository.repositoryName)
         ),
-        getRepositoryManagers(repository.userName))
+        getRepositoryManagers(repository.userName)
+      )
     }
   }
 
@@ -406,7 +409,8 @@ trait RepositoryService { self: AccountService =>
             repository.originRepositoryName.getOrElse(
               repository.repositoryName)
           ),
-          getRepositoryManagers(repository.userName))
+          getRepositoryManagers(repository.userName)
+        )
       }
   }
 
@@ -461,7 +465,8 @@ trait RepositoryService { self: AccountService =>
             repository.originRepositoryName.getOrElse(
               repository.repositoryName)
           ),
-          getRepositoryManagers(repository.userName))
+          getRepositoryManagers(repository.userName)
+        )
       }
   }
 

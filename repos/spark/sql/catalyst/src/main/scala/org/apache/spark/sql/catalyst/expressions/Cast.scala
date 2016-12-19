@@ -433,27 +433,33 @@ case class Cast(child: Expression, dataType: DataType)
                               toType: DataType): Any => Any = {
     val elementCast = cast(fromType, toType)
     // TODO: Could be faster?
-    buildCast[ArrayData](_, array => {
-      val values = new Array[Any](array.numElements())
-      array.foreach(fromType, (i, e) => {
-        if (e == null) {
-          values(i) = null
-        } else {
-          values(i) = elementCast(e)
-        }
-      })
-      new GenericArrayData(values)
-    })
+    buildCast[ArrayData](
+      _,
+      array => {
+        val values = new Array[Any](array.numElements())
+        array.foreach(fromType, (i, e) => {
+          if (e == null) {
+            values(i) = null
+          } else {
+            values(i) = elementCast(e)
+          }
+        })
+        new GenericArrayData(values)
+      }
+    )
   }
 
   private[this] def castMap(from: MapType, to: MapType): Any => Any = {
     val keyCast = castArray(from.keyType, to.keyType)
     val valueCast = castArray(from.valueType, to.valueType)
-    buildCast[MapData](_, map => {
-      val keys = keyCast(map.keyArray()).asInstanceOf[ArrayData]
-      val values = valueCast(map.valueArray()).asInstanceOf[ArrayData]
-      new ArrayBasedMapData(keys, values)
-    })
+    buildCast[MapData](
+      _,
+      map => {
+        val keys = keyCast(map.keyArray()).asInstanceOf[ArrayData]
+        val values = valueCast(map.valueArray()).asInstanceOf[ArrayData]
+        new ArrayBasedMapData(keys, values)
+      }
+    )
   }
 
   private[this] def castStruct(from: StructType, to: StructType): Any => Any = {

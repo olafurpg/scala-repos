@@ -157,15 +157,17 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
             offset <= editor.getDocument.getTextLength) {
           HintManager
             .getInstance()
-            .showQuestionHint(editor,
-                              if (classes.length == 1)
-                                classes(0).qualifiedName + "? Alt+Enter"
-                              else
-                                classes(0).qualifiedName +
-                                  "? (multiple choices...) Alt+Enter",
-                              offset,
-                              offset + ref.getTextLength,
-                              action)
+            .showQuestionHint(
+              editor,
+              if (classes.length == 1)
+                classes(0).qualifiedName + "? Alt+Enter"
+              else
+                classes(0).qualifiedName +
+                  "? (multiple choices...) Alt+Enter",
+              offset,
+              offset + ref.getTextLength,
+              action
+            )
           return
         }
       }
@@ -183,20 +185,24 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
         def run() {
           if (!ref.isValid || !FileModificationService.getInstance
                 .prepareFileForWrite(ref.getContainingFile)) return
-          ScalaUtils.runWriteAction(new Runnable {
-            def run() {
-              PsiDocumentManager
-                .getInstance(project)
-                .commitDocument(editor.getDocument)
-              if (!ref.isValid) return
-              if (!ref.isInstanceOf[ScDocResolvableCodeReference])
-                ref.bindToElement(clazz.element)
-              else
-                ref.replace(
-                  ScalaPsiElementFactory
-                    .createDocLinkValue(clazz.qualifiedName, ref.getManager))
-            }
-          }, clazz.getProject, "Add import action")
+          ScalaUtils.runWriteAction(
+            new Runnable {
+              def run() {
+                PsiDocumentManager
+                  .getInstance(project)
+                  .commitDocument(editor.getDocument)
+                if (!ref.isValid) return
+                if (!ref.isInstanceOf[ScDocResolvableCodeReference])
+                  ref.bindToElement(clazz.element)
+                else
+                  ref.replace(
+                    ScalaPsiElementFactory
+                      .createDocLinkValue(clazz.qualifiedName, ref.getManager))
+              }
+            },
+            clazz.getProject,
+            "Add import action"
+          )
         }
       })
     }

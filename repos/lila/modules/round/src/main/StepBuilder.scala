@@ -29,17 +29,19 @@ object StepBuilder {
           else _ => None
         val steps = games.map { g =>
           val fen = Forsyth >> g
-          Step(ply = g.turns,
-               move = for {
-                 uci <- g.board.history.lastMove
-                 san <- g.pgnMoves.lastOption
-               } yield Step.Move(uci, san),
-               fen = fen,
-               check = g.situation.check,
-               dests = None,
-               opening = openingOf(fen),
-               drops = None,
-               crazyData = g.situation.board.crazyData)
+          Step(
+            ply = g.turns,
+            move = for {
+              uci <- g.board.history.lastMove
+              san <- g.pgnMoves.lastOption
+            } yield Step.Move(uci, san),
+            fen = fen,
+            check = g.situation.check,
+            dests = None,
+            opening = openingOf(fen),
+            drops = None,
+            crazyData = g.situation.board.crazyData
+          )
         }
         JsArray(
           a.fold[Seq[Step]](steps) {
@@ -81,20 +83,20 @@ object StepBuilder {
           after <- steps lift index
         } yield
           steps
-            .updated(index,
-                     after
-                       .copy(nag = ad.nag.symbol.some,
-                             comments = ad
-                                 .makeComment(false, true) :: after.comments,
-                             variations =
-                               if (ad.info.variation.isEmpty)
-                                 after.variations
-                               else
-                                 makeVariation(
-                                   gameId,
-                                   before,
-                                   ad.info,
-                                   variant).toList :: after.variations))) | steps
+            .updated(
+              index,
+              after
+                .copy(
+                  nag = ad.nag.symbol.some,
+                  comments = ad
+                      .makeComment(false, true) :: after.comments,
+                  variations =
+                    if (ad.info.variation.isEmpty)
+                      after.variations
+                    else
+                      makeVariation(gameId, before, ad.info, variant).toList :: after.variations
+                )
+            )) | steps
     }
 
   private def makeVariation(gameId: String,
@@ -107,16 +109,18 @@ object StepBuilder {
         error foreach logChessError(gameId)
         val lastPly = games.lastOption.??(_.turns)
         games.drop(1).map { g =>
-          Step(ply = g.turns,
-               move = for {
-                 uci <- g.board.history.lastMove
-                 san <- g.pgnMoves.lastOption
-               } yield Step.Move(uci, san),
-               fen = Forsyth >> g,
-               check = g.situation.check,
-               dests = None,
-               drops = None,
-               crazyData = g.situation.board.crazyData)
+          Step(
+            ply = g.turns,
+            move = for {
+              uci <- g.board.history.lastMove
+              san <- g.pgnMoves.lastOption
+            } yield Step.Move(uci, san),
+            fen = Forsyth >> g,
+            check = g.situation.check,
+            dests = None,
+            drops = None,
+            crazyData = g.situation.board.crazyData
+          )
         }
     }
   }

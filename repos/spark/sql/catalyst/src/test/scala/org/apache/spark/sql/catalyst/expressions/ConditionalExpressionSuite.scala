@@ -197,21 +197,25 @@ class ConditionalExpressionSuite
     checkEvaluation(Least(Seq(Literal(true), Literal(false))),
                     false,
                     InternalRow.empty)
-    checkEvaluation(Least(
-                      Seq(Literal(BigDecimal("1234567890987654321123456")),
-                          Literal(BigDecimal("1234567890987654321123458")))),
-                    BigDecimal("1234567890987654321123456"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Least(
+        Seq(Literal(BigDecimal("1234567890987654321123456")),
+            Literal(BigDecimal("1234567890987654321123458")))),
+      BigDecimal("1234567890987654321123456"),
+      InternalRow.empty
+    )
     checkEvaluation(Least(
                       Seq(Literal(Date.valueOf("2015-01-01")),
                           Literal(Date.valueOf("2015-07-01")))),
                     Date.valueOf("2015-01-01"),
                     InternalRow.empty)
-    checkEvaluation(Least(
-                      Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
-                          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
-                    Timestamp.valueOf("2015-07-01 08:00:00"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Least(
+        Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
+            Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
+      Timestamp.valueOf("2015-07-01 08:00:00"),
+      InternalRow.empty
+    )
 
     DataTypeTestUtils.ordered.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Least, dt, 2)
@@ -262,21 +266,25 @@ class ConditionalExpressionSuite
     checkEvaluation(Greatest(Seq(Literal(true), Literal(false))),
                     true,
                     InternalRow.empty)
-    checkEvaluation(Greatest(
-                      Seq(Literal(BigDecimal("1234567890987654321123456")),
-                          Literal(BigDecimal("1234567890987654321123458")))),
-                    BigDecimal("1234567890987654321123458"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Greatest(
+        Seq(Literal(BigDecimal("1234567890987654321123456")),
+            Literal(BigDecimal("1234567890987654321123458")))),
+      BigDecimal("1234567890987654321123458"),
+      InternalRow.empty
+    )
     checkEvaluation(Greatest(
                       Seq(Literal(Date.valueOf("2015-01-01")),
                           Literal(Date.valueOf("2015-07-01")))),
                     Date.valueOf("2015-07-01"),
                     InternalRow.empty)
-    checkEvaluation(Greatest(
-                      Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
-                          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
-                    Timestamp.valueOf("2015-07-01 10:00:00"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Greatest(
+        Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
+            Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
+      Timestamp.valueOf("2015-07-01 10:00:00"),
+      InternalRow.empty
+    )
 
     DataTypeTestUtils.ordered.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Greatest, dt, 2)

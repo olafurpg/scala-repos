@@ -640,7 +640,8 @@ private[spark] object JsonProtocol {
       "JVM Information" -> mapFromJson(json \ "JVM Information").toSeq,
       "Spark Properties" -> mapFromJson(json \ "Spark Properties").toSeq,
       "System Properties" -> mapFromJson(json \ "System Properties").toSeq,
-      "Classpath Entries" -> mapFromJson(json \ "Classpath Entries").toSeq)
+      "Classpath Entries" -> mapFromJson(json \ "Classpath Entries").toSeq
+    )
     SparkListenerEnvironmentUpdate(environmentDetails)
   }
 

@@ -128,11 +128,13 @@ object AssociationRules {
     @Since("1.5.0")
     def confidence: Double = freqUnion.toDouble / freqAntecedent
 
-    require(antecedent.toSet.intersect(consequent.toSet).isEmpty, {
-      val sharedItems = antecedent.toSet.intersect(consequent.toSet)
-      s"A valid association rule must have disjoint antecedent and " +
-        s"consequent but ${sharedItems} is present in both."
-    })
+    require(
+      antecedent.toSet.intersect(consequent.toSet).isEmpty, {
+        val sharedItems = antecedent.toSet.intersect(consequent.toSet)
+        s"A valid association rule must have disjoint antecedent and " +
+          s"consequent but ${sharedItems} is present in both."
+      }
+    )
 
     /**
       * Returns antecedent in a Java List.

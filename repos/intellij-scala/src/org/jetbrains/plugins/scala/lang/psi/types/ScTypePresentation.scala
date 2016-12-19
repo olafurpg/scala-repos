@@ -43,17 +43,19 @@ import scala.collection.mutable.ArrayBuffer
 
 trait ScTypePresentation {
   def presentableText(t: ScType) =
-    typeText(t, {
-      case c: PsiClass => ScalaPsiUtil.nameWithPrefixIfNeeded(c)
-      case e => e.name
-    }, {
-      case obj: ScObject
-          if Set("scala.Predef", "scala").contains(obj.qualifiedName) =>
-        ""
-      case pack: PsiPackage => ""
-      case c: PsiClass => ScalaPsiUtil.nameWithPrefixIfNeeded(c) + "."
-      case e => e.name + "."
-    })
+    typeText(
+      t, {
+        case c: PsiClass => ScalaPsiUtil.nameWithPrefixIfNeeded(c)
+        case e => e.name
+      }, {
+        case obj: ScObject
+            if Set("scala.Predef", "scala").contains(obj.qualifiedName) =>
+          ""
+        case pack: PsiPackage => ""
+        case c: PsiClass => ScalaPsiUtil.nameWithPrefixIfNeeded(c) + "."
+        case e => e.name + "."
+      }
+    )
 
   def urlText(t: ScType) = {
     def nameFun(e: PsiNamedElement, withPoint: Boolean): String = {

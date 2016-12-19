@@ -196,7 +196,8 @@ final class JsonView(getLightUser: String => Option[LightUser],
         CachableData(JsArray(pairings map pairingJson),
                      featured map featuredJson,
                      podium),
-    timeToLive = 1 second)
+    timeToLive = 1 second
+  )
 
   private def featuredJson(featured: FeaturedGame) = {
     val game = featured.game
@@ -213,15 +214,17 @@ final class JsonView(getLightUser: String => Option[LightUser],
         )
         .noNull
     }
-    Json.obj("id" -> game.id,
-             "fen" -> (chess.format.Forsyth exportBoard game.toChess.board),
-             "color" -> (game.variant match {
-               case chess.variant.RacingKings => chess.White
-               case _ => game.firstColor
-             }).name,
-             "lastMove" -> ~game.castleLastMoveTime.lastMoveString,
-             "white" -> playerJson(featured.white, game player chess.White),
-             "black" -> playerJson(featured.black, game player chess.Black))
+    Json.obj(
+      "id" -> game.id,
+      "fen" -> (chess.format.Forsyth exportBoard game.toChess.board),
+      "color" -> (game.variant match {
+        case chess.variant.RacingKings => chess.White
+        case _ => game.firstColor
+      }).name,
+      "lastMove" -> ~game.castleLastMoveTime.lastMoveString,
+      "white" -> playerJson(featured.white, game player chess.White),
+      "black" -> playerJson(featured.black, game player chess.Black)
+    )
   }
 
   private def myInfoJson(i: PlayerInfo) =
@@ -244,10 +247,13 @@ final class JsonView(getLightUser: String => Option[LightUser],
 
   private def sheetJson(sheet: ScoreSheet) = sheet match {
     case s: arena.ScoringSystem.Sheet =>
-      val o = Json.obj("scores" -> s.scores.reverse.map { score =>
-        if (score.flag == arena.ScoringSystem.Normal) JsNumber(score.value)
-        else Json.arr(score.value, score.flag.id)
-      }, "total" -> s.total)
+      val o = Json.obj(
+        "scores" -> s.scores.reverse.map { score =>
+          if (score.flag == arena.ScoringSystem.Normal) JsNumber(score.value)
+          else Json.arr(score.value, score.flag.id)
+        },
+        "total" -> s.total
+      )
       s.onFire.fold(o + ("fire" -> JsBoolean(true)), o)
   }
 
@@ -312,7 +318,8 @@ final class JsonView(getLightUser: String => Option[LightUser],
              case Some(w) if w == p.user1 => 2
              case Some(w) => 3
              case _ => 1
-           } else 0))
+           } else 0)
+    )
 }
 
 object JsonView {

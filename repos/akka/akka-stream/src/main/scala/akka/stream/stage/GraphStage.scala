@@ -163,7 +163,8 @@ object GraphStageLogic {
             "{} message sent to StageActor({}) will be ignored, since it is not a real Actor." +
               "Use a custom message type to communicate with it instead.",
             m,
-            functionRef.path)
+            functionRef.path
+          )
         case pair ⇒ callback.invoke(pair)
       }
     }
@@ -1059,21 +1060,24 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
     private var pulled = false
 
     private val _sink =
-      new SubSink[T](name, getAsyncCallback[ActorSubscriberMessage] { msg ⇒
-        if (!closed)
-          msg match {
-            case OnNext(e) ⇒
-              elem = e.asInstanceOf[T]
-              pulled = false
-              handler.onPush()
-            case OnComplete ⇒
-              closed = true
-              handler.onUpstreamFinish()
-            case OnError(ex) ⇒
-              closed = true
-              handler.onUpstreamFailure(ex)
-          }
-      }.invoke _)
+      new SubSink[T](
+        name,
+        getAsyncCallback[ActorSubscriberMessage] { msg ⇒
+          if (!closed)
+            msg match {
+              case OnNext(e) ⇒
+                elem = e.asInstanceOf[T]
+                pulled = false
+                handler.onPush()
+              case OnComplete ⇒
+                closed = true
+                handler.onUpstreamFinish()
+              case OnError(ex) ⇒
+                closed = true
+                handler.onUpstreamFailure(ex)
+            }
+        }.invoke _
+      )
 
     def sink: Graph[SinkShape[T], NotUsed] = _sink
 

@@ -93,13 +93,15 @@ trait SystemSettingsService {
         getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
         if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
           Some(
-            Smtp(getValue(props, SmtpHost, ""),
-                 getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
-                 getOptionValue(props, SmtpUser, None),
-                 getOptionValue(props, SmtpPassword, None),
-                 getOptionValue[Boolean](props, SmtpSsl, None),
-                 getOptionValue(props, SmtpFromAddress, None),
-                 getOptionValue(props, SmtpFromName, None)))
+            Smtp(
+              getValue(props, SmtpHost, ""),
+              getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
+              getOptionValue(props, SmtpUser, None),
+              getOptionValue(props, SmtpPassword, None),
+              getOptionValue[Boolean](props, SmtpSsl, None),
+              getOptionValue(props, SmtpFromAddress, None),
+              getOptionValue(props, SmtpFromName, None)
+            ))
         } else {
           None
         },

@@ -478,10 +478,12 @@ class Engine[TD, EI, PD, Q, P, A](
       (name, extractedParams)
     }
 
-    new EngineParams(dataSourceParams = dataSourceParamsWithName,
-                     preparatorParams = preparatorParamsWithName,
-                     algorithmParamsList = algorithmsParamsWithNames,
-                     servingParams = servingParamsWithName)
+    new EngineParams(
+      dataSourceParams = dataSourceParamsWithName,
+      preparatorParams = preparatorParamsWithName,
+      algorithmParamsList = algorithmsParamsWithNames,
+      servingParams = servingParamsWithName
+    )
   }
 }
 

@@ -27,12 +27,14 @@ import com.typesafe.config.ConfigFactory
 
 class ReplicatedDataSerializerSpec
     extends TestKit(
-      ActorSystem("ReplicatedDataSerializerSpec",
-                  ConfigFactory.parseString(
-                    """
+      ActorSystem(
+        "ReplicatedDataSerializerSpec",
+        ConfigFactory.parseString(
+          """
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
-    """)))
+    """)
+      ))
     with WordSpecLike
     with Matchers
     with BeforeAndAfterAll {
@@ -164,14 +166,16 @@ class ReplicatedDataSerializerSpec
       checkSameContent(
         PNCounter().increment(address1, 2).increment(address3, 5),
         PNCounter().increment(address3, 5).increment(address1, 2))
-      checkSameContent(PNCounter()
-                         .increment(address1, 2)
-                         .decrement(address1, 1)
-                         .increment(address3, 5),
-                       PNCounter()
-                         .increment(address3, 5)
-                         .increment(address1, 2)
-                         .decrement(address1, 1))
+      checkSameContent(
+        PNCounter()
+          .increment(address1, 2)
+          .decrement(address1, 1)
+          .increment(address3, 5),
+        PNCounter()
+          .increment(address3, 5)
+          .increment(address1, 2)
+          .decrement(address1, 1)
+      )
     }
 
     "serialize ORMap" in {

@@ -161,11 +161,13 @@ final case class TailChoppingPool(
     with PoolOverrideUnsetConfig[TailChoppingPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API
@@ -250,9 +252,11 @@ final case class TailChoppingGroup(
     extends Group {
 
   def this(config: Config) =
-    this(paths = immutableSeq(config.getStringList("routees.paths")),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"))
+    this(
+      paths = immutableSeq(config.getStringList("routees.paths")),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval")
+    )
 
   /**
     * Java API

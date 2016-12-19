@@ -59,7 +59,8 @@ class IteratorInterpreterSpec extends AkkaSpec {
             if (elem == 2) ctx.fail(new ArithmeticException())
             else ctx.push(elem)
           }
-        })).iterator
+        })
+      ).iterator
 
       itr.next() should be(1)
       itr.hasNext should be(true)
@@ -75,7 +76,8 @@ class IteratorInterpreterSpec extends AkkaSpec {
             if (elem == 2) throw new ArithmeticException()
             else ctx.push(elem)
           }
-        })).iterator
+        })
+      ).iterator
 
       itr.next() should be(1)
       itr.hasNext should be(true)

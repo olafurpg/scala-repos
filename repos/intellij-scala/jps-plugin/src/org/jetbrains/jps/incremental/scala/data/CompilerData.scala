@@ -34,11 +34,13 @@ object CompilerData {
         compilerJarsIn(module).flatMap {
           case jars: CompilerJars =>
             val absentJars = jars.files.filter(!_.exists)
-            Either.cond(absentJars.isEmpty,
-                        Some(jars),
-                        "Scala compiler JARs not found (module '" +
-                          chunk.representativeTarget().getModule.getName +
-                          "'): " + absentJars.map(_.getPath).mkString(", "))
+            Either.cond(
+              absentJars.isEmpty,
+              Some(jars),
+              "Scala compiler JARs not found (module '" +
+                chunk.representativeTarget().getModule.getName +
+                "'): " + absentJars.map(_.getPath).mkString(", ")
+            )
         }
       } else {
         Right(None)

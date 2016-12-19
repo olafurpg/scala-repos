@@ -103,19 +103,22 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
   private[mllib] def multiplyGramianMatrixBy(v: BDV[Double]): BDV[Double] = {
     val n = numCols().toInt
     val vbr = rows.context.broadcast(v)
-    rows.treeAggregate(BDV.zeros[Double](n))(seqOp = (U, r) => {
-      val rBrz = r.toBreeze
-      val a = rBrz.dot(vbr.value)
-      rBrz match {
-        // use specialized axpy for better performance
-        case _: BDV[_] => brzAxpy(a, rBrz.asInstanceOf[BDV[Double]], U)
-        case _: BSV[_] => brzAxpy(a, rBrz.asInstanceOf[BSV[Double]], U)
-        case _ =>
-          throw new UnsupportedOperationException(
-            s"Do not support vector operation from type ${rBrz.getClass.getName}.")
-      }
-      U
-    }, combOp = (U1, U2) => U1 += U2)
+    rows.treeAggregate(BDV.zeros[Double](n))(
+      seqOp = (U, r) => {
+        val rBrz = r.toBreeze
+        val a = rBrz.dot(vbr.value)
+        rBrz match {
+          // use specialized axpy for better performance
+          case _: BDV[_] => brzAxpy(a, rBrz.asInstanceOf[BDV[Double]], U)
+          case _: BSV[_] => brzAxpy(a, rBrz.asInstanceOf[BSV[Double]], U)
+          case _ =>
+            throw new UnsupportedOperationException(
+              s"Do not support vector operation from type ${rBrz.getClass.getName}.")
+        }
+        U
+      },
+      combOp = (U1, U2) => U1 += U2
+    )
   }
 
   /**
@@ -359,10 +362,10 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
 
     val (m, mean) =
       rows.treeAggregate[(Long, BDV[Double])]((0L, BDV.zeros[Double](n)))(
-        seqOp = (s: (Long, BDV[Double]),
-                 v: Vector) => (s._1 + 1L, s._2 += v.toBreeze),
-        combOp = (s1: (Long, BDV[Double]),
-                  s2: (Long, BDV[Double])) => (s1._1 + s2._1, s1._2 += s2._2)
+        seqOp = (s: (Long, BDV[Double]), v: Vector) =>
+          (s._1 + 1L, s._2 += v.toBreeze),
+        combOp = (s1: (Long, BDV[Double]), s2: (Long, BDV[Double])) =>
+          (s1._1 + s2._1, s1._2 += s2._2)
       )
 
     if (m <= 1) {

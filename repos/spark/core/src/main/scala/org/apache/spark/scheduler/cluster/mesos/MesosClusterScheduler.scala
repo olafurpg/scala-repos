@@ -473,14 +473,16 @@ private[spark] class MesosClusterScheduler(
 
   private def generateCmdOption(desc: MesosDriverDescription,
                                 sandboxPath: String): Seq[String] = {
-    var options = Seq("--name",
-                      desc.schedulerProperties("spark.app.name"),
-                      "--master",
-                      s"mesos://${conf.get("spark.master")}",
-                      "--driver-cores",
-                      desc.cores.toString,
-                      "--driver-memory",
-                      s"${desc.mem}M")
+    var options = Seq(
+      "--name",
+      desc.schedulerProperties("spark.app.name"),
+      "--master",
+      s"mesos://${conf.get("spark.master")}",
+      "--driver-cores",
+      desc.cores.toString,
+      "--driver-memory",
+      s"${desc.mem}M"
+    )
 
     // Assume empty main class means we're running python
     if (!desc.command.mainClass.equals("")) {
@@ -645,7 +647,8 @@ private[spark] class MesosClusterScheduler(
         copyBuffer(queuedDrivers),
         launchedDrivers.values.map(_.copy()).toList,
         finishedDrivers.map(_.copy()).toList,
-        copyBuffer(pendingRetryDrivers))
+        copyBuffer(pendingRetryDrivers)
+      )
     }
   }
 

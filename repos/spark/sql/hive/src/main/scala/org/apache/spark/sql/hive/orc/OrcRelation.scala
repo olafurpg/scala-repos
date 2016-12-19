@@ -347,7 +347,8 @@ private[orc] object OrcRelation {
     "uncompressed" -> CompressionKind.NONE,
     "snappy" -> CompressionKind.SNAPPY,
     "zlib" -> CompressionKind.ZLIB,
-    "lzo" -> CompressionKind.LZO)
+    "lzo" -> CompressionKind.LZO
+  )
 
   // The extensions for ORC compression codecs
   val extensionsForCompressionCodecNames = Map(

@@ -1136,9 +1136,11 @@ private[kafka] class ZookeeperConsumerConnector(
       }
       .flatten
 
-    require(topicThreadIds.size == allQueuesAndStreams.size,
-            "Mismatch between thread ID count (%d) and queue count (%d)"
-              .format(topicThreadIds.size, allQueuesAndStreams.size))
+    require(
+      topicThreadIds.size == allQueuesAndStreams.size,
+      "Mismatch between thread ID count (%d) and queue count (%d)"
+        .format(topicThreadIds.size, allQueuesAndStreams.size)
+    )
     val threadQueueStreamPairs = topicThreadIds.zip(allQueuesAndStreams)
 
     threadQueueStreamPairs.foreach(e => {

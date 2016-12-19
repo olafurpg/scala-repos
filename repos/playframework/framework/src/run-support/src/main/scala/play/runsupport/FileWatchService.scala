@@ -133,19 +133,23 @@ private[play] class PollingFileWatchService(val pollDelayMillis: Int)
 
     @volatile var stopped = false
 
-    val thread = new Thread(new Runnable {
-      def run() = {
-        var state = WatchState.empty
-        while (!stopped) {
-          val (triggered, newState) =
-            SourceModificationWatch.watch(distinctPathFinder(filesToWatch.***),
-                                          pollDelayMillis,
-                                          state)(stopped)
-          if (triggered) onChange()
-          state = newState
+    val thread = new Thread(
+      new Runnable {
+        def run() = {
+          var state = WatchState.empty
+          while (!stopped) {
+            val (triggered, newState) =
+              SourceModificationWatch.watch(
+                distinctPathFinder(filesToWatch.***),
+                pollDelayMillis,
+                state)(stopped)
+            if (triggered) onChange()
+            state = newState
+          }
         }
-      }
-    }, "sbt-play-watch-service")
+      },
+      "sbt-play-watch-service"
+    )
     thread.setDaemon(true)
     thread.start()
 
@@ -182,11 +186,13 @@ private object JNotifyFileWatchService {
                         removeWatchMethod: Method) {
     def addWatch(fileOrDirectory: String, listener: AnyRef): Int = {
       addWatchMethod
-        .invoke(null,
-                fileOrDirectory, // The file or directory to watch
-                15: java.lang.Integer, // flags to say watch for all events
-                true: java.lang.Boolean, // Watch subtree
-                listener)
+        .invoke(
+          null,
+          fileOrDirectory, // The file or directory to watch
+          15: java.lang.Integer, // flags to say watch for all events
+          true: java.lang.Boolean, // Watch subtree
+          listener
+        )
         .asInstanceOf[Int]
     }
     def removeWatch(id: Int): Unit = {
@@ -334,49 +340,53 @@ private[play] class JDK7FileWatchService(logger: LoggerProxy)
         Array[WatchEvent.Kind[_]](ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY),
         // This custom modifier exists just for polling implementations of the watch service, and means poll every 2 seconds.
         // For non polling event based watchers, it has no effect.
-        com.sun.nio.file.SensitivityWatchEventModifier.HIGH)
+        com.sun.nio.file.SensitivityWatchEventModifier.HIGH
+      )
     }
 
     // Get all sub directories
     val allDirsToWatch = allSubDirectories(dirsToWatch)
     allDirsToWatch.foreach(watchDir)
 
-    val thread = new Thread(new Runnable {
-      def run() = {
-        try {
-          while (true) {
-            val watchKey = watcher.take()
+    val thread = new Thread(
+      new Runnable {
+        def run() = {
+          try {
+            while (true) {
+              val watchKey = watcher.take()
 
-            val events = watchKey.pollEvents()
+              val events = watchKey.pollEvents()
 
-            import scala.collection.JavaConversions._
-            // If a directory has been created, we must watch it and its sub directories
-            events.foreach { event =>
-              if (event.kind == ENTRY_CREATE) {
-                val file = watchKey.watchable
-                  .asInstanceOf[Path]
-                  .resolve(event.context.asInstanceOf[Path])
-                  .toFile
+              import scala.collection.JavaConversions._
+              // If a directory has been created, we must watch it and its sub directories
+              events.foreach { event =>
+                if (event.kind == ENTRY_CREATE) {
+                  val file = watchKey.watchable
+                    .asInstanceOf[Path]
+                    .resolve(event.context.asInstanceOf[Path])
+                    .toFile
 
-                if (file.isDirectory) {
-                  allSubDirectories(Seq(file)).foreach(watchDir)
+                  if (file.isDirectory) {
+                    allSubDirectories(Seq(file)).foreach(watchDir)
+                  }
                 }
               }
+
+              onChange()
+
+              watchKey.reset()
             }
-
-            onChange()
-
-            watchKey.reset()
+          } catch {
+            case NonFatal(e) =>
+            // Do nothing, this means the watch service has been closed, or we've been interrupted.
+          } finally {
+            // Just in case it wasn't closed.
+            watcher.close()
           }
-        } catch {
-          case NonFatal(e) =>
-          // Do nothing, this means the watch service has been closed, or we've been interrupted.
-        } finally {
-          // Just in case it wasn't closed.
-          watcher.close()
         }
-      }
-    }, "sbt-play-watch-service")
+      },
+      "sbt-play-watch-service"
+    )
     thread.setDaemon(true)
     thread.start()
 

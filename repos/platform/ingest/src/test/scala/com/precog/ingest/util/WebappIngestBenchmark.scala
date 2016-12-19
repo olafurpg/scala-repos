@@ -87,8 +87,8 @@ abstract class IngestProducer(args: Array[String])
          DistributedSampleSet(0, sampler = AdSamples.interactionSample)),
         ("/clicks/",
          DistributedSampleSet(0, sampler = AdSamples.interactionSample2)),
-        ("/events/",
-         DistributedSampleSet(0, sampler = AdSamples.eventsSample)))
+        ("/events/", DistributedSampleSet(0, sampler = AdSamples.eventsSample))
+      )
 
       val testRuns = 0.until(threadCount).map(_ => new TestRun(samples))
 

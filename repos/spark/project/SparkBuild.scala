@@ -192,7 +192,8 @@ object SparkBuild extends PomBuild {
   lazy val sparkGenjavadocSettings: Seq[sbt.Def.Setting[_]] = Seq(
     libraryDependencies += compilerPlugin(
       "org.spark-project" %% "genjavadoc-plugin" % unidocGenjavadocVersion.value cross CrossVersion.full),
-    scalacOptions <+= target.map(t => "-P:genjavadoc:out=" + (t / "java")))
+    scalacOptions <+= target.map(t => "-P:genjavadoc:out=" + (t / "java"))
+  )
 
   lazy val sharedSettings =
     sparkGenjavadocSettings ++ Seq(
@@ -921,15 +922,17 @@ object TestSettings {
     // Setting SPARK_DIST_CLASSPATH is a simple way to make sure any child processes
     // launched by the tests have access to the correct test-time classpath.
     envVars in Test ++=
-      Map("SPARK_DIST_CLASSPATH" -> (fullClasspath in Test).value.files
-            .map(_.getAbsolutePath)
-            .mkString(":")
-            .stripSuffix(":"),
-          "SPARK_PREPEND_CLASSES" -> "1",
-          "SPARK_TESTING" -> "1",
-          "JAVA_HOME" -> sys.env
-            .get("JAVA_HOME")
-            .getOrElse(sys.props("java.home"))),
+      Map(
+        "SPARK_DIST_CLASSPATH" -> (fullClasspath in Test).value.files
+          .map(_.getAbsolutePath)
+          .mkString(":")
+          .stripSuffix(":"),
+        "SPARK_PREPEND_CLASSES" -> "1",
+        "SPARK_TESTING" -> "1",
+        "JAVA_HOME" -> sys.env
+          .get("JAVA_HOME")
+          .getOrElse(sys.props("java.home"))
+      ),
     javaOptions in Test += s"-Djava.io.tmpdir=$testTempDir",
     javaOptions in Test += "-Dspark.test.home=" + sparkHome,
     javaOptions in Test += "-Dspark.testing=1",

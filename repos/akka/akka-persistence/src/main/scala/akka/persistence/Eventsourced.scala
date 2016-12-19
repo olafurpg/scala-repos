@@ -131,7 +131,8 @@ private[persistence] trait Eventsourced
             "persistenceId [{}].",
           evt.getClass.getName,
           lastSequenceNr,
-          persistenceId)
+          persistenceId
+        )
       case None ⇒
         log.error(
           cause,
@@ -181,7 +182,8 @@ private[persistence] trait Eventsourced
       event.getClass.getName,
       seqNr,
       persistenceId,
-      cause.getMessage)
+      cause.getMessage
+    )
   }
 
   private def stashInternally(currMsg: Any): Unit =
@@ -285,7 +287,8 @@ private[persistence] trait Eventsourced
           toSequenceNr,
           persistenceId,
           e.getClass.getCanonicalName,
-          e.getMessage)
+          e.getMessage
+        )
       case m ⇒ super.unhandled(m)
     }
   }

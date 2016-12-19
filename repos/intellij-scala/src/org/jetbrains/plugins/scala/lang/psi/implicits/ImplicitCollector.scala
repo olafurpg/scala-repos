@@ -94,9 +94,9 @@ object ImplicitCollector {
       isImplicitConversion: Boolean,
       isExtensionConversion: Boolean,
       searchImplicitsRecursively: Int,
-      predicate: Option[
-        (ScalaResolveResult,
-         ScSubstitutor) => Option[(ScalaResolveResult, ScSubstitutor)]],
+      predicate: Option[(
+          ScalaResolveResult,
+          ScSubstitutor) => Option[(ScalaResolveResult, ScSubstitutor)]],
       previousRecursionState: Option[RecursionMap])
 }
 
@@ -115,20 +115,22 @@ class ImplicitCollector(
     isImplicitConversion: Boolean,
     isExtensionConversion: Boolean,
     searchImplicitsRecursively: Int = 0,
-    predicate: Option[
-      (ScalaResolveResult,
-       ScSubstitutor) => Option[(ScalaResolveResult, ScSubstitutor)]] = None,
+    predicate: Option[(
+        ScalaResolveResult,
+        ScSubstitutor) => Option[(ScalaResolveResult, ScSubstitutor)]] = None,
     previousRecursionState: Option[RecursionMap] = None) {
   def this(state: ImplicitState) {
-    this(state.place,
-         state.tp,
-         state.expandedTp,
-         state.coreElement,
-         state.isImplicitConversion,
-         state.isExtensionConversion,
-         state.searchImplicitsRecursively,
-         state.predicate,
-         state.previousRecursionState)
+    this(
+      state.place,
+      state.tp,
+      state.expandedTp,
+      state.coreElement,
+      state.isImplicitConversion,
+      state.isExtensionConversion,
+      state.searchImplicitsRecursively,
+      state.predicate,
+      state.previousRecursionState
+    )
   }
 
   lazy val collectorState: ImplicitState = ImplicitState(
@@ -140,7 +142,8 @@ class ImplicitCollector(
     isExtensionConversion,
     searchImplicitsRecursively,
     predicate,
-    Some(ScalaRecursionManager.recursionMap.get()))
+    Some(ScalaRecursionManager.recursionMap.get())
+  )
 
   private var placeCalculated = false
 
@@ -577,16 +580,19 @@ class ImplicitCollector(
                                       importsUsed = r1.importsUsed ++ r2.importsUsed)
                                 }
                               }
-                              Some(addImportsUsed(
-                                     c.copy(implicitParameterType =
-                                              Some(valueType),
-                                            implicitParameters =
-                                              results.getOrElse(Seq.empty),
-                                            implicitReason = OkResult,
-                                            unresolvedTypeParameters =
-                                              Some(typeParams)),
-                                     results.getOrElse(Seq.empty)),
-                                   subst)
+                              Some(
+                                addImportsUsed(
+                                  c.copy(
+                                    implicitParameterType = Some(valueType),
+                                    implicitParameters =
+                                      results.getOrElse(Seq.empty),
+                                    implicitReason = OkResult,
+                                    unresolvedTypeParameters = Some(typeParams)
+                                  ),
+                                  results.getOrElse(Seq.empty)
+                                ),
+                                subst
+                              )
                             } else {
                               val (valueType, typeParams) = inferValueType(
                                 nonValueType.getOrElse(
@@ -632,7 +638,8 @@ class ImplicitCollector(
                         },
                         coreTypeForTp,
                         compute(),
-                        IMPLICIT_PARAM_TYPES_KEY) match {
+                        IMPLICIT_PARAM_TYPES_KEY
+                      ) match {
                         case Some(res) => res
                         case None =>
                           if (fullInfo)
@@ -837,24 +844,28 @@ class ImplicitCollector(
         abstractsToUpper(ScCompoundType(comps, Map.empty, Map.empty))
           .removeUndefines()
       case ScExistentialType(quant, wilds) =>
-        abstractsToUpper(ScExistentialType(quant.recursiveUpdate {
-          case tp @ ScTypeVariable(name) =>
-            wilds
-              .find(_.name == name)
-              .map(w => (true, w.upperBound))
-              .getOrElse((false, tp))
-          case tp @ ScDesignatorType(element) =>
-            element match {
-              case a: ScTypeAlias
-                  if a.getContext.isInstanceOf[ScExistentialClause] =>
+        abstractsToUpper(
+          ScExistentialType(
+            quant.recursiveUpdate {
+              case tp @ ScTypeVariable(name) =>
                 wilds
-                  .find(_.name == a.name)
+                  .find(_.name == name)
                   .map(w => (true, w.upperBound))
                   .getOrElse((false, tp))
-              case _ => (false, tp)
-            }
-          case other => (false, other)
-        }, wilds)).removeUndefines()
+              case tp @ ScDesignatorType(element) =>
+                element match {
+                  case a: ScTypeAlias
+                      if a.getContext.isInstanceOf[ScExistentialClause] =>
+                    wilds
+                      .find(_.name == a.name)
+                      .map(w => (true, w.upperBound))
+                      .getOrElse((false, tp))
+                  case _ => (false, tp)
+                }
+              case other => (false, other)
+            },
+            wilds
+          )).removeUndefines()
       case _ => abstractsToUpper(tp).removeUndefines()
     }
   }

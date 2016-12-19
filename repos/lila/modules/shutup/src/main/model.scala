@@ -10,11 +10,13 @@ case class UserRecord(_id: String,
   def userId = _id
 
   def reports: List[TextReport] =
-    List(TextReport(TextType.PublicForumMessage, ~puf),
-         TextReport(TextType.TeamForumMessage, ~tef),
-         TextReport(TextType.PrivateMessage, ~prm),
-         TextReport(TextType.PrivateChat, ~prc),
-         TextReport(TextType.PublicChat, ~puc))
+    List(
+      TextReport(TextType.PublicForumMessage, ~puf),
+      TextReport(TextType.TeamForumMessage, ~tef),
+      TextReport(TextType.PrivateMessage, ~prm),
+      TextReport(TextType.PrivateChat, ~prc),
+      TextReport(TextType.PublicChat, ~puc)
+    )
 }
 
 case class TextAnalysis(text: String, badWords: List[String]) {

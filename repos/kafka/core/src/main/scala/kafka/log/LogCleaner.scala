@@ -90,15 +90,18 @@ class LogCleaner(val config: CleanerConfig,
       cleaners.map(_.lastStats).map(100 * _.bufferUtilization).max.toInt
   })
   /* a metric to track the recopy rate of each thread's last cleaning */
-  newGauge("cleaner-recopy-percent", new Gauge[Int] {
-    def value: Int = {
-      val stats = cleaners.map(_.lastStats)
-      val recopyRate =
-        stats.map(_.bytesWritten).sum.toDouble / math
-          .max(stats.map(_.bytesRead).sum, 1)
-      (100 * recopyRate).toInt
+  newGauge(
+    "cleaner-recopy-percent",
+    new Gauge[Int] {
+      def value: Int = {
+        val stats = cleaners.map(_.lastStats)
+        val recopyRate =
+          stats.map(_.bytesWritten).sum.toDouble / math
+            .max(stats.map(_.bytesRead).sum, 1)
+        (100 * recopyRate).toInt
+      }
     }
-  })
+  )
   /* a metric to track the maximum cleaning time for the last cleaning from each thread */
   newGauge("max-clean-time-secs", new Gauge[Int] {
     def value: Int = cleaners.map(_.lastStats).map(_.elapsedSecs).max.toInt
@@ -213,7 +216,8 @@ class LogCleaner(val config: CleanerConfig,
       dupBufferLoadFactor = config.dedupeBufferLoadFactor,
       throttler = throttler,
       time = time,
-      checkDone = checkDone)
+      checkDone = checkDone
+    )
 
     @volatile var lastStats: CleanerStats = new CleanerStats()
     private val backOffWaitLatch = new CountDownLatch(1)
@@ -295,7 +299,8 @@ class LogCleaner(val config: CleanerConfig,
               mb(stats.bytesRead),
               stats.elapsedSecs - stats.elapsedIndexSecs,
               mb(stats.bytesRead) / (stats.elapsedSecs - stats.elapsedIndexSecs),
-              100 * (stats.elapsedSecs - stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
+              100 * (stats.elapsedSecs - stats.elapsedIndexSecs).toDouble / stats.elapsedSecs
+            ) +
           "\tStart size: %,.1f MB (%,d messages)%n"
             .format(mb(stats.bytesRead), stats.messagesRead) +
           "\tEnd size: %,.1f MB (%,d messages)%n"
@@ -732,7 +737,8 @@ private[log] class Cleaner(val id: Int,
           .format(segmentSize,
                   log.name,
                   segment.log.file.getName,
-                  maxDesiredMapSize))
+                  maxDesiredMapSize)
+      )
       if (map.size + segmentSize <= maxDesiredMapSize)
         offset = buildOffsetMapForSegment(log.topicAndPartition, segment, map)
       else full = true

@@ -67,7 +67,8 @@ object Imports {
     val generateUpstreamCodeSamplesReport = TaskKey[CodeSamplesReport](
       "generateUpstreamCodeSamplesReport",
       "Parses all markdown files from the upstream translation and generates a report of code samples used",
-      KeyRanks.CTask)
+      KeyRanks.CTask
+    )
     val translationCodeSamplesReportFile = SettingKey[File](
       "translationCodeSamplesReportFilename",
       "The filename of the translation code samples report",

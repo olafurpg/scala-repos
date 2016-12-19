@@ -129,17 +129,17 @@ object Framing {
 
   class FramingException(msg: String) extends RuntimeException(msg)
 
-  private final val bigEndianDecoder: (ByteIterator, Int) ⇒ Int = (bs,
-                                                                   length) ⇒ {
-    var count = length
-    var decoded = 0
-    while (count > 0) {
-      decoded <<= 8
-      decoded |= bs.next().toInt & 0xFF
-      count -= 1
+  private final val bigEndianDecoder: (ByteIterator, Int) ⇒ Int =
+    (bs, length) ⇒ {
+      var count = length
+      var decoded = 0
+      while (count > 0) {
+        decoded <<= 8
+        decoded |= bs.next().toInt & 0xFF
+        count -= 1
+      }
+      decoded
     }
-    decoded
-  }
 
   private final val littleEndianDecoder: (ByteIterator, Int) ⇒ Int =
     (bs, length) ⇒ {

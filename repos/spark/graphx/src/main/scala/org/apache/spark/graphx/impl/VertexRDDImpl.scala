@@ -154,8 +154,8 @@ class VertexRDDImpl[VD] private[graphx] (
   }
 
   override def leftZipJoin[VD2: ClassTag, VD3: ClassTag](
-      other: VertexRDD[VD2])(f: (VertexId, VD,
-                                 Option[VD2]) => VD3): VertexRDD[VD3] = {
+      other: VertexRDD[VD2])(
+      f: (VertexId, VD, Option[VD2]) => VD3): VertexRDD[VD3] = {
     val newPartitionsRDD = partitionsRDD.zipPartitions(
       other.partitionsRDD,
       preservesPartitioning = true
@@ -168,8 +168,8 @@ class VertexRDDImpl[VD] private[graphx] (
   }
 
   override def leftJoin[VD2: ClassTag, VD3: ClassTag](
-      other: RDD[(VertexId, VD2)])(f: (VertexId, VD,
-                                       Option[VD2]) => VD3): VertexRDD[VD3] = {
+      other: RDD[(VertexId, VD2)])(
+      f: (VertexId, VD, Option[VD2]) => VD3): VertexRDD[VD3] = {
     // Test if the other vertex is a VertexRDD to choose the optimal join strategy.
     // If the other set is a VertexRDD then we use the much more efficient leftZipJoin
     other match {

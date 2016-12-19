@@ -89,13 +89,15 @@ abstract class QueryTest extends PlanTest {
     val decoded = try ds.collect().toSet
     catch {
       case e: Exception =>
-        fail(s"""
+        fail(
+          s"""
              |Exception collecting dataset as objects
              |${ds.resolvedTEncoder}
              |${ds.resolvedTEncoder.fromRowExpression.treeString}
              |${ds.queryExecution}
            """.stripMargin,
-             e)
+          e
+        )
     }
 
     // Handle the case where the return type is an array
@@ -251,13 +253,15 @@ abstract class QueryTest extends PlanTest {
       TreeNode.fromJSON[LogicalPlan](jsonString, sqlContext.sparkContext)
     } catch {
       case NonFatal(e) =>
-        fail(s"""
+        fail(
+          s"""
              |Failed to rebuild the logical plan from JSON:
              |${logicalPlan.treeString}
              |
              |${logicalPlan.prettyJson}
            """.stripMargin,
-             e)
+          e
+        )
     }
 
     val normalized2 =
@@ -385,7 +389,8 @@ object QueryTest {
                isSorted).map(_.toString()),
              s"== Spark Answer - ${sparkAnswer.size} ==" +: prepareAnswer(
                sparkAnswer,
-               isSorted).map(_.toString())).mkString("\n")}
+               isSorted).map(_.toString())
+           ).mkString("\n")}
         """.stripMargin
       return Some(errorMessage)
     }

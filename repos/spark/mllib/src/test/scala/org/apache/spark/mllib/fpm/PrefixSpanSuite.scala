@@ -268,18 +268,20 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(sequences, 2)
     val prefixSpan = new PrefixSpan().setMinSupport(1.0).setMaxPatternLength(2)
     val model = prefixSpan.run(rdd)
-    val expected = Array((Array(Array(1)), 1L),
-                         (Array(Array(1, 2)), 1L),
-                         (Array(Array(1), Array(1)), 1L),
-                         (Array(Array(1), Array(2)), 1L),
-                         (Array(Array(1), Array(3)), 1L),
-                         (Array(Array(1, 3)), 1L),
-                         (Array(Array(2)), 1L),
-                         (Array(Array(2, 3)), 1L),
-                         (Array(Array(2), Array(1)), 1L),
-                         (Array(Array(2), Array(2)), 1L),
-                         (Array(Array(2), Array(3)), 1L),
-                         (Array(Array(3)), 1L))
+    val expected = Array(
+      (Array(Array(1)), 1L),
+      (Array(Array(1, 2)), 1L),
+      (Array(Array(1), Array(1)), 1L),
+      (Array(Array(1), Array(2)), 1L),
+      (Array(Array(1), Array(3)), 1L),
+      (Array(Array(1, 3)), 1L),
+      (Array(Array(2)), 1L),
+      (Array(Array(2, 3)), 1L),
+      (Array(Array(2), Array(1)), 1L),
+      (Array(Array(2), Array(2)), 1L),
+      (Array(Array(2), Array(3)), 1L),
+      (Array(Array(3)), 1L)
+    )
     compareResults(expected, model.freqSequences.collect())
   }
 

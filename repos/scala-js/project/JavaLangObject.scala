@@ -45,28 +45,31 @@ object JavaLangObject {
                     GetClass(This()(ThisType))
                   })(OptimizerHints.empty.withInline(true), None),
         /* def hashCode(): Int = System.identityHashCode(this) */
-        MethodDef(static = false,
-                  Ident("hashCode__I", Some("hashCode__I")),
-                  Nil,
-                  IntType, {
-                    Apply(LoadModule(ClassType("jl_System$")),
-                          Ident("identityHashCode__O__I",
-                                Some("identityHashCode")),
-                          List(This()(ThisType)))(IntType)
-                  })(OptimizerHints.empty, None),
+        MethodDef(
+          static = false,
+          Ident("hashCode__I", Some("hashCode__I")),
+          Nil,
+          IntType, {
+            Apply(LoadModule(ClassType("jl_System$")),
+                  Ident("identityHashCode__O__I", Some("identityHashCode")),
+                  List(This()(ThisType)))(IntType)
+          }
+        )(OptimizerHints.empty, None),
         /* def equals(that: Object): Boolean = this eq that */
-        MethodDef(static = false,
-                  Ident("equals__O__Z", Some("equals__O__Z")),
-                  List(
-                    ParamDef(Ident("that", Some("that")),
-                             AnyType,
-                             mutable = false,
-                             rest = false)),
-                  BooleanType, {
-                    BinaryOp(BinaryOp.===,
-                             This()(ThisType),
-                             VarRef(Ident("that", Some("that")))(AnyType))
-                  })(OptimizerHints.empty.withInline(true), None),
+        MethodDef(
+          static = false,
+          Ident("equals__O__Z", Some("equals__O__Z")),
+          List(
+            ParamDef(Ident("that", Some("that")),
+                     AnyType,
+                     mutable = false,
+                     rest = false)),
+          BooleanType, {
+            BinaryOp(BinaryOp.===,
+                     This()(ThisType),
+                     VarRef(Ident("that", Some("that")))(AnyType))
+          }
+        )(OptimizerHints.empty.withInline(true), None),
         /* protected def clone(): Object =
          *   if (this.isInstanceOf[Cloneable]) <clone>(this)
          *   else throw new CloneNotSupportedException()
@@ -76,18 +79,21 @@ object JavaLangObject {
           Ident("clone__O", Some("clone__O")),
           Nil,
           AnyType, {
-            If(IsInstanceOf(This()(ThisType), ClassType("jl_Cloneable")), {
-              Apply(LoadModule(ClassType("sjsr_package$")),
-                    Ident("cloneObject__sjs_js_Object__sjs_js_Object",
-                          Some("cloneObject")),
-                    List(This()(ThisType)))(AnyType)
-            }, {
-              Throw(
-                New(ClassType("jl_CloneNotSupportedException"),
-                    Ident("init___", Some("<init>")),
-                    Nil))
-            })(AnyType)
-          })(OptimizerHints.empty.withInline(true), None),
+            If(
+              IsInstanceOf(This()(ThisType), ClassType("jl_Cloneable")), {
+                Apply(LoadModule(ClassType("sjsr_package$")),
+                      Ident("cloneObject__sjs_js_Object__sjs_js_Object",
+                            Some("cloneObject")),
+                      List(This()(ThisType)))(AnyType)
+              }, {
+                Throw(
+                  New(ClassType("jl_CloneNotSupportedException"),
+                      Ident("init___", Some("<init>")),
+                      Nil))
+              }
+            )(AnyType)
+          }
+        )(OptimizerHints.empty.withInline(true), None),
         /* def toString(): String =
          *   getClass().getName() + "@" + Integer.toHexString(hashCode())
          */
@@ -96,24 +102,27 @@ object JavaLangObject {
           Ident("toString__T", Some("toString__T")),
           Nil,
           ClassType(StringClass), {
-            BinaryOp(BinaryOp.String_+,
-                     BinaryOp(BinaryOp.String_+,
-                              Apply(Apply(This()(ThisType),
-                                          Ident("getClass__jl_Class",
-                                                Some("getClass__jl_Class")),
-                                          Nil)(ClassType(ClassClass)),
-                                    Ident("getName__T"),
-                                    Nil)(ClassType(StringClass)),
-                              // +
-                              StringLiteral("@")),
-                     // +
-                     Apply(LoadModule(ClassType("jl_Integer$")),
-                           Ident("toHexString__I__T"),
-                           List(
-                             Apply(This()(ThisType),
-                                   Ident("hashCode__I"),
-                                   Nil)(IntType)))(ClassType(StringClass)))
-          })(OptimizerHints.empty, None),
+            BinaryOp(
+              BinaryOp.String_+,
+              BinaryOp(
+                BinaryOp.String_+,
+                Apply(Apply(This()(ThisType),
+                            Ident("getClass__jl_Class",
+                                  Some("getClass__jl_Class")),
+                            Nil)(ClassType(ClassClass)),
+                      Ident("getName__T"),
+                      Nil)(ClassType(StringClass)),
+                // +
+                StringLiteral("@")
+              ),
+              // +
+              Apply(LoadModule(ClassType("jl_Integer$")),
+                    Ident("toHexString__I__T"),
+                    List(Apply(This()(ThisType), Ident("hashCode__I"), Nil)(
+                      IntType)))(ClassType(StringClass))
+            )
+          }
+        )(OptimizerHints.empty, None),
         /* Since wait() is not supported in any way, a correct implementation
          * of notify() and notifyAll() is to do nothing.
          */

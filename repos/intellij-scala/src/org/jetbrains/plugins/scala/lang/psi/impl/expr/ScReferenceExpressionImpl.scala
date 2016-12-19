@@ -84,16 +84,18 @@ class ScReferenceExpressionImpl(node: ASTNode)
   def bindToElement(element: PsiElement,
                     containingClass: Option[PsiClass]): PsiElement = {
     def tail(qualName: String)(simpleImport: => PsiElement): PsiElement = {
-      safeBindToElement(qualName, {
-        case (qual, true) =>
-          ScalaPsiElementFactory
-            .createExpressionWithContextFromText(qual, getContext, this)
-            .asInstanceOf[ScReferenceExpression]
-        case (qual, false) =>
-          ScalaPsiElementFactory
-            .createExpressionFromText(qual, getManager)
-            .asInstanceOf[ScReferenceExpression]
-      })(simpleImport)
+      safeBindToElement(
+        qualName, {
+          case (qual, true) =>
+            ScalaPsiElementFactory
+              .createExpressionWithContextFromText(qual, getContext, this)
+              .asInstanceOf[ScReferenceExpression]
+          case (qual, false) =>
+            ScalaPsiElementFactory
+              .createExpressionFromText(qual, getManager)
+              .asInstanceOf[ScReferenceExpression]
+        }
+      )(simpleImport)
     }
 
     if (isReferenceTo(element)) return this

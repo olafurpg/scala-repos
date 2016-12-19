@@ -116,7 +116,8 @@ class ScalaCompilingEvaluator(psiContext: PsiElement,
             codeFragment,
             SourcePosition.createFromElement(generatedClass.getAnchor))
         }
-      })
+      }
+    )
   }
 
   private def defineClasses(classes: Seq[OutputFileObject],

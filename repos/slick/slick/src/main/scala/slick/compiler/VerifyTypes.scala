@@ -19,16 +19,19 @@ class VerifyTypes(after: Option[Phase] = None) extends Phase {
 
   def check(tree: Node): Node = {
     val retyped = tree
-      .replace({
-        case t: TableNode =>
-          t.nodeType match {
-            case CollectionType(cons, NominalType(ts, _)) =>
-            case _ =>
-              logger.warn("Table has unexpected type:", t)
-          }
-          t
-        case n => n.untyped
-      }, bottomUp = true)
+      .replace(
+        {
+          case t: TableNode =>
+            t.nodeType match {
+              case CollectionType(cons, NominalType(ts, _)) =>
+              case _ =>
+                logger.warn("Table has unexpected type:", t)
+            }
+            t
+          case n => n.untyped
+        },
+        bottomUp = true
+      )
       .infer()
 
     val errors = mutable.Set.empty[RefId[Dumpable]]
@@ -55,7 +58,8 @@ class VerifyTypes(after: Option[Phase] = None) extends Phase {
           errors.size + " type errors found in " + nodeCount + " nodes:",
         tree,
         removeUnmarked = false,
-        mark = (errors contains RefId(_)))
+        mark = (errors contains RefId(_))
+      )
 
     tree
   }

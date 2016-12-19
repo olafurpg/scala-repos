@@ -56,7 +56,8 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
       itemStringIntMap = sc.get
         .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
         .first,
-      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
+      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first
+    )
   }
 }
 
@@ -69,18 +70,24 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   @transient lazy val logger = Logger[this.type]
 
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
-    require(!data.viewEvents.take(1).isEmpty,
-            s"viewEvents in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(!data.users.take(1).isEmpty,
-            s"users in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(!data.items.take(1).isEmpty,
-            s"items in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      !data.viewEvents.take(1).isEmpty,
+      s"viewEvents in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
+    require(
+      !data.users.take(1).isEmpty,
+      s"users in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
+    require(
+      !data.items.take(1).isEmpty,
+      s"items in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly."
+    )
     // create User and item's String ID to integer index BiMap
     val userStringIntMap = BiMap.stringInt(data.users.keys)
     val itemStringIntMap = BiMap.stringInt(data.items.keys)

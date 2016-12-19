@@ -114,22 +114,26 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
-      pruneFilterProject(
-        l,
-        projects,
-        filters,
-        (a, f) =>
-          toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray, f))) :: Nil
+      pruneFilterProject(l,
+                         projects,
+                         filters,
+                         (a, f) =>
+                           toCatalystRDD(
+                             l,
+                             a,
+                             t.buildScan(a.map(_.name).toArray, f))) :: Nil
 
     case PhysicalOperation(projects,
                            filters,
                            l @ LogicalRelation(t: PrunedScan, _, _)) =>
-      pruneFilterProject(
-        l,
-        projects,
-        filters,
-        (a,
-         _) => toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray))) :: Nil
+      pruneFilterProject(l,
+                         projects,
+                         filters,
+                         (a, _) =>
+                           toCatalystRDD(
+                             l,
+                             a,
+                             t.buildScan(a.map(_.name).toArray))) :: Nil
 
     // Scanning partitioned HadoopFsRelation
     case PhysicalOperation(projects,
@@ -213,8 +217,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
 
       t.bucketSpec match {
         case Some(spec) if t.sqlContext.conf.bucketingEnabled =>
-          val scanBuilder: (Seq[Attribute],
-                            Array[Filter]) => RDD[InternalRow] = {
+          val scanBuilder: (Seq[Attribute], Array[Filter]) => RDD[InternalRow] = {
             (requiredColumns: Seq[Attribute], filters: Array[Filter]) =>
               {
                 val bucketed = t.location
@@ -266,7 +269,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                                              None,
                                              t.location.allFiles(),
                                              confBroadcast,
-                                             t.options)) :: Nil
+                                             t.options)
+          ) :: Nil
       }
 
     case l @ LogicalRelation(baseRelation: TableScan, _, _) =>
@@ -360,7 +364,8 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                     .getOrElse {
                       relation.sqlContext.emptyResult: RDD[InternalRow]
                     }
-                })
+                }
+              )
               bucketed
 
             case _ =>
@@ -467,44 +472,44 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         }
       }
 
-      val mapPartitionsFunc = (_: TaskContext, _: Int,
-                               iterator: Iterator[Object]) => {
-        // Note that we can't use an `UnsafeRowJoiner` to replace the following `JoinedRow` and
-        // `UnsafeProjection`.  Because the projection may also adjust column order.
-        val mutableJoinedRow = new JoinedRow()
-        val unsafePartitionValues =
-          UnsafeProjection.create(partitionColumnSchema)(partitionValues)
-        val unsafeProjection = UnsafeProjection
-          .create(requiredColumns, dataColumns ++ partitionColumns)
+      val mapPartitionsFunc =
+        (_: TaskContext, _: Int, iterator: Iterator[Object]) => {
+          // Note that we can't use an `UnsafeRowJoiner` to replace the following `JoinedRow` and
+          // `UnsafeProjection`.  Because the projection may also adjust column order.
+          val mutableJoinedRow = new JoinedRow()
+          val unsafePartitionValues =
+            UnsafeProjection.create(partitionColumnSchema)(partitionValues)
+          val unsafeProjection = UnsafeProjection
+            .create(requiredColumns, dataColumns ++ partitionColumns)
 
-        // If we are returning batches directly, we need to augment them with the partitioning
-        // columns. We want to do this without a row by row operation.
-        var columnBatch: ColumnarBatch = null
-        var mergedBatch: ColumnarBatch = null
+          // If we are returning batches directly, we need to augment them with the partitioning
+          // columns. We want to do this without a row by row operation.
+          var columnBatch: ColumnarBatch = null
+          var mergedBatch: ColumnarBatch = null
 
-        iterator.map { input =>
-          {
-            if (input.isInstanceOf[InternalRow]) {
-              unsafeProjection(
-                mutableJoinedRow(input.asInstanceOf[InternalRow],
-                                 unsafePartitionValues))
-            } else {
-              require(input.isInstanceOf[ColumnarBatch])
-              val inputBatch = input.asInstanceOf[ColumnarBatch]
-              if (inputBatch != mergedBatch) {
-                mergedBatch = inputBatch
-                columnBatch = projectedColumnBatch(inputBatch,
-                                                   requiredColumns,
-                                                   dataColumns,
-                                                   partitionColumnSchema,
-                                                   partitionValues)
+          iterator.map { input =>
+            {
+              if (input.isInstanceOf[InternalRow]) {
+                unsafeProjection(
+                  mutableJoinedRow(input.asInstanceOf[InternalRow],
+                                   unsafePartitionValues))
+              } else {
+                require(input.isInstanceOf[ColumnarBatch])
+                val inputBatch = input.asInstanceOf[ColumnarBatch]
+                if (inputBatch != mergedBatch) {
+                  mergedBatch = inputBatch
+                  columnBatch = projectedColumnBatch(inputBatch,
+                                                     requiredColumns,
+                                                     dataColumns,
+                                                     partitionColumnSchema,
+                                                     partitionValues)
+                }
+                columnBatch.setNumRows(inputBatch.numRows())
+                columnBatch
               }
-              columnBatch.setNumRows(inputBatch.numRows())
-              columnBatch
             }
           }
         }
-      }
 
       // This is an internal RDD whose call site the user should not be concerned with
       // Since we create many of these (one per partition), the time spent on computing
@@ -616,12 +621,13 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
   //     `PrunedFilteredScan` and `HadoopFsRelation`).
   //
   // Note that 2 and 3 shouldn't be used together.
-  protected def pruneFilterProjectRaw(
-      relation: LogicalRelation,
-      projects: Seq[NamedExpression],
-      filterPredicates: Seq[Expression],
-      scanBuilder: (Seq[Attribute], Seq[Expression],
-                    Seq[Filter]) => RDD[InternalRow]) = {
+  protected def pruneFilterProjectRaw(relation: LogicalRelation,
+                                      projects: Seq[NamedExpression],
+                                      filterPredicates: Seq[Expression],
+                                      scanBuilder: (
+                                          Seq[Attribute],
+                                          Seq[Expression],
+                                          Seq[Filter]) => RDD[InternalRow]) = {
 
     val projectSet = AttributeSet(projects.flatMap(_.references))
     val filterSet = AttributeSet(filterPredicates.flatMap(_.references))

@@ -70,8 +70,7 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         (bytes ⇒ ClusterHeartbeatSender.Heartbeat(addressFromBinary(bytes))),
       classOf[ClusterHeartbeatSender.HeartbeatRsp] ->
         (bytes ⇒
-           ClusterHeartbeatSender.HeartbeatRsp(
-             uniqueAddressFromBinary(bytes))),
+          ClusterHeartbeatSender.HeartbeatRsp(uniqueAddressFromBinary(bytes))),
       classOf[GossipStatus] -> gossipStatusFromBinary,
       classOf[GossipEnvelope] -> gossipEnvelopeFromBinary,
       classOf[MetricsGossipEnvelope] -> metricsGossipEnvelopeFromBinary
@@ -221,7 +220,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       MemberStatus.Exiting -> cm.MemberStatus.Exiting_VALUE,
       MemberStatus.Down -> cm.MemberStatus.Down_VALUE,
       MemberStatus.Removed -> cm.MemberStatus.Removed_VALUE,
-      MemberStatus.WeaklyUp -> cm.MemberStatus.WeaklyUp_VALUE)
+      MemberStatus.WeaklyUp -> cm.MemberStatus.WeaklyUp_VALUE
+    )
 
   private val memberStatusFromInt = memberStatusToInt.map {
     case (a, b) ⇒ (b, a)
@@ -231,7 +231,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     scala.collection.immutable.HashMap[Reachability.ReachabilityStatus, Int](
       Reachability.Reachable -> cm.ReachabilityStatus.Reachable_VALUE,
       Reachability.Unreachable -> cm.ReachabilityStatus.Unreachable_VALUE,
-      Reachability.Terminated -> cm.ReachabilityStatus.Terminated_VALUE)
+      Reachability.Terminated -> cm.ReachabilityStatus.Terminated_VALUE
+    )
 
   private val reachabilityStatusFromInt = reachabilityStatusToInt.map {
     case (a, b) ⇒ (b, a)
@@ -409,7 +410,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
         addressMapping(member.getAddressIndex),
         member.getUpNumber,
         memberStatusFromInt(member.getStatus.getNumber),
-        member.getRolesIndexesList.asScala.map(roleMapping(_))(breakOut))
+        member.getRolesIndexesList.asScala.map(roleMapping(_))(breakOut)
+      )
 
     val members: immutable.SortedSet[Member] =
       gossip.getMembersList.asScala.map(memberFromProto)(breakOut)
@@ -443,7 +445,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       Deadline.now + GossipTimeToLive,
       () ⇒
         gossipFromProto(
-          cm.Gossip.parseFrom(decompress(serializedGossip.toByteArray))))
+          cm.Gossip.parseFrom(decompress(serializedGossip.toByteArray)))
+    )
   }
 
   private def gossipStatusFromProto(status: cm.GossipStatus): GossipStatus =
@@ -458,10 +461,11 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     val allNodeMetrics = envelope.gossip.nodes
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
     val addressMapping = allAddresses.zipWithIndex.toMap
-    val allMetricNames: Vector[String] = allNodeMetrics
-      .foldLeft(Set.empty[String])((s, n) ⇒
-        s ++ n.metrics.iterator.map(_.name))
-      .toVector
+    val allMetricNames: Vector[String] =
+      allNodeMetrics
+        .foldLeft(Set.empty[String])((s, n) ⇒
+          s ++ n.metrics.iterator.map(_.name))
+        .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =
       mapWithErrorMessage(addressMapping, address, "address")

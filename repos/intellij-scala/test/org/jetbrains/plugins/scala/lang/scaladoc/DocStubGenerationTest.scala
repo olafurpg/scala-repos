@@ -30,14 +30,16 @@ class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
     genericTestStub(
       "  /**\n   * \n   * @throws java.io.IOException\n   * @return\n   */\n" +
         "  @throws(classOf[java.io.IOException])\n def f(): Int = {1}}",
-      " @throws(classOf[java.io.IOException])\n def f(): Int = {1}}")
+      " @throws(classOf[java.io.IOException])\n def f(): Int = {1}}"
+    )
   }
 
   def testMixedMethodStub() {
     genericTestStub(
       "  /**\n   * \n   * @param a\n   * @param b\n   * @tparam C\n   * @return\n   */\n" +
         " def f[C](a: String, b: String): Int = 1 }",
-      " def f[C](a: String, b: String): Int = 1 }")
+      " def f[C](a: String, b: String): Int = 1 }"
+    )
   }
 
   def testClassStub() {
@@ -45,7 +47,8 @@ class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
       standartDocCommentStart,
       "class A[E, T](i: Int, j: String) {}",
       "/**\n * \n * @param i\n * @param j\n * @tparam E\n * @tparam T\n */\n" +
-        "class A[E, T](i: Int, j: String) {}")
+        "class A[E, T](i: Int, j: String) {}"
+    )
   }
 
   def testTraitStub() {

@@ -167,7 +167,8 @@ case class Game(
     },
     castles = castleLastMoveTime.castles,
     positionHashes = positionHashes,
-    checkCount = checkCount)
+    checkCount = checkCount
+  )
 
   def update(game: ChessGame,
              moveOrDrop: MoveOrDrop,
@@ -196,7 +197,8 @@ case class Game(
         castles = history.castles,
         lastMove = history.lastMove.map(_.origDest),
         lastMoveTime = Some(((nowMillis - createdAt.getMillis) / 100).toInt),
-        check = situation.kingPos ifTrue situation.check),
+        check = situation.kingPos ifTrue situation.check
+      ),
       binaryMoveTimes = isPgnImport.fold(
         ByteArray.empty,
         BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
@@ -215,7 +217,8 @@ case class Game(
       status = (status != updated.status) option updated.status,
       winner = situation.winner,
       whiteOffersDraw = whitePlayer.isOfferingDraw,
-      blackOffersDraw = blackPlayer.isOfferingDraw)
+      blackOffersDraw = blackPlayer.isOfferingDraw
+    )
 
     val clockEvent =
       updated.clock map Event.Clock.apply orElse {

@@ -43,5 +43,6 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
         .first,
       // HOWTO: read items too as part of algo model
-      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
+      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first
+    )
 }

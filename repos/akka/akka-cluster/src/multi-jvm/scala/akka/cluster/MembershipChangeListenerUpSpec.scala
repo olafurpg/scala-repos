@@ -45,17 +45,20 @@ abstract class MembershipChangeListenerUpSpec
       runOn(first, second) {
         val latch = TestLatch()
         val expectedAddresses = Set(first, second) map address
-        cluster.subscribe(system.actorOf(Props(new Actor {
-          var members = Set.empty[Member]
-          def receive = {
-            case state: CurrentClusterState ⇒ members = state.members
-            case MemberUp(m) ⇒
-              members = members - m + m
-              if (members.map(_.address) == expectedAddresses)
-                latch.countDown()
-            case _ ⇒ // ignore
-          }
-        }).withDeploy(Deploy.local)), classOf[MemberEvent])
+        cluster.subscribe(
+          system.actorOf(Props(new Actor {
+            var members = Set.empty[Member]
+            def receive = {
+              case state: CurrentClusterState ⇒ members = state.members
+              case MemberUp(m) ⇒
+                members = members - m + m
+                if (members.map(_.address) == expectedAddresses)
+                  latch.countDown()
+              case _ ⇒ // ignore
+            }
+          }).withDeploy(Deploy.local)),
+          classOf[MemberEvent]
+        )
         enterBarrier("listener-1-registered")
         cluster.join(first)
         latch.await
@@ -72,16 +75,20 @@ abstract class MembershipChangeListenerUpSpec
 
       val latch = TestLatch()
       val expectedAddresses = Set(first, second, third) map address
-      cluster.subscribe(system.actorOf(Props(new Actor {
-        var members = Set.empty[Member]
-        def receive = {
-          case state: CurrentClusterState ⇒ members = state.members
-          case MemberUp(m) ⇒
-            members = members - m + m
-            if (members.map(_.address) == expectedAddresses) latch.countDown()
-          case _ ⇒ // ignore
-        }
-      }).withDeploy(Deploy.local)), classOf[MemberEvent])
+      cluster.subscribe(
+        system.actorOf(Props(new Actor {
+          var members = Set.empty[Member]
+          def receive = {
+            case state: CurrentClusterState ⇒ members = state.members
+            case MemberUp(m) ⇒
+              members = members - m + m
+              if (members.map(_.address) == expectedAddresses)
+                latch.countDown()
+            case _ ⇒ // ignore
+          }
+        }).withDeploy(Deploy.local)),
+        classOf[MemberEvent]
+      )
       enterBarrier("listener-2-registered")
 
       runOn(third) {

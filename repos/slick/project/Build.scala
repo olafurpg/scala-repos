@@ -115,24 +115,23 @@ object SlickBuild extends Build {
       resolvers += Resolver.sonatypeRepo("snapshots"),
       scalacOptions ++= List("-deprecation", "-feature", "-unchecked"),
       scalacOptions in (Compile, doc) <++=
-        (version, sourceDirectory in Compile, name).map(
-          (v, src, n) =>
-            Seq(
-              "-doc-title",
-              n,
-              "-doc-version",
-              v,
-              "-doc-footer",
-              "Slick is developed by Typesafe and EPFL Lausanne.",
-              "-sourcepath",
-              src.getPath, // needed for scaladoc to strip the location of the linked source path
-              "-doc-source-url",
-              "https://github.com/slick/slick/blob/" + v +
-                "/slick/src/main€{FILE_PATH}.scala",
-              "-implicits",
-              "-diagrams", // requires graphviz
-              "-groups"
-          )),
+        (version, sourceDirectory in Compile, name).map((v, src, n) =>
+          Seq(
+            "-doc-title",
+            n,
+            "-doc-version",
+            v,
+            "-doc-footer",
+            "Slick is developed by Typesafe and EPFL Lausanne.",
+            "-sourcepath",
+            src.getPath, // needed for scaladoc to strip the location of the linked source path
+            "-doc-source-url",
+            "https://github.com/slick/slick/blob/" + v +
+              "/slick/src/main€{FILE_PATH}.scala",
+            "-implicits",
+            "-diagrams", // requires graphviz
+            "-groups"
+        )),
       logBuffered := false,
       repoKind <<= (version)(
         v => if (v.trim.endsWith("SNAPSHOT")) "snapshots" else "releases"),
@@ -228,10 +227,11 @@ object SlickBuild extends Build {
         sdlc <<= sdlc dependsOn
           (sdlc in slickProject,
           sdlc in slickCodegenProject, sdlc in slickHikariCPProject)
-      )).aggregate(slickProject,
-                   slickCodegenProject,
-                   slickHikariCPProject,
-                   slickTestkitProject)
+      )
+  ).aggregate(slickProject,
+              slickCodegenProject,
+              slickHikariCPProject,
+              slickTestkitProject)
 
   lazy val slickProject: Project = Project(
     id = "slick",
@@ -302,7 +302,8 @@ object SlickBuild extends Build {
         Seq(
           libraryDependencies <+= scalaVersion(
             "org.scala-lang" % "scala-compiler" % _ % "macro")
-        )))
+        ))
+  )
 
   /** Create an OSGi version range for standard Scala / Typesafe versioning
     * schemes that describes binary compatible versions. */
@@ -376,8 +377,8 @@ object SlickBuild extends Build {
           Seq(
             libraryDependencies <+= scalaVersion(
               "org.scala-lang" % "scala-compiler" % _ % "provided")
-          )))
-      .configs(DocTest)
+          ))
+    ).configs(DocTest)
       .settings(inConfig(DocTest)(Defaults.testSettings): _*)
       .settings(
         unmanagedSourceDirectories in DocTest +=
@@ -407,7 +408,8 @@ object SlickBuild extends Build {
             (baseDirectory in aRootProject).value / "common-test-resources",
           test := (),
           testOnly := () // suppress test status output
-        )) dependsOn (slickProject)
+        )
+    ) dependsOn (slickProject)
 
   lazy val slickHikariCPProject =
     Project(
@@ -434,7 +436,8 @@ object SlickBuild extends Build {
             "*"
           ),
           OsgiKeys.privatePackage := Nil
-        )) dependsOn (slickProject)
+        )
+    ) dependsOn (slickProject)
 
   lazy val reactiveStreamsTestProject =
     Project(
@@ -451,7 +454,8 @@ object SlickBuild extends Build {
             (Dependencies.logback +: Dependencies.testDBs).map(_ % "test"),
           libraryDependencies += Dependencies.reactiveStreamsTCK,
           parallelExecution in Test := false
-        )) dependsOn (slickTestkitProject)
+        )
+    ) dependsOn (slickTestkitProject)
 
   lazy val osgiBundleFiles =
     taskKey[Seq[File]]("osgi-bundles that our tests rely on using.")

@@ -157,16 +157,18 @@ object EventJson4sSupport {
       val prId = (jv \ "prId").extract[Option[String]]
       val creationTime =
         DataUtils.stringToDateTime((jv \ "creationTime").extract[String])
-      Event(event = event,
-            entityType = entityType,
-            entityId = entityId,
-            targetEntityType = targetEntityType,
-            targetEntityId = targetEntityId,
-            properties = DataMap(properties),
-            eventTime = eventTime,
-            tags = tags,
-            prId = prId,
-            creationTime = creationTime)
+      Event(
+        event = event,
+        entityType = entityType,
+        entityId = entityId,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        properties = DataMap(properties),
+        eventTime = eventTime,
+        tags = tags,
+        prId = prId,
+        creationTime = creationTime
+      )
     }
   }
 

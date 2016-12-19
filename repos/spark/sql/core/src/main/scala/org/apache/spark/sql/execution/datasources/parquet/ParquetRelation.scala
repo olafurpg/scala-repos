@@ -147,7 +147,8 @@ private[sql] class DefaultSource
         .getOrElse(compressionCodec.getOrElse(
                      sqlContext.conf.parquetCompressionCodec.toLowerCase),
                    CompressionCodecName.UNCOMPRESSED)
-        .name())
+        .name()
+    )
 
     new OutputWriterFactory {
       override def newInstance(path: String,
@@ -264,7 +265,8 @@ private[sql] class DefaultSource
       metadata = leaves.filter(
         _.getPath.getName == ParquetFileWriter.PARQUET_METADATA_FILE),
       commonMetadata = leaves.filter(
-        _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE))
+        _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE)
+    )
   }
 
   private def isSummaryFile(file: Path): Boolean = {
@@ -310,13 +312,14 @@ private[sql] class DefaultSource
       .initializeDriverSideJobFunc(inputFiles, parquetBlockSize) _
 
     Utils.withDummyCallSite(sqlContext.sparkContext) {
-      new SqlNewHadoopRDD(sqlContext = sqlContext,
-                          broadcastedConf = broadcastedConf,
-                          initDriverSideJobFuncOpt = Some(setInputPaths),
-                          initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
-                          inputFormatClass =
-                            classOf[ParquetInputFormat[InternalRow]],
-                          valueClass = classOf[InternalRow]) {
+      new SqlNewHadoopRDD(
+        sqlContext = sqlContext,
+        broadcastedConf = broadcastedConf,
+        initDriverSideJobFuncOpt = Some(setInputPaths),
+        initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
+        inputFormatClass = classOf[ParquetInputFormat[InternalRow]],
+        valueClass = classOf[InternalRow]
+      ) {
 
         val cacheMetadata = useMetadataCache
 
@@ -326,16 +329,18 @@ private[sql] class DefaultSource
             // (which does happen in some S3N credentials), we need to use the string returned by the
             // URI of the path to create a new Path.
             val pathWithEscapedAuthority = escapePathUserInfo(f.getPath)
-            new FileStatus(f.getLen,
-                           f.isDirectory,
-                           f.getReplication,
-                           f.getBlockSize,
-                           f.getModificationTime,
-                           f.getAccessTime,
-                           f.getPermission,
-                           f.getOwner,
-                           f.getGroup,
-                           pathWithEscapedAuthority)
+            new FileStatus(
+              f.getLen,
+              f.isDirectory,
+              f.getReplication,
+              f.getBlockSize,
+              f.getModificationTime,
+              f.getAccessTime,
+              f.getPermission,
+              f.getOwner,
+              f.getGroup,
+              pathWithEscapedAuthority
+            )
           }
           .toSeq
 
@@ -487,10 +492,12 @@ private[sql] object ParquetRelation extends Logging {
         .foreach(ParquetInputFormat.setFilterPredicate(conf, _))
     }
 
-    conf.set(CatalystReadSupport.SPARK_ROW_REQUESTED_SCHEMA, {
-      val requestedSchema = StructType(requiredColumns.map(dataSchema(_)))
-      CatalystSchemaConverter.checkFieldNames(requestedSchema).json
-    })
+    conf.set(
+      CatalystReadSupport.SPARK_ROW_REQUESTED_SCHEMA, {
+        val requestedSchema = StructType(requiredColumns.map(dataSchema(_)))
+        CatalystSchemaConverter.checkFieldNames(requestedSchema).json
+      }
+    )
 
     conf.set(CatalystWriteSupport.SPARK_ROW_SCHEMA,
              CatalystSchemaConverter.checkFieldNames(dataSchema).json)
@@ -846,5 +853,6 @@ private[sql] object ParquetRelation extends Logging {
     "uncompressed" -> CompressionCodecName.UNCOMPRESSED,
     "snappy" -> CompressionCodecName.SNAPPY,
     "gzip" -> CompressionCodecName.GZIP,
-    "lzo" -> CompressionCodecName.LZO)
+    "lzo" -> CompressionCodecName.LZO
+  )
 }

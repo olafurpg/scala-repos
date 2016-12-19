@@ -19,25 +19,28 @@ object ThriftServiceIfaceExample {
     // See the docs at https://twitter.github.io/finagle/guide/Protocols.html#using-finagle-thrift
     //#thriftserverapi
     val server =
-      Thrift.serveIface("localhost:1234", new LoggerService[Future] {
-        def log(message: String, logLevel: Int): Future[String] = {
-          println(s"[$logLevel] Server received: '$message'")
-          Future.value(s"You've sent: ('$message', $logLevel)")
-        }
+      Thrift.serveIface(
+        "localhost:1234",
+        new LoggerService[Future] {
+          def log(message: String, logLevel: Int): Future[String] = {
+            println(s"[$logLevel] Server received: '$message'")
+            Future.value(s"You've sent: ('$message', $logLevel)")
+          }
 
-        var counter = 0
-        // getLogSize throws ReadExceptions every other request.
-        def getLogSize(): Future[Int] = {
-          counter += 1
-          if (counter % 2 == 1) {
-            println(s"Server: getLogSize ReadException")
-            Future.exception(new ReadException())
-          } else {
-            println(s"Server: getLogSize Success")
-            Future.value(4)
+          var counter = 0
+          // getLogSize throws ReadExceptions every other request.
+          def getLogSize(): Future[Int] = {
+            counter += 1
+            if (counter % 2 == 1) {
+              println(s"Server: getLogSize ReadException")
+              Future.exception(new ReadException())
+            } else {
+              println(s"Server: getLogSize Success")
+              Future.value(4)
+            }
           }
         }
-      })
+      )
     //#thriftserverapi
 
     import LoggerService._

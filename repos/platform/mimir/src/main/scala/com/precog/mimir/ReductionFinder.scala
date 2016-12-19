@@ -138,13 +138,15 @@ trait ReductionFinderModule[M[+ _]]
             val secondIndex =
               st.reducesByParent(parent).reverse indexOf graph
 
-            dag.Join(DerefArray,
-                     Cross(Some(CrossLeft)),
-                     dag.Join(DerefArray,
-                              Cross(Some(CrossLeft)),
-                              left,
-                              Const(CLong(firstIndex))(graph.loc))(graph.loc),
-                     Const(CLong(secondIndex))(graph.loc))(graph.loc)
+            dag.Join(
+              DerefArray,
+              Cross(Some(CrossLeft)),
+              dag.Join(DerefArray,
+                       Cross(Some(CrossLeft)),
+                       left,
+                       Const(CLong(firstIndex))(graph.loc))(graph.loc),
+              Const(CLong(secondIndex))(graph.loc)
+            )(graph.loc)
           }
         }
       }

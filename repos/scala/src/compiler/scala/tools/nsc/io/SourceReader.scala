@@ -30,7 +30,8 @@ class SourceReader(decoder: CharsetDecoder, reporter: Reporter) {
     reporter.error(
       scala.reflect.internal.util.NoPosition,
       "IO error while decoding " + filename + " with " + decoder.charset() +
-        "\n" + "Please try specifying another one using the -encoding option")
+        "\n" + "Please try specifying another one using the -encoding option"
+    )
   }
 
   /** Reads the specified file. */

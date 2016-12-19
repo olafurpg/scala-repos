@@ -108,15 +108,16 @@ object ExternalShuffleService extends Logging {
 
   def main(args: Array[String]): Unit = {
     main(args,
-         (conf: SparkConf,
-          sm: SecurityManager) => new ExternalShuffleService(conf, sm))
+         (conf: SparkConf, sm: SecurityManager) =>
+           new ExternalShuffleService(conf, sm))
   }
 
   /** A helper main method that allows the caller to call this with a custom shuffle service. */
-  private[spark] def main(
-      args: Array[String],
-      newShuffleService: (SparkConf,
-                          SecurityManager) => ExternalShuffleService): Unit = {
+  private[spark] def main(args: Array[String],
+                          newShuffleService: (
+                              SparkConf,
+                              SecurityManager) => ExternalShuffleService)
+    : Unit = {
     Utils.initDaemon(log)
     val sparkConf = new SparkConf
     Utils.loadDefaultSparkProperties(sparkConf)

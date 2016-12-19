@@ -260,7 +260,8 @@ class SQLQuerySuite
     sql(
       "INSERT INTO TABLE orderupdates PARTITION(state, month) SELECT * FROM orderupdates1")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select orders.state, orders.month
           |from orders
           |join (
@@ -270,7 +271,8 @@ class SQLQuerySuite
           |    on orderupdates.id = orders.id) ao
           |  on ao.state = orders.state and ao.month = orders.month
         """.stripMargin),
-                (1 to 6).map(_ => Row("CA", 20151)))
+      (1 to 6).map(_ => Row("CA", 20151))
+    )
   }
 
   test("show functions") {
@@ -306,14 +308,16 @@ class SQLQuerySuite
       "Usage: upper(str) - Returns str with all characters changed to uppercase",
       "Extended Usage:",
       "> SELECT upper('SparkSql')",
-      "'SPARKSQL'")
+      "'SPARKSQL'"
+    )
 
     checkExistence(
       sql("describe functioN Upper"),
       true,
       "Function: upper",
       "Class: org.apache.spark.sql.catalyst.expressions.Upper",
-      "Usage: upper(str) - Returns str with all characters changed to uppercase")
+      "Usage: upper(str) - Returns str with all characters changed to uppercase"
+    )
 
     checkExistence(sql("describe functioN Upper"), false, "Extended Usage")
 
@@ -385,12 +389,14 @@ class SQLQuerySuite
         "SELECT `a`.`ints` FROM nestedArray LATERAL VIEW explode(a.b) `a` AS `ints`"),
       Row(1) :: Row(2) :: Row(3) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT `weird``tab`.`weird``col`
           |FROM nestedArray
           |LATERAL VIEW explode(a.b) `weird``tab` AS `weird``col`
         """.stripMargin),
-                Row(1) :: Row(2) :: Row(3) :: Nil)
+      Row(1) :: Row(2) :: Row(3) :: Nil
+    )
   }
 
   test(
@@ -449,7 +455,8 @@ class SQLQuerySuite
       assert(
         message.contains("Cannot specify database name in a CTAS statement"),
         "When spark.sql.hive.convertCTAS is true, we should not allow " +
-          "database name specified.")
+          "database name specified."
+      )
 
       sql(
         "CREATE TABLE ctas1 stored as textfile" +
@@ -514,16 +521,20 @@ class SQLQuerySuite
     checkAnswer(
       sql("SELECT k, value FROM ctas1 ORDER BY k, value"),
       sql("SELECT key, value FROM src ORDER BY key, value").collect().toSeq)
-    checkAnswer(sql("SELECT key, value FROM ctas2 ORDER BY key, value"),
-                sql("""
+    checkAnswer(
+      sql("SELECT key, value FROM ctas2 ORDER BY key, value"),
+      sql("""
           SELECT key, value
           FROM src
-          ORDER BY key, value""").collect().toSeq)
-    checkAnswer(sql("SELECT key, value FROM ctas3 ORDER BY key, value"),
-                sql("""
+          ORDER BY key, value""").collect().toSeq
+    )
+    checkAnswer(
+      sql("SELECT key, value FROM ctas3 ORDER BY key, value"),
+      sql("""
           SELECT key, value
           FROM src
-          ORDER BY key, value""").collect().toSeq)
+          ORDER BY key, value""").collect().toSeq
+    )
     intercept[AnalysisException] {
       sql("""CREATE TABLE ctas4 AS
           | SELECT key, value FROM src ORDER BY key, value""".stripMargin)
@@ -532,20 +543,22 @@ class SQLQuerySuite
     checkAnswer(sql("SELECT key, value FROM ctas4 ORDER BY key, value"),
                 sql("SELECT key, value FROM ctas4 LIMIT 1").collect().toSeq)
 
-    checkExistence(sql("DESC EXTENDED ctas2"),
-                   true,
-                   "name:key",
-                   "type:string",
-                   "name:value",
-                   "ctas2",
-                   "org.apache.hadoop.hive.ql.io.RCFileInputFormat",
-                   "org.apache.hadoop.hive.ql.io.RCFileOutputFormat",
-                   "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe",
-                   "serde_p1=p1",
-                   "serde_p2=p2",
-                   "tbl_p1=p11",
-                   "tbl_p2=p22",
-                   "MANAGED_TABLE")
+    checkExistence(
+      sql("DESC EXTENDED ctas2"),
+      true,
+      "name:key",
+      "type:string",
+      "name:value",
+      "ctas2",
+      "org.apache.hadoop.hive.ql.io.RCFileInputFormat",
+      "org.apache.hadoop.hive.ql.io.RCFileOutputFormat",
+      "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe",
+      "serde_p1=p1",
+      "serde_p2=p2",
+      "tbl_p1=p11",
+      "tbl_p2=p22",
+      "MANAGED_TABLE"
+    )
 
     sql("""CREATE TABLE ctas5
         | STORED AS parquet AS
@@ -564,7 +577,8 @@ class SQLQuerySuite
         "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
         "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
         "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-        "MANAGED_TABLE")
+        "MANAGED_TABLE"
+      )
     }
 
     // use the Hive SerDe for parquet tables
@@ -626,14 +640,16 @@ class SQLQuerySuite
   }
 
   test("ordering not in agg") {
-    checkAnswer(sql("SELECT key FROM src GROUP BY key, value ORDER BY value"),
-                sql("""
+    checkAnswer(
+      sql("SELECT key FROM src GROUP BY key, value ORDER BY value"),
+      sql("""
         SELECT key
         FROM (
           SELECT key, value
           FROM src
           GROUP BY key, value
-          ORDER BY value) a""").collect().toSeq)
+          ORDER BY value) a""").collect().toSeq
+    )
   }
 
   test("double nested data") {
@@ -713,7 +729,8 @@ class SQLQuerySuite
       sql("SELECT key FROM src WHERE key not between 0 and 10 order by key"),
       sql("SELECT key FROM src WHERE key between 11 and 500 order by key")
         .collect()
-        .toSeq)
+        .toSeq
+    )
   }
 
   test("SPARK-2554 SumDistinct partial aggregation") {
@@ -741,19 +758,18 @@ class SQLQuerySuite
     "SPARK-5284 Insert into Hive throws NPE when a inner complex type field has a null value") {
     val schema =
       StructType(
-        StructField("s",
-                    StructType(
-                      StructField("innerStruct",
-                                  StructType(StructField(
-                                    "s1",
-                                    StringType,
-                                    true) :: Nil)) :: StructField(
-                        "innerArray",
-                        ArrayType(IntegerType),
-                        true) :: StructField(
-                        "innerMap",
-                        MapType(StringType, IntegerType)) :: Nil),
-                    true) :: Nil)
+        StructField(
+          "s",
+          StructType(
+            StructField(
+              "innerStruct",
+              StructType(StructField("s1", StringType, true) :: Nil)) :: StructField(
+              "innerArray",
+              ArrayType(IntegerType),
+              true) :: StructField("innerMap",
+                                   MapType(StringType, IntegerType)) :: Nil),
+          true
+        ) :: Nil)
     val row = Row(Row(null, null, null))
 
     val rowRdd = sparkContext.parallelize(row :: Nil)
@@ -919,7 +935,8 @@ class SQLQuerySuite
           |(FROM test SELECT TRANSFORM(key, value) USING 'cat' AS (`thing1` int, thing2 string)) t
           |SELECT thing1 + 1
         """.stripMargin),
-      (2 to 6).map(i => Row(i)))
+      (2 to 6).map(i => Row(i))
+    )
   }
 
   test("window function: udaf with aggregate expression") {
@@ -946,7 +963,8 @@ class SQLQuerySuite
         ("b", 8, 15),
         ("c", 9, 19),
         ("c", 10, 19)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
 
     checkAnswer(
       sql("""
@@ -960,7 +978,8 @@ class SQLQuerySuite
         ("b", 7, 15),
         ("c", 8, 19),
         ("c", 9, 19)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
 
     checkAnswer(
       sql("""
@@ -974,7 +993,8 @@ class SQLQuerySuite
         ("b", 8, 8d / 15),
         ("c", 10, 10d / 19),
         ("c", 9, 9d / 19)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
 
     checkAnswer(
       sql("""
@@ -988,7 +1008,8 @@ class SQLQuerySuite
         ("b", 8, 8d / 13),
         ("c", 10, 10d / 17),
         ("c", 9, 9d / 17)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
   }
 
   test("window function: refer column in inner select block") {
@@ -1014,7 +1035,8 @@ class SQLQuerySuite
         ("b", 3),
         ("c", 2),
         ("c", 3)
-      ).map(i => Row(i._1, i._2)))
+      ).map(i => Row(i._1, i._2))
+    )
   }
 
   test("window function: partition and order expressions") {
@@ -1040,21 +1062,24 @@ class SQLQuerySuite
         (4, "b", 8, 51),
         (5, "c", 9, 51),
         (6, "c", 10, 51)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select month, area, product, sum(product)
           |over (partition by month % 2 order by 10 - product)
           |from windowData
         """.stripMargin),
-                Seq(
-                  (1, "a", 5, 21),
-                  (2, "a", 6, 24),
-                  (3, "b", 7, 16),
-                  (4, "b", 8, 18),
-                  (5, "c", 9, 9),
-                  (6, "c", 10, 10)
-                ).map(i => Row(i._1, i._2, i._3, i._4)))
+      Seq(
+        (1, "a", 5, 21),
+        (2, "a", 6, 24),
+        (3, "b", 7, 16),
+        (4, "b", 8, 18),
+        (5, "c", 9, 9),
+        (6, "c", 10, 10)
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("window function: distinct should not be silently ignored") {
@@ -1102,7 +1127,8 @@ class SQLQuerySuite
         (4, "b", 0, 8),
         (5, "c", 1, 5),
         (6, "c", 0, 6)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("Sorting columns are not in Generate") {
@@ -1130,7 +1156,8 @@ class SQLQuerySuite
             |SELECT C.val, b FROM data LATERAL VIEW OUTER explode(a) C as val
             |where b < 2 order by c, val, b
           """.stripMargin),
-        Row(1, 1) :: Row(2, 1) :: Nil)
+        Row(1, 1) :: Row(2, 1) :: Nil
+      )
     }
   }
 
@@ -1155,7 +1182,8 @@ class SQLQuerySuite
         (5, 9, 57),
         (6, 11, 57),
         (1, 10, 57)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
 
     checkAnswer(
       sql("""
@@ -1169,7 +1197,8 @@ class SQLQuerySuite
         ("c", 2),
         ("d", 2),
         ("c", 3)
-      ).map(i => Row(i._1, i._2)))
+      ).map(i => Row(i._1, i._2))
+    )
 
     checkAnswer(
       sql("""
@@ -1183,7 +1212,8 @@ class SQLQuerySuite
         ("c", 1),
         ("d", 1),
         ("c", 2)
-      ).map(i => Row(i._1, i._2)))
+      ).map(i => Row(i._1, i._2))
+    )
 
     checkAnswer(
       sql("""
@@ -1197,7 +1227,8 @@ class SQLQuerySuite
         ("b", 0.5333333333333333),
         ("c", 0.45),
         ("c", 0.55)
-      ).map(i => Row(i._1, i._2)))
+      ).map(i => Row(i._1, i._2))
+    )
   }
 
   // todo: fix this test case by reimplementing the function ResolveAggregateFunctions
@@ -1212,19 +1243,21 @@ class SQLQuerySuite
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select area, sum(product) over () as c from windowData
           |where product > 3 group by area, product
           |having avg(month) > 0 order by avg(month), product
         """.stripMargin),
-                Seq(
-                  ("a", 51),
-                  ("b", 51),
-                  ("b", 51),
-                  ("c", 51),
-                  ("c", 51),
-                  ("d", 51)
-                ).map(i => Row(i._1, i._2)))
+      Seq(
+        ("a", 51),
+        ("b", 51),
+        ("b", 51),
+        ("c", 51),
+        ("c", 51),
+        ("d", 51)
+      ).map(i => Row(i._1, i._2))
+    )
   }
 
   test("window function: multiple window expressions in a single expression") {
@@ -1291,7 +1324,8 @@ class SQLQuerySuite
         | v2 as (select v1.key, v1_lag.cnt_val from v1, v1 v1_lag where v1.key = v1_lag.key)
         | select * from v2 order by key limit 1
       """.stripMargin),
-      Row(0, 3))
+      Row(0, 3)
+    )
   }
 
   test("SPARK-7269 Check analysis failed in case in-sensitive") {
@@ -1326,7 +1360,8 @@ class SQLQuerySuite
 
   // `Math.exp(1.0)` has different result for different jdk version, so not use createQueryTest
   test("udf_java_method") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT java_method("java.lang.String", "valueOf", 1),
         |       java_method("java.lang.String", "isEmpty"),
         |       java_method("java.lang.Math", "max", 2, 3),
@@ -1336,13 +1371,16 @@ class SQLQuerySuite
         |       java_method("java.lang.Math", "floor", 1.9D)
         |FROM src tablesample (1 rows)
       """.stripMargin),
-                Row("1",
-                    "true",
-                    java.lang.Math.max(2, 3).toString,
-                    java.lang.Math.min(2, 3).toString,
-                    java.lang.Math.round(2.5).toString,
-                    java.lang.Math.exp(1.0).toString,
-                    java.lang.Math.floor(1.9).toString))
+      Row(
+        "1",
+        "true",
+        java.lang.Math.max(2, 3).toString,
+        java.lang.Math.min(2, 3).toString,
+        java.lang.Math.round(2.5).toString,
+        java.lang.Math.exp(1.0).toString,
+        java.lang.Math.floor(1.9).toString
+      )
+    )
   }
 
   test("dynamic partition value test") {
@@ -1421,11 +1459,14 @@ class SQLQuerySuite
           | CAST(CAST(CAST('1970-01-01 23:00:00' AS timestamp) AS date) AS timestamp)
           | FROM src LIMIT 1
         """.stripMargin),
-      Row(Date.valueOf("1969-12-31"),
-          String.valueOf("1969-12-31"),
-          Timestamp.valueOf("1969-12-31 16:00:00"),
-          String.valueOf("1969-12-31 16:00:00"),
-          Timestamp.valueOf("1970-01-01 00:00:00")))
+      Row(
+        Date.valueOf("1969-12-31"),
+        String.valueOf("1969-12-31"),
+        Timestamp.valueOf("1969-12-31 16:00:00"),
+        String.valueOf("1969-12-31 16:00:00"),
+        Timestamp.valueOf("1970-01-01 00:00:00")
+      )
+    )
   }
 
   test("SPARK-8588 HiveTypeCoercion.inConversion fires too early") {
@@ -1457,11 +1498,13 @@ class SQLQuerySuite
   test("Convert hive interval term into Literal of CalendarIntervalType") {
     checkAnswer(sql("select interval '10-9' year to month"),
                 Row(CalendarInterval.fromString("interval 10 years 9 months")))
-    checkAnswer(sql("select interval '20 15:40:32.99899999' day to second"),
-                Row(
-                  CalendarInterval.fromString(
-                    "interval 2 weeks 6 days 15 hours 40 minutes " +
-                      "32 seconds 99 milliseconds 899 microseconds")))
+    checkAnswer(
+      sql("select interval '20 15:40:32.99899999' day to second"),
+      Row(
+        CalendarInterval.fromString(
+          "interval 2 weeks 6 days 15 hours 40 minutes " +
+            "32 seconds 99 milliseconds 899 microseconds"))
+    )
     checkAnswer(sql("select interval '30' year"),
                 Row(CalendarInterval.fromString("interval 30 years")))
     checkAnswer(sql("select interval '25' month"),
@@ -1542,7 +1585,8 @@ class SQLQuerySuite
           |) t
           |SELECT c
         """.stripMargin),
-      (0 until 5).map(i => Row(i + "#")))
+      (0 until 5).map(i => Row(i + "#"))
+    )
   }
 
   test("SPARK-10310: script transformation using LazySimpleSerDe") {
@@ -1574,21 +1618,25 @@ class SQLQuerySuite
           "CREATE TABLE test10741(c1 STRING, c2 INT) STORED AS PARQUET AS SELECT * FROM src")
       }
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
           |SELECT c1, AVG(c2) AS c_avg
           |FROM test10741
           |GROUP BY c1
           |HAVING (AVG(c2) > 5) ORDER BY c1
         """.stripMargin),
-                  Row("a", 7.0) :: Row("b", 6.0) :: Nil)
+        Row("a", 7.0) :: Row("b", 6.0) :: Nil
+      )
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
           |SELECT c1, AVG(c2) AS c_avg
           |FROM test10741
           |GROUP BY c1
           |ORDER BY AVG(c2)
         """.stripMargin),
-                  Row("b", 6.0) :: Row("a", 7.0) :: Nil)
+        Row("b", 6.0) :: Row("a", 7.0) :: Nil
+      )
     }
   }
 
@@ -1813,7 +1861,8 @@ class SQLQuerySuite
         (84, 1, 0),
         (105, 2, 0),
         (107, 4, 0)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
   }
 
   test("SPARK-8976 Wrong Result for Rollup #2") {
@@ -1834,7 +1883,8 @@ class SQLQuerySuite
         (1, 0, 140, 0),
         (1, 0, 145, 0),
         (1, 0, 150, 0)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("SPARK-8976 Wrong Result for Rollup #3") {
@@ -1855,7 +1905,8 @@ class SQLQuerySuite
         (1, 0, 140, 0),
         (1, 0, 145, 0),
         (1, 0, 150, 0)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("SPARK-8976 Wrong Result for CUBE #1") {
@@ -1869,7 +1920,8 @@ class SQLQuerySuite
         (84, 1, 0),
         (105, 2, 0),
         (107, 4, 0)
-      ).map(i => Row(i._1, i._2, i._3)))
+      ).map(i => Row(i._1, i._2, i._3))
+    )
   }
 
   test("SPARK-8976 Wrong Result for CUBE #2") {
@@ -1890,7 +1942,8 @@ class SQLQuerySuite
         (1, null, 14, 2),
         (1, null, 15, 2),
         (1, null, 22, 2)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("SPARK-8976 Wrong Result for GroupingSet") {
@@ -1911,7 +1964,8 @@ class SQLQuerySuite
         (1, null, 14, 2),
         (1, null, 15, 2),
         (1, null, 22, 2)
-      ).map(i => Row(i._1, i._2, i._3, i._4)))
+      ).map(i => Row(i._1, i._2, i._3, i._4))
+    )
   }
 
   test("SPARK-10562: partition by column with mixed case name") {
@@ -1961,27 +2015,33 @@ class SQLQuerySuite
   }
 
   test("SPARK-11590: use native json_tuple in lateral view") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT a, b
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
         |LATERAL VIEW json_tuple(json, 'f1', 'f2') jt AS a, b
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12")
+    )
 
     // we should use `c0`, `c1`... as the name of fields if no alias is provided, to follow hive.
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT c0, c1
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
         |LATERAL VIEW json_tuple(json, 'f1', 'f2') jt
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12")
+    )
 
     // we can also use `json_tuple` in project list.
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT json_tuple(json, 'f1', 'f2')
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12")
+    )
 
     // we can also mix `json_tuple` with other project expressions.
     checkAnswer(
@@ -1989,7 +2049,8 @@ class SQLQuerySuite
         |SELECT json_tuple(json, 'f1', 'f2'), 3.14, str
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json, 'hello' as str) test
       """.stripMargin),
-      Row("value1", "12", BigDecimal("3.14"), "hello"))
+      Row("value1", "12", BigDecimal("3.14"), "hello")
+    )
   }
 
   test("multi-insert with lateral view") {

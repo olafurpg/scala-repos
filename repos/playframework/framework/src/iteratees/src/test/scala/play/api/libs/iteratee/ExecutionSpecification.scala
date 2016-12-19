@@ -23,7 +23,8 @@ trait ExecutionSpecification { self: SpecificationLike =>
   }
 
   def testExecution[A](
-      f: (TestExecutionContext, TestExecutionContext,
+      f: (TestExecutionContext,
+          TestExecutionContext,
           TestExecutionContext) => A): A = {
     testExecution(
       ec1 => testExecution(ec2 => testExecution(ec3 => f(ec1, ec2, ec3))))

@@ -4,9 +4,14 @@ internal.reificationSupport.SyntacticClassDef
 
 object DefinitionDeconstructionProps
     extends QuasiquoteProperties("definition deconstruction")
-    with TraitDeconstruction with ClassDeconstruction with ObjectDeconstruction
-    with ModsDeconstruction with ValVarDeconstruction with DefDeconstruction
-    with PackageDeconstruction with ImportDeconstruction
+    with TraitDeconstruction
+    with ClassDeconstruction
+    with ObjectDeconstruction
+    with ModsDeconstruction
+    with ValVarDeconstruction
+    with DefDeconstruction
+    with PackageDeconstruction
+    with ImportDeconstruction
 
 trait TraitDeconstruction { self: QuasiquoteProperties =>
   property("exhaustive trait matcher") = test {
@@ -21,7 +26,7 @@ trait TraitDeconstruction { self: QuasiquoteProperties =>
     matches("trait Foo extends Bar with Baz")
     matches("trait Foo { self: Bippy => val x: Int = 1}")
     matches(
-        "trait Foo extends { val early: Int = 1 } with Bar { val late = early }")
+      "trait Foo extends { val early: Int = 1 } with Bar { val late = early }")
     matches("private[Gap] trait Foo")
   }
 }
@@ -100,24 +105,29 @@ trait ClassDeconstruction { self: QuasiquoteProperties =>
     val PARAMACCESSOR = (1 << 29).toLong.asInstanceOf[FlagSet]
     assertThrows[MatchError] {
       val SyntacticClassDef(_, _, _, _, _, _, _, _, _) = ClassDef(
-          Modifiers(),
-          TypeName("Foo"),
-          List(),
-          Template(
-              List(Select(Ident(TermName("scala")), TypeName("AnyRef"))),
-              noSelfType,
+        Modifiers(),
+        TypeName("Foo"),
+        List(),
+        Template(
+          List(Select(Ident(TermName("scala")), TypeName("AnyRef"))),
+          noSelfType,
+          List(
+            //ValDef(Modifiers(PRIVATE | LOCAL | PARAMACCESSOR), TermName("x"), Ident(TypeName("Int")), EmptyTree),
+            DefDef(
+              Modifiers(),
+              termNames.CONSTRUCTOR,
+              List(),
               List(
-                  //ValDef(Modifiers(PRIVATE | LOCAL | PARAMACCESSOR), TermName("x"), Ident(TypeName("Int")), EmptyTree),
-                  DefDef(Modifiers(),
-                         termNames.CONSTRUCTOR,
-                         List(),
-                         List(List(ValDef(Modifiers(PARAM | PARAMACCESSOR),
-                                          TermName("x"),
-                                          Ident(TypeName("Int")),
-                                          EmptyTree))),
-                         TypeTree(),
-                         Block(List(pendingSuperCall),
-                               Literal(Constant(())))))))
+                List(
+                  ValDef(Modifiers(PARAM | PARAMACCESSOR),
+                         TermName("x"),
+                         Ident(TypeName("Int")),
+                         EmptyTree))),
+              TypeTree(),
+              Block(List(pendingSuperCall), Literal(Constant(())))
+            ))
+        )
+      )
     }
   }
 
@@ -297,8 +307,11 @@ trait ImportDeconstruction { self: QuasiquoteProperties =>
   }
 
   property("unquote names into import selector") = forAll {
-    (expr: Tree, plain: TermName, oldname: TermName, newname: TermName,
-    discard: TermName) =>
+    (expr: Tree,
+     plain: TermName,
+     oldname: TermName,
+     newname: TermName,
+     discard: TermName) =>
       val Import(expr1,
                  List(ImportSelector(plain11, _, plain12, _),
                       ImportSelector(oldname1, _, newname1, _),

@@ -3898,7 +3898,10 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
 
   @inline
   def onChildClick(
-      f: (android.widget.ExpandableListView, android.view.View, Int, Int,
+      f: (android.widget.ExpandableListView,
+          android.view.View,
+          Int,
+          Int,
           Long) => Boolean): This = {
     basis.setOnChildClickListener(
       new android.widget.ExpandableListView.OnChildClickListener {
@@ -3925,7 +3928,9 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
 
   @inline
   def onGroupClick(
-      f: (android.widget.ExpandableListView, android.view.View, Int,
+      f: (android.widget.ExpandableListView,
+          android.view.View,
+          Int,
           Long) => Boolean): This = {
     basis.setOnGroupClickListener(
       new android.widget.ExpandableListView.OnGroupClickListener {
@@ -5959,8 +5964,8 @@ trait TraitListPopupWindow[This <: android.widget.ListPopupWindow] {
 
   @inline
   def onItemClick[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemClickListener(
       new android.widget.AdapterView.OnItemClickListener {
         def onItemClick(p1: android.widget.AdapterView[_],
@@ -5984,8 +5989,8 @@ trait TraitListPopupWindow[This <: android.widget.ListPopupWindow] {
 
   @inline
   def onItemSelected[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemSelectedListener(
       new android.widget.AdapterView.OnItemSelectedListener {
         def onItemSelected(p1: android.widget.AdapterView[_],
@@ -8046,8 +8051,8 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
 
   @inline
   def onItemClick[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemClickListener(
       new android.widget.AdapterView.OnItemClickListener {
         def onItemClick(p1: android.widget.AdapterView[_],
@@ -8071,7 +8076,9 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
 
   @inline
   def onItemLongClick(
-      f: (android.widget.AdapterView[_], android.view.View, Int,
+      f: (android.widget.AdapterView[_],
+          android.view.View,
+          Int,
           Long) => Boolean): This = {
     basis.setOnItemLongClickListener(
       new android.widget.AdapterView.OnItemLongClickListener {
@@ -8096,8 +8103,8 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
 
   @inline
   def onItemSelected[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemSelectedListener(
       new android.widget.AdapterView.OnItemSelectedListener {
         def onItemSelected(p1: android.widget.AdapterView[_],
@@ -10633,8 +10640,8 @@ trait TraitTextView[This <: android.widget.TextView] extends TraitView[This] {
 
   @inline
   def onEditorAction(
-      f: (android.widget.TextView, Int,
-          android.view.KeyEvent) => Boolean): This = {
+      f: (android.widget.TextView, Int, android.view.KeyEvent) => Boolean)
+    : This = {
     basis.setOnEditorActionListener(
       new android.widget.TextView.OnEditorActionListener {
         def onEditorAction(p1: android.widget.TextView,
@@ -11318,8 +11325,8 @@ trait TraitAutoCompleteTextView[This <: android.widget.AutoCompleteTextView]
 
   @inline
   def onItemClick[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemClickListener(
       new android.widget.AdapterView.OnItemClickListener {
         def onItemClick(p1: android.widget.AdapterView[_],
@@ -11343,8 +11350,8 @@ trait TraitAutoCompleteTextView[This <: android.widget.AutoCompleteTextView]
 
   @inline
   def onItemSelected[U](
-      f: (android.widget.AdapterView[_], android.view.View, Int,
-          Long) => U): This = {
+      f: (android.widget.AdapterView[_], android.view.View, Int, Long) => U)
+    : This = {
     basis.setOnItemSelectedListener(
       new android.widget.AdapterView.OnItemSelectedListener {
         def onItemSelected(p1: android.widget.AdapterView[_],
@@ -12707,8 +12714,8 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
 
   @inline
   def onGesture[U](
-      f: (android.gesture.GestureOverlayView,
-          android.view.MotionEvent) => U): This = {
+      f: (android.gesture.GestureOverlayView, android.view.MotionEvent) => U)
+    : This = {
     basis.addOnGestureListener(
       new android.gesture.GestureOverlayView.OnGestureListener {
         def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12740,8 +12747,8 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
 
   @inline
   def onGestureCancelled[U](
-      f: (android.gesture.GestureOverlayView,
-          android.view.MotionEvent) => U): This = {
+      f: (android.gesture.GestureOverlayView, android.view.MotionEvent) => U)
+    : This = {
     basis.addOnGestureListener(
       new android.gesture.GestureOverlayView.OnGestureListener {
         def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12775,8 +12782,8 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
 
   @inline
   def onGestureEnded[U](
-      f: (android.gesture.GestureOverlayView,
-          android.view.MotionEvent) => U): This = {
+      f: (android.gesture.GestureOverlayView, android.view.MotionEvent) => U)
+    : This = {
     basis.addOnGestureListener(
       new android.gesture.GestureOverlayView.OnGestureListener {
         def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12808,8 +12815,8 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
 
   @inline
   def onGesturePerformed[U](
-      f: (android.gesture.GestureOverlayView,
-          android.gesture.Gesture) => U): This = {
+      f: (android.gesture.GestureOverlayView, android.gesture.Gesture) => U)
+    : This = {
     basis.addOnGesturePerformedListener(
       new android.gesture.GestureOverlayView.OnGesturePerformedListener {
         def onGesturePerformed(p1: android.gesture.GestureOverlayView,
@@ -12831,8 +12838,8 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
 
   @inline
   def onGestureStarted[U](
-      f: (android.gesture.GestureOverlayView,
-          android.view.MotionEvent) => U): This = {
+      f: (android.gesture.GestureOverlayView, android.view.MotionEvent) => U)
+    : This = {
     basis.addOnGestureListener(
       new android.gesture.GestureOverlayView.OnGestureListener {
         def onGesture(p1: android.gesture.GestureOverlayView,
@@ -13200,8 +13207,11 @@ trait TraitWebView[This <: android.webkit.WebView]
 
   @inline
   def onDownloadStart[U](
-      f: (java.lang.String, java.lang.String, java.lang.String,
-          java.lang.String, Long) => U): This = {
+      f: (java.lang.String,
+          java.lang.String,
+          java.lang.String,
+          java.lang.String,
+          Long) => U): This = {
     basis.setDownloadListener(new android.webkit.DownloadListener {
       def onDownloadStart(p1: java.lang.String,
                           p2: java.lang.String,

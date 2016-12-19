@@ -169,7 +169,8 @@ object RenameSuperMembersUtil {
         },
         title,
         processor,
-        selection)
+        selection
+      )
 
     if (ApplicationManager.getApplication.isUnitTestMode) {
       processor.execute(

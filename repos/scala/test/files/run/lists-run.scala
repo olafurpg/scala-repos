@@ -61,21 +61,27 @@ object Test_multiset {
       def sort(zs: List[Int]) = zs sortWith (_ > _)
       sort(xs intersect ys) == sort(ys intersect xs)
     }, "be symmetric after sorting")
-    assert({
-      def cardinality[A](zs: List[A], e: A): Int = zs count (e == _)
-      val intersection = xs intersect ys
-      xs forall
-        (e =>
-           cardinality(intersection, e) ==
-             (cardinality(xs, e) min cardinality(ys, e)))
-    }, "obey min cardinality")
-    assert({
-      val intersection = xs intersect ys
-      val unconsumed = xs.foldLeft(intersection) { (rest, e) =>
-        if (!rest.isEmpty && e == rest.head) rest.tail else rest
-      }
-      unconsumed.isEmpty
-    }, "maintain order")
+    assert(
+      {
+        def cardinality[A](zs: List[A], e: A): Int = zs count (e == _)
+        val intersection = xs intersect ys
+        xs forall
+          (e =>
+            cardinality(intersection, e) ==
+              (cardinality(xs, e) min cardinality(ys, e)))
+      },
+      "obey min cardinality"
+    )
+    assert(
+      {
+        val intersection = xs intersect ys
+        val unconsumed = xs.foldLeft(intersection) { (rest, e) =>
+          if (!rest.isEmpty && e == rest.head) rest.tail else rest
+        }
+        unconsumed.isEmpty
+      },
+      "maintain order"
+    )
     assert(xs == (xs intersect xs), "has the list as again intersection")
   }
 }

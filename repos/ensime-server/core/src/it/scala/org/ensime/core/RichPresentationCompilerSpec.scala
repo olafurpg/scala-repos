@@ -57,20 +57,22 @@ class RichPresentationCompilerSpec
 
   "RichPresentationCompiler" should "round-trip between typeFullName and askTypeInfoByName" in {
     withPresCompiler { (config, cc) =>
-      val file = srcFile(config,
-                         "abc.scala",
-                         contents(
-                           "package com.example",
-                           "object /*1*/A { ",
-                           "   val /*1.1*/x: Int = 1",
-                           "   class  /*1.2*/X {} ",
-                           "   object /*1.3*/X {} ",
-                           "}",
-                           "class  /*2*/A { ",
-                           "   class  /*2.1*/X {} ",
-                           "   object /*2.2*/X {} ",
-                           "}"
-                         ))
+      val file = srcFile(
+        config,
+        "abc.scala",
+        contents(
+          "package com.example",
+          "object /*1*/A { ",
+          "   val /*1.1*/x: Int = 1",
+          "   class  /*1.2*/X {} ",
+          "   object /*1.3*/X {} ",
+          "}",
+          "class  /*2*/A { ",
+          "   class  /*2.1*/X {} ",
+          "   object /*2.2*/X {} ",
+          "}"
+        )
+      )
       cc.askReloadFile(file)
       cc.askLoadedTyped(file)
 
@@ -159,16 +161,18 @@ class RichPresentationCompilerSpec
   it should "jump to case class definition when symbol under cursor is name of case class field" in {
     withPresCompiler { (config, cc) =>
       import ReallyRichPresentationCompilerFixture._
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "package com.example",
-                                     "case class Foo(bar: String, baz: Int)",
-                                     "object Bla {",
-                                     "  val foo = Foo(",
-                                     "    b@@ar = \"Bar\",",
-                                     "    baz = 123",
-                                     "  )",
-                                     "}") { (p, label, cc) =>
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "package com.example",
+        "case class Foo(bar: String, baz: Int)",
+        "object Bla {",
+        "  val foo = Foo(",
+        "    b@@ar = \"Bar\",",
+        "    baz = 123",
+        "  )",
+        "}"
+      ) { (p, label, cc) =>
         val sym = cc.askSymbolInfoAt(p).get
         sym.name shouldBe "apply"
         sym.localName shouldBe "apply"
@@ -193,7 +197,8 @@ class RichPresentationCompilerSpec
         "    baz = 123",
         "  )",
         " val fooUpd = foo.copy(b@@ar = foo.bar.reverse)",
-        "}") { (p, label, cc) =>
+        "}"
+      ) { (p, label, cc) =>
         val sym = cc.askSymbolInfoAt(p).get
         sym.name shouldBe "copy"
         sym.localName shouldBe "copy"
@@ -218,7 +223,8 @@ class RichPresentationCompilerSpec
         "    baz = 123",
         "  )",
         " val fooUpd = foo.copy(b@@ar = foo.bar.reverse)",
-        "}") { (p, label, cc) =>
+        "}"
+      ) { (p, label, cc) =>
         val outsidePosition = new OffsetPosition(p.source, 1000)
         val completions = cc.completionsAt(outsidePosition, 100, false)
         completions.completions.size shouldBe 0
@@ -318,20 +324,22 @@ class RichPresentationCompilerSpec
   }
 
   it should "handle askSymbolByName" in withPresCompiler { (config, cc) =>
-    val file = srcFile(config,
-                       "abc.scala",
-                       contents(
-                         "package com.example",
-                         "object A { ",
-                         "   val x: Int = 1",
-                         "   class  X {}",
-                         "   object X {}",
-                         "}",
-                         "class A { ",
-                         "   class  X {}",
-                         "   object X {}",
-                         "}"
-                       ))
+    val file = srcFile(
+      config,
+      "abc.scala",
+      contents(
+        "package com.example",
+        "object A { ",
+        "   val x: Int = 1",
+        "   class  X {}",
+        "   object X {}",
+        "}",
+        "class A { ",
+        "   class  X {}",
+        "   object X {}",
+        "}"
+      )
+    )
     cc.askReloadFile(file)
     cc.askLoadedTyped(file)
 
@@ -609,7 +617,8 @@ class RichPresentationCompilerSpec
       "package com.example",
       "import @1.0@java@1.1@.@1.2@io@1.3@.@1.4@File@1.5@.@1.6@separator@1.7@",
       "import java.io.{ @2.0@Bits => one@2.1@, @2.2@File => two@2.3@ }",
-      "import java.io._@3.0@") { (p, label, cc) =>
+      "import java.io._@3.0@"
+    ) { (p, label, cc) =>
       val info = cc.askTypeInfoAt(p)
       info.map(_.fullName) should ===(expected(label))
     }
@@ -617,56 +626,60 @@ class RichPresentationCompilerSpec
 
   it should "get symbol positions for compiled files" in withPresCompiler {
     (config, cc) =>
-      val defsFile = srcFile(config,
-                             "com/example/defs.scala",
-                             contents(
-                               "package com.example",
-                               "object /*1*/A { ",
-                               "   val /*1.1*/x: Int = 1",
-                               "   class /*1.2*/X {} ",
-                               "}",
-                               "class  /*2*/B { ",
-                               "   val /*2.1*/y: Int = 1",
-                               "   def /*2.2*/meth(a: String): Int = 1",
-                               "   def /*2.3*/meth(a: Int): Int = 1",
-                               "}",
-                               "trait  /*3*/C { ",
-                               "   val /*3.1*/z: Int = 1",
-                               "   class /*3.2*/Z {}",
-                               "}",
-                               "class /*4*/D extends C { }",
-                               "package object /*5.0*/pkg {",
-                               "   type /*5.1*/A  = java.lang.Error",
-                               "   def /*5.2*/B = 1",
-                               "   val /*5.3*/C = 2",
-                               "   class /*5.4*/D {}",
-                               "   object /*5.5*/E {}",
-                               "}"
-                             ),
-                             write = true)
-      val usesFile = srcFile(config,
-                             "com/example/uses.scala",
-                             contents(
-                               "package com.example",
-                               "object Test { ",
-                               "   val x_1 = A/*1*/",
-                               "   val x_1_1 = A.x/*1.1*/",
-                               "   val x_1_2 = new A.X/*1.2*/",
-                               "   val x_2 = new B/*2*/",
-                               "   val x_2_1 = new B().y/*2.1*/",
-                               "   val x_2_2 = new B().meth/*2.2*/(\"x\")",
-                               "   val x_2_3 = new B().meth/*2.3*/(1)",
-                               "   val x_3: C/*3*/ = new D/*4*/",
-                               "   val x_3_1 = x_3.z/*3.1*/",
-                               "   val x_3_2 = new x_3.Z/*3.2*/",
-                               "   val x_5_0 = pkg.`package`/*5.0*/",
-                               "   var x_5_1: pkg.A/*5.1*/ = null",
-                               "   val x_5_2 = pkg.B/*5.2*/",
-                               "   val x_5_3 = pkg.C/*5.3*/",
-                               "   val x_5_4 = new pkg.D/*5.4*/",
-                               "   val x_5_5 = pkg.E/*5.5*/",
-                               "}"
-                             ))
+      val defsFile = srcFile(
+        config,
+        "com/example/defs.scala",
+        contents(
+          "package com.example",
+          "object /*1*/A { ",
+          "   val /*1.1*/x: Int = 1",
+          "   class /*1.2*/X {} ",
+          "}",
+          "class  /*2*/B { ",
+          "   val /*2.1*/y: Int = 1",
+          "   def /*2.2*/meth(a: String): Int = 1",
+          "   def /*2.3*/meth(a: Int): Int = 1",
+          "}",
+          "trait  /*3*/C { ",
+          "   val /*3.1*/z: Int = 1",
+          "   class /*3.2*/Z {}",
+          "}",
+          "class /*4*/D extends C { }",
+          "package object /*5.0*/pkg {",
+          "   type /*5.1*/A  = java.lang.Error",
+          "   def /*5.2*/B = 1",
+          "   val /*5.3*/C = 2",
+          "   class /*5.4*/D {}",
+          "   object /*5.5*/E {}",
+          "}"
+        ),
+        write = true
+      )
+      val usesFile = srcFile(
+        config,
+        "com/example/uses.scala",
+        contents(
+          "package com.example",
+          "object Test { ",
+          "   val x_1 = A/*1*/",
+          "   val x_1_1 = A.x/*1.1*/",
+          "   val x_1_2 = new A.X/*1.2*/",
+          "   val x_2 = new B/*2*/",
+          "   val x_2_1 = new B().y/*2.1*/",
+          "   val x_2_2 = new B().meth/*2.2*/(\"x\")",
+          "   val x_2_3 = new B().meth/*2.3*/(1)",
+          "   val x_3: C/*3*/ = new D/*4*/",
+          "   val x_3_1 = x_3.z/*3.1*/",
+          "   val x_3_2 = new x_3.Z/*3.2*/",
+          "   val x_5_0 = pkg.`package`/*5.0*/",
+          "   var x_5_1: pkg.A/*5.1*/ = null",
+          "   val x_5_2 = pkg.B/*5.2*/",
+          "   val x_5_3 = pkg.C/*5.3*/",
+          "   val x_5_4 = new pkg.D/*5.4*/",
+          "   val x_5_5 = pkg.E/*5.5*/",
+          "}"
+        )
+      )
 
       def test(label: String, cc: RichPresentationCompiler) = {
         val comment = "/*" + label + "*/"
@@ -806,11 +819,12 @@ trait ReallyRichPresentationCompilerFixture {
 object ReallyRichPresentationCompilerFixture
     extends RichPresentationCompilerTestUtils {
 
-  def runForPositionInCompiledSource(config: EnsimeConfig,
-                                     cc: RichPresentationCompiler,
-                                     lines: String*)(
-      testCode: (OffsetPosition, String,
-                 RichPresentationCompiler) => Any): Any = {
+  def runForPositionInCompiledSource(
+      config: EnsimeConfig,
+      cc: RichPresentationCompiler,
+      lines: String*)(testCode: (OffsetPosition,
+                                 String,
+                                 RichPresentationCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0
     var points = Queue.empty[(Int, String)]

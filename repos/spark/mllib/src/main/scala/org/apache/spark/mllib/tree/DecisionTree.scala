@@ -1331,7 +1331,8 @@ object DecisionTree extends Serializable with Logging {
     assert(
       splits.length > 0,
       s"DecisionTree could not handle feature $featureIndex since it had only 1 unique value." +
-        "  Please remove this feature and then try again.")
+        "  Please remove this feature and then try again."
+    )
 
     // the split metadata must be updated on the driver
 

@@ -119,7 +119,8 @@ private[v1] class OneStageResource(ui: SparkUI) {
             (info.stageId, info.attemptId),
             // this is an internal error -- we should always have uiData
             throw new SparkException(
-              s"no stage ui data found for stage: ${info.stageId}:${info.attemptId}"))
+              s"no stage ui data found for stage: ${info.stageId}:${info.attemptId}")
+          )
           StageStatusInfoUi(status, info, ui)
         }
       }

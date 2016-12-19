@@ -294,9 +294,9 @@ class AlertDialogBuilder(
     })
 
   @inline
-  def positiveButton(name: CharSequence,
-                     onClick: (DialogInterface,
-                               Int) => Unit): AlertDialogBuilder = {
+  def positiveButton(
+      name: CharSequence,
+      onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
     setPositiveButton(name, func2DialogOnClickListener(onClick))
     this
   }
@@ -308,9 +308,9 @@ class AlertDialogBuilder(
     })
 
   @inline
-  def neutralButton(name: CharSequence,
-                    onClick: (DialogInterface,
-                              Int) => Unit): AlertDialogBuilder = {
+  def neutralButton(
+      name: CharSequence,
+      onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
     setNeutralButton(name, func2DialogOnClickListener(onClick))
     this
   }

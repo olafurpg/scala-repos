@@ -322,14 +322,17 @@ case class StringTranslate(srcExpr: Expression,
                         s"$termLastReplace = null;")
     ctx.addMutableState(classNameDict, termDict, s"$termDict = null;")
 
-    nullSafeCodeGen(ctx, ev, (src, matching, replace) => {
-      val check =
-        if (matchingExpr.foldable && replaceExpr.foldable) {
-          s"$termDict == null"
-        } else {
-          s"!$matching.equals($termLastMatching) || !$replace.equals($termLastReplace)"
-        }
-      s"""if ($check) {
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (src, matching, replace) => {
+        val check =
+          if (matchingExpr.foldable && replaceExpr.foldable) {
+            s"$termDict == null"
+          } else {
+            s"!$matching.equals($termLastMatching) || !$replace.equals($termLastReplace)"
+          }
+        s"""if ($check) {
         // Not all of them is literal or matching or replace value changed
         $termLastMatching = $matching.clone();
         $termLastReplace = $replace.clone();
@@ -338,7 +341,8 @@ case class StringTranslate(srcExpr: Expression,
       }
       ${ev.value} = $src.translate($termDict);
       """
-    })
+      }
+    )
   }
 
   override def dataType: DataType = StringType
@@ -475,10 +479,10 @@ case class SubstringIndex(strExpr: Expression,
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx,
-                  ev,
-                  (str, delim,
-                   count) => s"$str.subStringIndex($delim, $count)")
+    defineCodeGen(
+      ctx,
+      ev,
+      (str, delim, count) => s"$str.subStringIndex($delim, $count)")
   }
 }
 
@@ -786,13 +790,17 @@ case class Substring(str: Expression, pos: Expression, len: Expression)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
 
-    defineCodeGen(ctx, ev, (string, pos, len) => {
-      str.dataType match {
-        case StringType => s"$string.substringSQL($pos, $len)"
-        case BinaryType =>
-          s"${classOf[ByteArray].getName}.subStringSQL($string, $pos, $len)"
+    defineCodeGen(
+      ctx,
+      ev,
+      (string, pos, len) => {
+        str.dataType match {
+          case StringType => s"$string.substringSQL($pos, $len)"
+          case BinaryType =>
+            s"${classOf[ByteArray].getName}.subStringSQL($string, $pos, $len)"
+        }
       }
-    })
+    )
   }
 }
 
@@ -881,9 +889,12 @@ case class Ascii(child: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (child) => {
-      val bytes = ctx.freshName("bytes")
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (child) => {
+        val bytes = ctx.freshName("bytes")
+        s"""
         byte[] $bytes = $child.getBytes();
         if ($bytes.length > 0) {
           ${ev.value} = (int) $bytes[0];
@@ -891,7 +902,8 @@ case class Ascii(child: Expression)
           ${ev.value} = 0;
         }
        """
-    })
+      }
+    )
   }
 }
 
@@ -964,15 +976,17 @@ case class Decode(bin: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (bytes, charset) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (bytes, charset) => s"""
         try {
           ${ev.value} = UTF8String.fromString(new String($bytes, $charset.toString()));
         } catch (java.io.UnsupportedEncodingException e) {
           org.apache.spark.unsafe.Platform.throwException(e);
         }
-      """)
+      """
+    )
   }
 }
 
@@ -996,14 +1010,16 @@ case class Encode(value: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (string, charset) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (string, charset) => s"""
         try {
           ${ev.value} = $string.toString().getBytes($charset.toString());
         } catch (java.io.UnsupportedEncodingException e) {
           org.apache.spark.unsafe.Platform.throwException(e);
-        }""")
+        }"""
+    )
   }
 }
 
@@ -1086,35 +1102,38 @@ case class FormatNumber(x: Expression, d: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (num, d) => {
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (num, d) => {
 
-      def typeHelper(p: String): String = {
-        x.dataType match {
-          case _: DecimalType => s"""$p.toJavaBigDecimal()"""
-          case _ => s"$p"
+        def typeHelper(p: String): String = {
+          x.dataType match {
+            case _: DecimalType => s"""$p.toJavaBigDecimal()"""
+            case _ => s"$p"
+          }
         }
-      }
 
-      val sb = classOf[StringBuffer].getName
-      val df = classOf[DecimalFormat].getName
-      val dfs = classOf[DecimalFormatSymbols].getName
-      val l = classOf[Locale].getName
-      // SPARK-13515: US Locale configures the DecimalFormat object to use a dot ('.')
-      // as a decimal separator.
-      val usLocale = "US"
-      val lastDValue = ctx.freshName("lastDValue")
-      val pattern = ctx.freshName("pattern")
-      val numberFormat = ctx.freshName("numberFormat")
-      val i = ctx.freshName("i")
-      val dFormat = ctx.freshName("dFormat")
-      ctx.addMutableState("int", lastDValue, s"$lastDValue = -100;")
-      ctx.addMutableState(sb, pattern, s"$pattern = new $sb();")
-      ctx.addMutableState(
-        df,
-        numberFormat,
-        s"""$numberFormat = new $df("", new $dfs($l.$usLocale));""")
+        val sb = classOf[StringBuffer].getName
+        val df = classOf[DecimalFormat].getName
+        val dfs = classOf[DecimalFormatSymbols].getName
+        val l = classOf[Locale].getName
+        // SPARK-13515: US Locale configures the DecimalFormat object to use a dot ('.')
+        // as a decimal separator.
+        val usLocale = "US"
+        val lastDValue = ctx.freshName("lastDValue")
+        val pattern = ctx.freshName("pattern")
+        val numberFormat = ctx.freshName("numberFormat")
+        val i = ctx.freshName("i")
+        val dFormat = ctx.freshName("dFormat")
+        ctx.addMutableState("int", lastDValue, s"$lastDValue = -100;")
+        ctx.addMutableState(sb, pattern, s"$pattern = new $sb();")
+        ctx.addMutableState(
+          df,
+          numberFormat,
+          s"""$numberFormat = new $df("", new $dfs($l.$usLocale));""")
 
-      s"""
+        s"""
         if ($d >= 0) {
           $pattern.delete(0, $pattern.length());
           if ($d != $lastDValue) {
@@ -1130,13 +1149,14 @@ case class FormatNumber(x: Expression, d: Expression)
             $numberFormat.applyLocalizedPattern($pattern.toString());
           }
           ${ev.value} = UTF8String.fromString($numberFormat.format(${typeHelper(
-        num)}));
+          num)}));
         } else {
           ${ev.value} = null;
           ${ev.isNull} = true;
         }
        """
-    })
+      }
+    )
   }
 
   override def prettyName: String = "format_number"

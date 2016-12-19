@@ -116,13 +116,18 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(zkReady, "Zookeeper should be set up beforehand")
 
     // Kafka broker startup
-    Utils.startServiceOnPort(brokerPort, port => {
-      brokerPort = port
-      brokerConf = new KafkaConfig(brokerConfiguration)
-      server = new KafkaServer(brokerConf)
-      server.startup()
-      (server, port)
-    }, new SparkConf(), "KafkaBroker")
+    Utils.startServiceOnPort(
+      brokerPort,
+      port => {
+        brokerPort = port
+        brokerConf = new KafkaConfig(brokerConfiguration)
+        server = new KafkaServer(brokerConf)
+        server.startup()
+        (server, port)
+      },
+      new SparkConf(),
+      "KafkaBroker"
+    )
 
     brokerReady = true
   }

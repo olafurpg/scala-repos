@@ -31,11 +31,13 @@ object SnapshotDirectoryFailureSpec {
 
 class SnapshotDirectoryFailureSpec
     extends AkkaSpec(
-      PersistenceSpec.config("leveldb",
-                             "SnapshotDirectoryFailureSpec",
-                             extraConfig = Some(s"""
+      PersistenceSpec.config(
+        "leveldb",
+        "SnapshotDirectoryFailureSpec",
+        extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
-  """)))
+  """)
+      ))
     with ImplicitSender {
 
   import SnapshotDirectoryFailureSpec._

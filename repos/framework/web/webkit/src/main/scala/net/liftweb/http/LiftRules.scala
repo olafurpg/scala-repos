@@ -300,8 +300,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed before sending the response to client. The functions'
     * result will be ignored.
     */
-  val beforeSend = RulesSeq[(BasicResponse, HTTPResponse,
-                             List[(String, String)], Box[Req]) => Any]
+  val beforeSend = RulesSeq[
+    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
 
   private[this] lazy val defaultSecurityRules = SecurityRules()
 
@@ -346,8 +346,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * A method that returns a function to create migratory sessions.  If you want migratory sessions for your
     * application, <code>LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions</code>
     */
-  def sessionCreatorForMigratorySessions: (HTTPSession,
-                                           String) => LiftSession = {
+  def sessionCreatorForMigratorySessions: (HTTPSession, String) => LiftSession = {
     case (httpSession, contextPath) =>
       new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
       with MigratorySession
@@ -497,8 +496,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed after the response is sent to client. The functions' result
     * will be ignored.
     */
-  val afterSend = RulesSeq[(BasicResponse, HTTPResponse,
-                            List[(String, String)], Box[Req]) => Any]
+  val afterSend = RulesSeq[
+    (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
 
   /**
     * Calculate the Comet Server (by default, the server that
@@ -1112,9 +1111,12 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val externalTemplateResolver: FactoryMaker[
     () => PartialFunction[(Locale, List[String]), Box[NodeSeq]]] =
-    new FactoryMaker(() =>
-      (() =>
-         Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
+    new FactoryMaker(
+      () =>
+        (
+            () =>
+              Map.empty: PartialFunction[(Locale, List[String]),
+                                         Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1586,17 +1588,23 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                   cookies: List[HTTPCookie],
                   req: Req,
                   code: Int) =
-    convertResponse({
-      val ret =
-        XhtmlResponse(ns,
-                      /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
-                      headers,
-                      cookies,
-                      code,
-                      S.legacyIeCompatibilityMode)
-      ret._includeXmlVersion = !S.skipDocType
-      ret
-    }, headers, cookies, req)
+    convertResponse(
+      {
+        val ret =
+          XhtmlResponse(
+            ns,
+            /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
+            headers,
+            cookies,
+            code,
+            S.legacyIeCompatibilityMode)
+        ret._includeXmlVersion = !S.skipDocType
+        ret
+      },
+      headers,
+      cookies,
+      req
+    )
 
   @volatile
   var defaultHeaders: PartialFunction[(NodeSeq, Req), List[(String, String)]] = {
@@ -1690,7 +1698,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
         500,
-        S.legacyIeCompatibilityMode)
+        S.legacyIeCompatibilityMode
+      )
 
     case (_, r, e) =>
       logger.error("Exception being returned to browser when processing " +
@@ -1702,7 +1711,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
         500,
-        S.legacyIeCompatibilityMode)
+        S.legacyIeCompatibilityMode
+      )
   }
 
   /**
@@ -1874,8 +1884,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * level.
     */
   @volatile
-  var contentSecurityPolicyViolationReport: (ContentSecurityPolicyViolation) => Box[
-    LiftResponse] = { violation =>
+  var contentSecurityPolicyViolationReport: (
+      ContentSecurityPolicyViolation) => Box[LiftResponse] = { violation =>
     logger.warn(
       s"""Content security policy violation reported on page
        | '${violation.documentUri}' from referrer '${violation.referrer}':
@@ -2008,8 +2018,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * to create an on-disk version
     */
   @volatile
-  var handleMimeFile: (String, String, String,
-                       InputStream) => FileParamHolder =
+  var handleMimeFile: (String, String, String, InputStream) => FileParamHolder =
     (fieldName, contentType, fileName, inputStream) =>
       new InMemFileParamHolder(fieldName,
                                contentType,

@@ -43,7 +43,8 @@ trait RackAwareTest {
       assertEquals(
         "More than one replica of the same partition is assigned to the same rack",
         List.fill(numPartitions)(replicationFactor),
-        partitionRackMap.values.toList.map(_.distinct.size))
+        partitionRackMap.values.toList.map(_.distinct.size)
+      )
     }
 
     if (verifyLeaderDistribution) {

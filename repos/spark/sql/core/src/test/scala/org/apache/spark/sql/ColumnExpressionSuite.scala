@@ -35,7 +35,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
           true,
           true) :: Nil),
       StructType(
-        Seq(StructField("a", BooleanType), StructField("b", BooleanType))))
+        Seq(StructField("a", BooleanType), StructField("b", BooleanType)))
+    )
   }
 
   test("column names with space") {
@@ -255,7 +256,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
               null,
               null) :: Row(Double.MaxValue, Float.MinValue) :: Nil),
           StructType(
-            Seq(StructField("a", DoubleType), StructField("b", FloatType))))
+            Seq(StructField("a", DoubleType), StructField("b", FloatType)))
+        )
 
     checkAnswer(testData.select($"a".isNaN, $"b".isNaN),
                 Row(true, true) :: Row(true, true) :: Row(false, false) :: Row(
@@ -276,21 +278,26 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         sparkContext.parallelize(
           Row(null, 3.0, Double.NaN, Double.PositiveInfinity, 1.0f, 4) :: Nil),
         StructType(
-          Seq(StructField("a", DoubleType),
-              StructField("b", DoubleType),
-              StructField("c", DoubleType),
-              StructField("d", DoubleType),
-              StructField("e", FloatType),
-              StructField("f", IntegerType))))
+          Seq(
+            StructField("a", DoubleType),
+            StructField("b", DoubleType),
+            StructField("c", DoubleType),
+            StructField("d", DoubleType),
+            StructField("e", FloatType),
+            StructField("f", IntegerType)
+          ))
+      )
 
     checkAnswer(
-      testData.select(nanvl($"a", lit(5)),
-                      nanvl($"b", lit(10)),
-                      nanvl(lit(10), $"b"),
-                      nanvl($"c", lit(null).cast(DoubleType)),
-                      nanvl($"d", lit(10)),
-                      nanvl($"b", $"e"),
-                      nanvl($"e", $"f")),
+      testData.select(
+        nanvl($"a", lit(5)),
+        nanvl($"b", lit(10)),
+        nanvl(lit(10), $"b"),
+        nanvl($"c", lit(null).cast(DoubleType)),
+        nanvl($"d", lit(10)),
+        nanvl($"b", $"e"),
+        nanvl($"e", $"f")
+      ),
       Row(null, 3.0, 10.0, null, Double.PositiveInfinity, 3.0, 1.0)
     )
     testData.registerTempTable("t")
@@ -325,7 +332,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
       sparkContext.parallelize(
         Row(1, 1) :: Row(1, 2) :: Row(1, null) :: Row(null, null) :: Nil),
       StructType(
-        Seq(StructField("a", IntegerType), StructField("b", IntegerType))))
+        Seq(StructField("a", IntegerType), StructField("b", IntegerType)))
+    )
 
     checkAnswer(nullData.filter($"b" <=> 1), Row(1, 1) :: Nil)
 

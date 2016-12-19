@@ -13,9 +13,11 @@ final class ScheduleJsonView(getLightUser: String => Option[LightUser]) {
   import JsonView._
 
   def apply(tournaments: VisibleTournaments) =
-    Json.obj("created" -> tournaments.created.map(tournamentJson),
-             "started" -> tournaments.started.map(tournamentJson),
-             "finished" -> tournaments.finished.map(tournamentJson))
+    Json.obj(
+      "created" -> tournaments.created.map(tournamentJson),
+      "started" -> tournaments.started.map(tournamentJson),
+      "finished" -> tournaments.finished.map(tournamentJson)
+    )
 
   private def tournamentJson(tour: Tournament) =
     Json.obj(

@@ -209,7 +209,8 @@ object WebSocket {
                 CloseMessage(Some(CloseCodes.Unacceptable),
                              Json.stringify(JsError.toJson(errors))))
             }, identity),
-        out => Json.toJson(out))
+        out => Json.toJson(out)
+      )
     }
   }
 

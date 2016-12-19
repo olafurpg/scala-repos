@@ -171,12 +171,14 @@ class MapWithStateRDDSuite
       assert(
         timingOutStates.toSet === expectedTimingOutStates.toSet,
         "timing out states do not " +
-          "match those that were expected to do so while updating the MapWithStateRDDRecord")
+          "match those that were expected to do so while updating the MapWithStateRDDRecord"
+      )
 
       assert(
         removedStates.toSet === expectedRemovedStates.toSet,
         "removed states do not " +
-          "match those that were expected to do so while updating the MapWithStateRDDRecord")
+          "match those that were expected to do so while updating the MapWithStateRDDRecord"
+      )
     }
 
     // No data, no state should be changed, function should not be called,
@@ -222,12 +224,14 @@ class MapWithStateRDDSuite
                        expectedRemovedStates = Seq(345))
 
     // State strictly older than timeout threshold should be timed out
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Nil,
-                       timeoutThreshold = Some(initialTime),
-                       removeTimedoutData = true,
-                       expectedStates = Seq((123, initialTime)),
-                       expectedTimingOutStates = Nil)
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Nil,
+      timeoutThreshold = Some(initialTime),
+      removeTimedoutData = true,
+      expectedStates = Seq((123, initialTime)),
+      expectedTimingOutStates = Nil
+    )
 
     assertRecordUpdate(initStates = Seq(123),
                        data = Nil,
@@ -237,19 +241,23 @@ class MapWithStateRDDSuite
                        expectedTimingOutStates = Seq(123))
 
     // State should not be timed out after it has received data
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Seq("noop"),
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Seq((123, updatedTime)),
-                       expectedTimingOutStates = Nil)
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Seq("remove-state"),
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Nil,
-                       expectedTimingOutStates = Nil,
-                       expectedRemovedStates = Seq(123))
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Seq("noop"),
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Seq((123, updatedTime)),
+      expectedTimingOutStates = Nil
+    )
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Seq("remove-state"),
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Nil,
+      expectedTimingOutStates = Nil,
+      expectedRemovedStates = Seq(123)
+    )
 
     // If a state is not set but timeoutThreshold is defined, we should ignore this state.
     // Previously it threw NoSuchElementException (SPARK-13195).
@@ -295,25 +303,25 @@ class MapWithStateRDDSuite
       // To track which keys are being touched
       MapWithStateRDDSuite.touchedStateKeys.clear()
 
-      val mappingFunction = (time: Time, key: String, data: Option[Int],
-                             state: State[Int]) => {
+      val mappingFunction =
+        (time: Time, key: String, data: Option[Int], state: State[Int]) => {
 
-        // Track the key that has been touched
-        MapWithStateRDDSuite.touchedStateKeys += key
+          // Track the key that has been touched
+          MapWithStateRDDSuite.touchedStateKeys += key
 
-        // If the data is 0, do not do anything with the state
-        // else if the data is 1, increment the state if it exists, or set new state to 0
-        // else if the data is 2, remove the state if it exists
-        data match {
-          case Some(1) =>
-            if (state.exists()) { state.update(state.get + 1) } else
-              state.update(0)
-          case Some(2) =>
-            state.remove()
-          case _ =>
+          // If the data is 0, do not do anything with the state
+          // else if the data is 1, increment the state if it exists, or set new state to 0
+          // else if the data is 2, remove the state if it exists
+          data match {
+            case Some(1) =>
+              if (state.exists()) { state.update(state.get + 1) } else
+                state.update(0)
+            case Some(2) =>
+              state.remove()
+            case _ =>
+          }
+          None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
         }
-        None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
-      }
       val newDataRDD =
         sc.makeRDD(testData).partitionBy(testStateRDD.partitioner.get)
 
@@ -365,7 +373,8 @@ class MapWithStateRDDSuite
     val rdd4 = testStateUpdates(
       rdd3,
       Seq(("x", 0), ("k2", 1), ("k2", 1), ("k3", 1)), // should update k2, 0 -> 2 and create k3, 0
-      Set(("k1", 1, updateTime), ("k2", 2, updateTime), ("k3", 0, updateTime)))
+      Set(("k1", 1, updateTime), ("k2", 2, updateTime), ("k3", 0, updateTime))
+    )
 
     val rdd5 =
       testStateUpdates(rdd4,

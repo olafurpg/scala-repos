@@ -107,7 +107,8 @@ abstract class SuperAccessors
           if (!accDefs.contains(clazz))
             reporter.error(
               sel.pos,
-              s"Internal error: unable to store accessor definition in ${clazz}. clazz.hasPackageFlag=${clazz.hasPackageFlag}. Accessor required for ${sel} (${showRaw(sel)})")
+              s"Internal error: unable to store accessor definition in ${clazz}. clazz.hasPackageFlag=${clazz.hasPackageFlag}. Accessor required for ${sel} (${showRaw(sel)})"
+            )
           else storeAccessorDefinition(clazz, DefDef(acc, EmptyTree))
           acc
         }
@@ -155,7 +156,8 @@ abstract class SuperAccessors
             sel.pos,
             "" + sym.fullLocationString +
               " is accessed from super. It may not be abstract " +
-              "unless it is overridden by a member declared `abstract' and `override'")
+              "unless it is overridden by a member declared `abstract' and `override'"
+          )
       } else if (mix == tpnme.EMPTY && !sym.owner.isTrait) {
         // SI-4989 Check if an intermediate class between `clazz` and `sym.owner` redeclares the method as abstract.
         val intermediateClasses =
@@ -308,7 +310,8 @@ abstract class SuperAccessors
                               m2.name + " inherited from " + m2.owner +
                               ".  Changes to " + m2.name +
                               " will not be visible within " + sym.owner +
-                              " - you may want to give them distinct names.")
+                              " - you may want to give them distinct names."
+                          )
                         }
                       }
                     }
@@ -504,14 +507,16 @@ abstract class SuperAccessors
                                        newFlags = ARTIFACT)
           newAcc setInfoAndEnter accType(newAcc)
 
-          val code = DefDef(newAcc, {
-            val (receiver :: _) :: tail = newAcc.paramss
-            val base: Tree = Select(Ident(receiver), sym)
-            val allParamTypes = mapParamss(sym)(_.tpe)
-            val args = map2(tail, allParamTypes)((params, tpes) =>
-              map2(params, tpes)(makeArg(_, receiver, _)))
-            args.foldLeft(base)(Apply(_, _))
-          })
+          val code = DefDef(
+            newAcc, {
+              val (receiver :: _) :: tail = newAcc.paramss
+              val base: Tree = Select(Ident(receiver), sym)
+              val allParamTypes = mapParamss(sym)(_.tpe)
+              val args = map2(tail, allParamTypes)((params, tpes) =>
+                map2(params, tpes)(makeArg(_, receiver, _)))
+              args.foldLeft(base)(Apply(_, _))
+            }
+          )
 
           debuglog("created protected accessor: " + code)
           storeAccessorDefinition(clazz, code)
@@ -622,7 +627,8 @@ abstract class SuperAccessors
           pos,
           unit,
           sm"""$clazz accesses protected $sym inside a concrete trait method.
-              |Add an accessor in a class extending ${sym.enclClass} as a workaround.""")
+              |Add an accessor in a class extending ${sym.enclClass} as a workaround."""
+        )
         true
       }
       isCandidate && !host.isPackageClass && !isSelfType && !isJavaProtected

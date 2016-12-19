@@ -1957,13 +1957,15 @@ trait Trees extends api.Trees { self: SymbolTable =>
       rhs: Tree = null
   ): DefDef = tree match {
     case DefDef(mods0, name0, tparams0, vparamss0, tpt0, rhs0) =>
-      treeCopy.DefDef(tree,
-                      if (mods eq null) mods0 else mods,
-                      if (name eq null) name0 else name,
-                      if (tparams eq null) tparams0 else tparams,
-                      if (vparamss eq null) vparamss0 else vparamss,
-                      if (tpt eq null) tpt0 else tpt,
-                      if (rhs eq null) rhs0 else rhs)
+      treeCopy.DefDef(
+        tree,
+        if (mods eq null) mods0 else mods,
+        if (name eq null) name0 else name,
+        if (tparams eq null) tparams0 else tparams,
+        if (vparamss eq null) vparamss0 else vparamss,
+        if (tpt eq null) tpt0 else tpt,
+        if (rhs eq null) rhs0 else rhs
+      )
     case t =>
       sys.error("Not a DefDef: " + t + "/" + t.getClass)
   }

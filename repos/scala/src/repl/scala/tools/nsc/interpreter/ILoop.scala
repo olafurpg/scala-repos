@@ -1015,8 +1015,8 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
       NamedParam[IMain]("$intp", intp)(tagOfIMain, classTag[IMain]))
     // Auto-run code via some setting.
     (replProps.replAutorunCode.option flatMap (f =>
-                                                 io.File(f)
-                                                   .safeSlurp()) foreach
+      io.File(f)
+        .safeSlurp()) foreach
       (intp quietRun _))
     // classloader and power mode setup
     intp.setContextClassLoader()
@@ -1075,8 +1075,7 @@ object ILoop {
           // skip margin prefix for continuation lines, unless preserving session text for test
           // should test for repl.paste.ContinueString or replProps.continueText.contains(ch)
           override def write(str: String) =
-            if (!inSession && (str forall (ch =>
-                                             ch.isWhitespace || ch == '|')))
+            if (!inSession && (str forall (ch => ch.isWhitespace || ch == '|')))
               ()
             else super.write(str)
         }

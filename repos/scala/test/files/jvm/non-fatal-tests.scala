@@ -9,13 +9,14 @@ trait NonFatalTests {
                                       new NotImplementedError)
 
   //Fatals
-  val fatals: Seq[Throwable] = Seq(new InterruptedException,
-                                   new StackOverflowError,
-                                   new OutOfMemoryError,
-                                   new LinkageError,
-                                   new VirtualMachineError {},
-                                   new Throwable
-                                   with scala.util.control.ControlThrowable)
+  val fatals: Seq[Throwable] = Seq(
+    new InterruptedException,
+    new StackOverflowError,
+    new OutOfMemoryError,
+    new LinkageError,
+    new VirtualMachineError {},
+    new Throwable with scala.util.control.ControlThrowable
+  )
 
   def testFatalsUsingApply(): Unit = {
     fatals foreach { t =>

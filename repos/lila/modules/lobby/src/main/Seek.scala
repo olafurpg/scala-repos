@@ -75,24 +75,28 @@ object Seek {
            user: User,
            ratingRange: RatingRange,
            blocking: Set[String]): Seek =
-    new Seek(_id = Random nextStringUppercase idSize,
-             variant = variant.id,
-             daysPerTurn = daysPerTurn,
-             mode = mode.id,
-             color = color,
-             user = LobbyUser.make(user, blocking),
-             ratingRange = ratingRange.toString,
-             createdAt = DateTime.now)
+    new Seek(
+      _id = Random nextStringUppercase idSize,
+      variant = variant.id,
+      daysPerTurn = daysPerTurn,
+      mode = mode.id,
+      color = color,
+      user = LobbyUser.make(user, blocking),
+      ratingRange = ratingRange.toString,
+      createdAt = DateTime.now
+    )
 
   def renew(seek: Seek) =
-    new Seek(_id = Random nextStringUppercase idSize,
-             variant = seek.variant,
-             daysPerTurn = seek.daysPerTurn,
-             mode = seek.mode,
-             color = seek.color,
-             user = seek.user,
-             ratingRange = seek.ratingRange,
-             createdAt = DateTime.now)
+    new Seek(
+      _id = Random nextStringUppercase idSize,
+      variant = seek.variant,
+      daysPerTurn = seek.daysPerTurn,
+      mode = seek.mode,
+      color = seek.color,
+      user = seek.user,
+      ratingRange = seek.ratingRange,
+      createdAt = DateTime.now
+    )
 
   import reactivemongo.bson.Macros
   import lila.db.BSON.MapValue.MapHandler

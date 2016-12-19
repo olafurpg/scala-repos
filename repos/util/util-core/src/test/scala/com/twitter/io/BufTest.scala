@@ -467,7 +467,8 @@ class BufTest
       Buf.Utf16BE.apply,
       Buf.Utf16LE.apply,
       s => Buf.ByteArray.Owned(s.getBytes("UTF-8")),
-      s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s))))
+      s => Buf.ByteBuffer.Owned(UTF_8.encode(CharBuffer.wrap(s)))
+    )
 
     Arbitrary(for {
       s <- Arbitrary.arbitrary[String]

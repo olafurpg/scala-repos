@@ -40,7 +40,8 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
         accumMap,
         InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
       TaskMetrics
-        .getAccum[Long](accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME))
+        .getAccum[Long](accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME)
+    )
   }
 
   /**

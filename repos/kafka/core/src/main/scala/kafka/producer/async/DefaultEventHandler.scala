@@ -170,7 +170,8 @@ class DefaultEventHandler[K, V](
             message = new Message(key = keyEncoder.toBytes(e.key),
                                   bytes = encoder.toBytes(e.message),
                                   timestamp = time.milliseconds,
-                                  magicValue = Message.MagicValue_V1))
+                                  magicValue = Message.MagicValue_V1)
+          )
         else
           serializedMessages += new KeyedMessage[K, Message](
             topic = e.topic,
@@ -178,7 +179,8 @@ class DefaultEventHandler[K, V](
             partKey = e.partKey,
             message = new Message(bytes = encoder.toBytes(e.message),
                                   timestamp = time.milliseconds,
-                                  magicValue = Message.MagicValue_V1))
+                                  magicValue = Message.MagicValue_V1)
+          )
       } catch {
         case t: Throwable =>
           producerStats.serializationErrorRate.mark()
@@ -409,7 +411,8 @@ class DefaultEventHandler[K, V](
               .format(currentCorrelationId,
                       brokerId,
                       messagesPerTopic.map(_._1).mkString(",")),
-            t)
+            t
+          )
           messagesPerTopic.keys.toSeq
       }
     } else {

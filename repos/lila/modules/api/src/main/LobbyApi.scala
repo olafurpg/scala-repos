@@ -25,15 +25,17 @@ final class LobbyApi(lobby: ActorRef,
       seekApi.forAnon)(seekApi.forUser) zip
       (ctx.me ?? GameRepo.urgentGames) zip getFilter(ctx) map {
       case (((hooks, seeks), povs), filter) =>
-        Json.obj("me" -> ctx.me.map { u =>
-                   Json.obj("username" -> u.username)
-                 },
-                 "version" -> lobbyVersion(),
-                 "hooks" -> JsArray(hooks map (_.render)),
-                 "seeks" -> JsArray(seeks map (_.render)),
-                 "nowPlaying" -> JsArray(povs take 9 map nowPlaying),
-                 "nbNowPlaying" -> povs.size,
-                 "filter" -> filter.render)
+        Json.obj(
+          "me" -> ctx.me.map { u =>
+            Json.obj("username" -> u.username)
+          },
+          "version" -> lobbyVersion(),
+          "hooks" -> JsArray(hooks map (_.render)),
+          "seeks" -> JsArray(seeks map (_.render)),
+          "nowPlaying" -> JsArray(povs take 9 map nowPlaying),
+          "nbNowPlaying" -> povs.size,
+          "filter" -> filter.render
+        )
     }
 
   def nowPlaying(pov: Pov) =
@@ -49,11 +51,13 @@ final class LobbyApi(lobby: ActorRef,
       "perf" -> lila.game.PerfPicker.key(pov.game),
       "rated" -> pov.game.rated,
       "opponent" -> Json
-        .obj("id" -> pov.opponent.userId,
-             "username" -> lila.game.Namer
-               .playerString(pov.opponent, withRating = false)(lightUser),
-             "rating" -> pov.opponent.rating,
-             "ai" -> pov.opponent.aiLevel)
+        .obj(
+          "id" -> pov.opponent.userId,
+          "username" -> lila.game.Namer
+            .playerString(pov.opponent, withRating = false)(lightUser),
+          "rating" -> pov.opponent.rating,
+          "ai" -> pov.opponent.aiLevel
+        )
         .noNull,
       "isMyTurn" -> pov.isMyTurn,
       "secondsLeft" -> pov.remainingSeconds

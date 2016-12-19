@@ -56,7 +56,8 @@ private[mllib] class SlidingRDD[T: ClassTag](@transient val parent: RDD[T],
   require(
     windowSize > 0 && step > 0 && !(windowSize == 1 && step == 1),
     "Window size and step must be greater than 0, " +
-      s"and they cannot be both 1, but got windowSize = $windowSize and step = $step.")
+      s"and they cannot be both 1, but got windowSize = $windowSize and step = $step."
+  )
 
   override def compute(split: Partition,
                        context: TaskContext): Iterator[Array[T]] = {

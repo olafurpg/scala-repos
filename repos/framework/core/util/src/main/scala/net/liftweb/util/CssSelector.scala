@@ -276,11 +276,8 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
         (a => SurroundKids()) | ('-' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-        ('*' ~ '<' ^^ (a =>
-                         AppendKidsSubNode())) | '*' ^^ (a =>
-                                                           KidsSubNode()) | '^' ~ '*' ^^
-        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
-                                                      SelectThisNode(false)))
+        ('*' ~ '<' ^^ (a => AppendKidsSubNode())) | '*' ^^ (a => KidsSubNode()) | '^' ~ '*' ^^
+        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a => SelectThisNode(false)))
 
   private lazy val attrName: Parser[String] =
     (letter | '_' | ':') ~ rep(letter | number | '-' | '_' | ':' | '.') ^^ {

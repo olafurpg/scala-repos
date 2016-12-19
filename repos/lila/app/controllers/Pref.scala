@@ -63,7 +63,8 @@ object Pref extends LilaController {
     "soundSet" -> (forms.soundSet -> save("soundSet") _),
     "bg" -> (forms.bg -> save("bg") _),
     "bgImg" -> (forms.bgImg -> save("bgImg") _),
-    "is3d" -> (forms.is3d -> save("is3d") _))
+    "is3d" -> (forms.is3d -> save("is3d") _)
+  )
 
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
     ctx.me ?? {

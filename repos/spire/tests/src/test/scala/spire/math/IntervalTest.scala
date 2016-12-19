@@ -412,8 +412,8 @@ class IntervalCheck
     }
   }
 
-  def testBinop(f: (Interval[Rational],
-                    Interval[Rational]) => Interval[Rational])(
+  def testBinop(
+      f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(
       g: (Rational, Rational) => Rational): Unit = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)

@@ -45,7 +45,8 @@ class HiveTableScanSuite extends HiveComparisonTest {
       |SELECT 200,200 LIMIT 1;
       |
       |SELECT * from part_scan_test;
-    """.stripMargin)
+    """.stripMargin
+  )
 
   // In unit test, kv1.txt is a small file and will be loaded as table src
   // Since the small file will be considered as a single split, we assume

@@ -26,10 +26,12 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
                             classOf[LServing1])
 
     val engineParams =
-      EngineParams(dataSourceParams = PDataSource2.Params(0),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(0),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3)
+      )
 
     val models = engine.train(sc,
                               engineParams,
@@ -52,14 +54,16 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
                             ),
                             classOf[LServing1])
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(2)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(2)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22))
+      ),
+      servingParams = LServing1.Params(3)
+    )
 
     val pd = ProcessedData(1, TrainingData(0))
     val model21 = PAlgo3.Model(21, pd)
@@ -87,12 +91,14 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
                         classOf[LServing1])
 
     val engineParams =
-      EngineParams(dataSourceParams = LDataSource1.Params(0),
-                   preparatorParams = LPreparator1.Params(1),
-                   algorithmParamsList = Seq(("LAlgo2", LAlgo2.Params(20)),
-                                             ("LAlgo2", LAlgo2.Params(21)),
-                                             ("LAlgo3", LAlgo3.Params(22))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = LDataSource1.Params(0),
+        preparatorParams = LPreparator1.Params(1),
+        algorithmParamsList = Seq(("LAlgo2", LAlgo2.Params(20)),
+                                  ("LAlgo2", LAlgo2.Params(21)),
+                                  ("LAlgo3", LAlgo3.Params(22))),
+        servingParams = LServing1.Params(3)
+      )
 
     val pd = ProcessedData(1, TrainingData(0))
     val model20 = LAlgo2.Model(20, pd)
@@ -112,27 +118,31 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.train persisting P&NAlgo.Model") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map(
-                              "PAlgo2" -> classOf[PAlgo2],
-                              "PAlgo3" -> classOf[PAlgo3],
-                              "NAlgo2" -> classOf[NAlgo2],
-                              "NAlgo3" -> classOf[NAlgo3]
-                            ),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3],
+        "NAlgo2" -> classOf[NAlgo2],
+        "NAlgo3" -> classOf[NAlgo3]
+      ),
+      classOf[LServing1]
+    )
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(20)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22)),
-                                      ("NAlgo2", NAlgo2.Params(23)),
-                                      ("NAlgo3", NAlgo3.Params(24)),
-                                      ("NAlgo3", NAlgo3.Params(25))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(20)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22)),
+        ("NAlgo2", NAlgo2.Params(23)),
+        ("NAlgo3", NAlgo3.Params(24)),
+        ("NAlgo3", NAlgo3.Params(25))
+      ),
+      servingParams = LServing1.Params(3)
+    )
 
     val pd = ProcessedData(1, TrainingData(0))
     val model21 = PAlgo3.Model(21, pd)
@@ -169,11 +179,12 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val en = 3
 
     val engineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3)
+      )
 
     val algoCount = engineParams.algorithmParamsList.size
     val pd = ProcessedData(1, TrainingData(0))
@@ -217,27 +228,31 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.prepareDeploy PAlgo") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map(
-                              "PAlgo2" -> classOf[PAlgo2],
-                              "PAlgo3" -> classOf[PAlgo3],
-                              "NAlgo2" -> classOf[NAlgo2],
-                              "NAlgo3" -> classOf[NAlgo3]
-                            ),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3],
+        "NAlgo2" -> classOf[NAlgo2],
+        "NAlgo3" -> classOf[NAlgo3]
+      ),
+      classOf[LServing1]
+    )
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(20)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22)),
-                                      ("NAlgo2", NAlgo2.Params(23)),
-                                      ("NAlgo3", NAlgo3.Params(24)),
-                                      ("NAlgo3", NAlgo3.Params(25))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(20)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22)),
+        ("NAlgo2", NAlgo2.Params(23)),
+        ("NAlgo3", NAlgo3.Params(24)),
+        ("NAlgo3", NAlgo3.Params(25))
+      ),
+      servingParams = LServing1.Params(3)
+    )
 
     val pd = ProcessedData(1, TrainingData(0))
     val model20 = PAlgo2.Model(20, pd)

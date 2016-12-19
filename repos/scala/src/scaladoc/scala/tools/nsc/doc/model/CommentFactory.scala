@@ -61,11 +61,13 @@ trait CommentFactory extends base.CommentFactoryBase {
           tplComment.typeParams != Map.empty ||
           tplComment.deprecated.isDefined)
         Some(
-          createComment(body0 = tplComment.constructor,
-                        throws0 = tplComment.throws,
-                        valueParams0 = tplComment.valueParams,
-                        typeParams0 = tplComment.typeParams,
-                        deprecated0 = tplComment.deprecated))
+          createComment(
+            body0 = tplComment.constructor,
+            throws0 = tplComment.throws,
+            valueParams0 = tplComment.valueParams,
+            typeParams0 = tplComment.typeParams,
+            deprecated0 = tplComment.deprecated
+          ))
       else None
     }
 

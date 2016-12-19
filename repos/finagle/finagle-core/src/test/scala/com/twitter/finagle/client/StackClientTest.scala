@@ -231,14 +231,15 @@ class StackClientTest
       .concat(Stack.Leaf(Stack.Role("role"), underlyingFactory))
       // don't pool or else we don't see underlying close until service is ejected from pool
       .remove(DefaultPool.Role)
-      .replace(StackClient.Role.prepFactory, {
-        next: ServiceFactory[Unit, Unit] =>
+      .replace(
+        StackClient.Role.prepFactory, { next: ServiceFactory[Unit, Unit] =>
           next map { service: Service[Unit, Unit] =>
             new ServiceProxy[Unit, Unit](service) {
               override def close(deadline: Time) = Future.never
             }
           }
-      })
+        }
+      )
 
     val factory = stack.make(
       Stack.Params.empty +
@@ -405,21 +406,22 @@ class StackClientTest
 
       // direct the two addresses to the two service factories instead
       // of trying to connect to them
-      .replace(LoadBalancerFactory.role,
-               new Stack.Module1[LoadBalancerFactory.Dest,
-                                 ServiceFactory[Unit, Unit]] {
-                 val role = new Stack.Role("role")
-                 val description = "description"
-                 def make(dest: LoadBalancerFactory.Dest,
-                          next: ServiceFactory[Unit, Unit]) = {
-                   val LoadBalancerFactory.Dest(va) = dest
-                   va.sample() match {
-                     case Addr.Bound(addrs, _) if addrs == Set(addr1) => fac1
-                     case Addr.Bound(addrs, _) if addrs == Set(addr2) => fac2
-                     case _ => throw new IllegalArgumentException("wat")
-                   }
-                 }
-               })
+      .replace(
+        LoadBalancerFactory.role,
+        new Stack.Module1[LoadBalancerFactory.Dest, ServiceFactory[Unit, Unit]] {
+          val role = new Stack.Role("role")
+          val description = "description"
+          def make(dest: LoadBalancerFactory.Dest,
+                   next: ServiceFactory[Unit, Unit]) = {
+            val LoadBalancerFactory.Dest(va) = dest
+            va.sample() match {
+              case Addr.Bound(addrs, _) if addrs == Set(addr1) => fac1
+              case Addr.Bound(addrs, _) if addrs == Set(addr2) => fac2
+              case _ => throw new IllegalArgumentException("wat")
+            }
+          }
+        }
+      )
 
     val sr = new InMemoryStatsReceiver
 
@@ -525,17 +527,20 @@ class StackClientTest
 
     val stack = StackClient
       .newStack[Unit, Unit]
-      .concat(Stack.Leaf(Stack.Role("role"), new ServiceFactory[Unit, Unit] {
-        def apply(conn: ClientConnection): Future[Service[Unit, Unit]] =
-          if (first) {
-            first = false
-            Future.value(endpoint1)
-          } else {
-            Future.value(endpoint2)
-          }
+      .concat(Stack.Leaf(
+        Stack.Role("role"),
+        new ServiceFactory[Unit, Unit] {
+          def apply(conn: ClientConnection): Future[Service[Unit, Unit]] =
+            if (first) {
+              first = false
+              Future.value(endpoint1)
+            } else {
+              Future.value(endpoint2)
+            }
 
-        def close(deadline: Time): Future[Unit] = Future.Done
-      }))
+          def close(deadline: Time): Future[Unit] = Future.Done
+        }
+      ))
       .remove(DefaultPool.Role)
 
     val sr = new InMemoryStatsReceiver

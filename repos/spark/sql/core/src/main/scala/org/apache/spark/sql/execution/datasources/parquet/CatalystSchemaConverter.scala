@@ -61,19 +61,23 @@ private[parquet] class CatalystSchemaConverter(
       SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get) {
 
   def this(conf: SQLConf) =
-    this(assumeBinaryIsString = conf.isParquetBinaryAsString,
-         assumeInt96IsTimestamp = conf.isParquetINT96AsTimestamp,
-         writeLegacyParquetFormat = conf.writeLegacyParquetFormat)
+    this(
+      assumeBinaryIsString = conf.isParquetBinaryAsString,
+      assumeInt96IsTimestamp = conf.isParquetINT96AsTimestamp,
+      writeLegacyParquetFormat = conf.writeLegacyParquetFormat
+    )
 
   def this(conf: Configuration) =
-    this(assumeBinaryIsString =
-           conf.get(SQLConf.PARQUET_BINARY_AS_STRING.key).toBoolean,
-         assumeInt96IsTimestamp =
-           conf.get(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key).toBoolean,
-         writeLegacyParquetFormat = conf
-           .get(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key,
-                SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get.toString)
-           .toBoolean)
+    this(
+      assumeBinaryIsString =
+        conf.get(SQLConf.PARQUET_BINARY_AS_STRING.key).toBoolean,
+      assumeInt96IsTimestamp =
+        conf.get(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key).toBoolean,
+      writeLegacyParquetFormat = conf
+        .get(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key,
+             SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get.toString)
+        .toBoolean
+    )
 
   /**
     * Converts Parquet [[MessageType]] `parquetSchema` to a Spark SQL [[StructType]].
@@ -175,7 +179,8 @@ private[parquet] class CatalystSchemaConverter(
         CatalystSchemaConverter.checkConversionRequirement(
           assumeInt96IsTimestamp,
           "INT96 is not supported unless it's interpreted as timestamp. " +
-            s"Please try to set ${SQLConf.PARQUET_INT96_AS_TIMESTAMP.key} to true.")
+            s"Please try to set ${SQLConf.PARQUET_INT96_AS_TIMESTAMP.key} to true."
+        )
         TimestampType
 
       case BINARY =>
@@ -469,7 +474,8 @@ private[parquet] class CatalystSchemaConverter(
             // "array_element" is the name chosen by parquet-hive (1.7.0 and prior version)
             .addField(
               convertField(StructField("array", elementType, nullable)))
-            .named("bag"))
+            .named("bag")
+        )
 
       // Spark 1.4.x and prior versions convert ArrayType with non-nullable elements into a 2-level
       // LIST structure.  This behavior mimics parquet-avro (1.6.0rc3).  Note that this case is
@@ -483,7 +489,8 @@ private[parquet] class CatalystSchemaConverter(
           repetition,
           field.name,
           // "array" is the name chosen by parquet-avro (1.7.0 and prior version)
-          convertField(StructField("array", elementType, nullable), REPEATED))
+          convertField(StructField("array", elementType, nullable), REPEATED)
+        )
 
       // Spark 1.4.x and prior versions convert MapType into a 3-level group annotated by
       // MAP_KEY_VALUE.  This is covered by `convertGroupField(field: GroupType): DataType`.
@@ -571,7 +578,8 @@ private[parquet] object CatalystSchemaConverter {
       !name.matches(".*[ ,;{}()\n\t=].*"),
       s"""Attribute name "$name" contains invalid character(s) among " ,;{}()\\n\\t=".
          |Please use alias to rename it.
-       """.stripMargin.split("\n").mkString(" ").trim)
+       """.stripMargin.split("\n").mkString(" ").trim
+    )
   }
 
   def checkFieldNames(schema: StructType): StructType = {

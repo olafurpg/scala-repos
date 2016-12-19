@@ -89,16 +89,18 @@ trait IssuesControllerBase extends ControllerBase {
     defining(repository.owner, repository.name, params("id")) {
       case (owner, name, issueId) =>
         getIssue(owner, name, issueId) map {
-          html.issue(_,
-                     getComments(owner, name, issueId.toInt),
-                     getIssueLabels(owner, name, issueId.toInt),
-                     (getCollaborators(owner, name) :::
-                       (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                        else List(owner))).sorted,
-                     getMilestonesWithIssueCount(owner, name),
-                     getLabels(owner, name),
-                     hasWritePermission(owner, name, context.loginAccount),
-                     repository)
+          html.issue(
+            _,
+            getComments(owner, name, issueId.toInt),
+            getIssueLabels(owner, name, issueId.toInt),
+            (getCollaborators(owner, name) :::
+              (if (getAccountByUserName(owner).get.isGroupAccount) Nil
+               else List(owner))).sorted,
+            getMilestonesWithIssueCount(owner, name),
+            getLabels(owner, name),
+            hasWritePermission(owner, name, context.loginAccount),
+            repository
+          )
         } getOrElse NotFound
     }
   })
@@ -106,13 +108,15 @@ trait IssuesControllerBase extends ControllerBase {
   get("/:owner/:repository/issues/new")(readableUsersOnly { repository =>
     defining(repository.owner, repository.name) {
       case (owner, name) =>
-        html.create((getCollaborators(owner, name) :::
-                      (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                       else List(owner))).sorted,
-                    getMilestones(owner, name),
-                    getLabels(owner, name),
-                    hasWritePermission(owner, name, context.loginAccount),
-                    repository)
+        html.create(
+          (getCollaborators(owner, name) :::
+            (if (getAccountByUserName(owner).get.isGroupAccount) Nil
+             else List(owner))).sorted,
+          getMilestones(owner, name),
+          getLabels(owner, name),
+          hasWritePermission(owner, name, context.loginAccount),
+          repository
+        )
     }
   })
 
@@ -524,7 +528,8 @@ trait IssuesControllerBase extends ControllerBase {
           } else
             session
               .getAs[IssueSearchCondition](sessionKey)
-              .getOrElse(IssueSearchCondition()))
+              .getOrElse(IssueSearchCondition())
+        )
 
         html.list(
           "issues",
@@ -547,7 +552,8 @@ trait IssuesControllerBase extends ControllerBase {
                      owner -> repoName),
           condition,
           repository,
-          hasWritePermission(owner, repoName, context.loginAccount))
+          hasWritePermission(owner, repoName, context.loginAccount)
+        )
     }
   }
 }

@@ -38,7 +38,8 @@ object ClusterSingletonProxySettings {
       singletonIdentificationInterval = config
         .getDuration("singleton-identification-interval", MILLISECONDS)
         .millis,
-      bufferSize = config.getInt("buffer-size"))
+      bufferSize = config.getInt("buffer-size")
+    )
 
   /**
     * Java API: Create settings from the default configuration

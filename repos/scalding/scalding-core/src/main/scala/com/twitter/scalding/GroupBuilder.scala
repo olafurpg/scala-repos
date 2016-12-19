@@ -304,7 +304,8 @@ class GroupBuilder(val groupFields: Fields)
       (i: X, it: Iterator[T]) => new ScanLeftIterator(it, i, fn),
       outFields,
       conv,
-      setter)
+      setter
+    )
     every(
       pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }

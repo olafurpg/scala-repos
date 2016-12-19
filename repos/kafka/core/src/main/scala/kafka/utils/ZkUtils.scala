@@ -155,24 +155,28 @@ class ZkUtils(val zkClient: ZkClient,
               val isSecure: Boolean)
     extends Logging {
   // These are persistent ZK paths that should exist on kafka broker startup.
-  val persistentZkPaths = Seq(ConsumersPath,
-                              BrokerIdsPath,
-                              BrokerTopicsPath,
-                              EntityConfigChangesPath,
-                              getEntityConfigRootPath(ConfigType.Topic),
-                              getEntityConfigRootPath(ConfigType.Client),
-                              DeleteTopicsPath,
-                              BrokerSequenceIdPath,
-                              IsrChangeNotificationPath)
+  val persistentZkPaths = Seq(
+    ConsumersPath,
+    BrokerIdsPath,
+    BrokerTopicsPath,
+    EntityConfigChangesPath,
+    getEntityConfigRootPath(ConfigType.Topic),
+    getEntityConfigRootPath(ConfigType.Client),
+    DeleteTopicsPath,
+    BrokerSequenceIdPath,
+    IsrChangeNotificationPath
+  )
 
-  val securePersistentZkPaths = Seq(BrokerIdsPath,
-                                    BrokerTopicsPath,
-                                    EntityConfigChangesPath,
-                                    getEntityConfigRootPath(ConfigType.Topic),
-                                    getEntityConfigRootPath(ConfigType.Client),
-                                    DeleteTopicsPath,
-                                    BrokerSequenceIdPath,
-                                    IsrChangeNotificationPath)
+  val securePersistentZkPaths = Seq(
+    BrokerIdsPath,
+    BrokerTopicsPath,
+    EntityConfigChangesPath,
+    getEntityConfigRootPath(ConfigType.Topic),
+    getEntityConfigRootPath(ConfigType.Client),
+    DeleteTopicsPath,
+    BrokerSequenceIdPath,
+    IsrChangeNotificationPath
+  )
 
   val DefaultAcls: java.util.List[ACL] = ZkUtils.DefaultAcls(isSecure)
 
@@ -335,14 +339,16 @@ class ZkUtils(val zkClient: ZkClient,
     val timestamp = SystemTime.milliseconds.toString
 
     val version = if (apiVersion >= KAFKA_0_10_0_IV0) 3 else 2
-    var jsonMap = Map("version" -> version,
-                      "host" -> host,
-                      "port" -> port,
-                      "endpoints" -> advertisedEndpoints.values
-                        .map(_.connectionString)
-                        .toArray,
-                      "jmx_port" -> jmxPort,
-                      "timestamp" -> timestamp)
+    var jsonMap = Map(
+      "version" -> version,
+      "host" -> host,
+      "port" -> port,
+      "endpoints" -> advertisedEndpoints.values
+        .map(_.connectionString)
+        .toArray,
+      "jmx_port" -> jmxPort,
+      "timestamp" -> timestamp
+    )
     rack.foreach(rack => if (version >= 3) jsonMap += ("rack" -> rack))
 
     val brokerInfo = Json.encode(jsonMap)

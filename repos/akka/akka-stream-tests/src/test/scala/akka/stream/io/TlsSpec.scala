@@ -358,17 +358,19 @@ class TlsSpec
       def output = ByteString("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHAhello")
     }
 
-    val scenarios = Seq(SingleBytes,
-                        MediumMessages,
-                        LargeMessages,
-                        EmptyBytesFirst,
-                        EmptyBytesInTheMiddle,
-                        EmptyBytesLast,
-                        CancellingRHS,
-                        SessionRenegotiationBySender,
-                        SessionRenegotiationByReceiver,
-                        SessionRenegotiationFirstOne,
-                        SessionRenegotiationFirstTwo)
+    val scenarios = Seq(
+      SingleBytes,
+      MediumMessages,
+      LargeMessages,
+      EmptyBytesFirst,
+      EmptyBytesInTheMiddle,
+      EmptyBytesLast,
+      CancellingRHS,
+      SessionRenegotiationBySender,
+      SessionRenegotiationByReceiver,
+      SessionRenegotiationFirstOne,
+      SessionRenegotiationFirstTwo
+    )
 
     for {
       commPattern ← communicationPatterns

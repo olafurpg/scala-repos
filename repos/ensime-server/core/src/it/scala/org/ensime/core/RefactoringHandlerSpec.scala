@@ -155,21 +155,23 @@ class RefactoringHandlerSpec
       // --> OrganizeImportsWildcardsTest.scala
 
       // OrganizeImports need some paren --> "{...}"
-      val file = srcFile(dir,
-                         "tmp-contents",
-                         contents(
-                           "import java.lang.Integer.{valueOf => vo}",
-                           "import java.lang.Integer.toBinaryString",
-                           "import java.lang.String.valueOf",
-                           " ",
-                           "trait Temp {",
-                           "  valueOf(5)",
-                           "  vo(\"5\")",
-                           "  toBinaryString(27)",
-                           "}"
-                         ),
-                         write = true,
-                         encoding = encoding)
+      val file = srcFile(
+        dir,
+        "tmp-contents",
+        contents(
+          "import java.lang.Integer.{valueOf => vo}",
+          "import java.lang.Integer.toBinaryString",
+          "import java.lang.String.valueOf",
+          " ",
+          "trait Temp {",
+          "  valueOf(5)",
+          "  vo(\"5\")",
+          "  toBinaryString(27)",
+          "}"
+        ),
+        write = true,
+        encoding = encoding
+      )
 
       val analyzer = analyzerRef.underlyingActor
 
@@ -202,20 +204,22 @@ class RefactoringHandlerSpec
 
   it should "add imports on the first line" in withAnalyzer {
     (dir, analyzerRef) =>
-      val file = srcFile(dir,
-                         "tmp-contents",
-                         contents(
-                           "import java.lang.Integer.toBinaryString",
-                           "import java.lang.String.valueOf",
-                           "",
-                           "trait Temp {",
-                           "  valueOf(5)",
-                           "  vo(\"5\")",
-                           "  toBinaryString(27)",
-                           "}"
-                         ),
-                         write = true,
-                         encoding = encoding)
+      val file = srcFile(
+        dir,
+        "tmp-contents",
+        contents(
+          "import java.lang.Integer.toBinaryString",
+          "import java.lang.String.valueOf",
+          "",
+          "trait Temp {",
+          "  valueOf(5)",
+          "  vo(\"5\")",
+          "  toBinaryString(27)",
+          "}"
+        ),
+        write = true,
+        encoding = encoding
+      )
 
       val analyzer = analyzerRef.underlyingActor
 
@@ -252,19 +256,21 @@ class RefactoringHandlerSpec
 
   it should "add imports on the first line when other examples come" in {
     withAnalyzer { (dir, analyzerRef) =>
-      val file = srcFile(dir,
-                         "tmp-contents",
-                         contents(
-                           "package org.ensime.testing",
-                           "",
-                           "trait Temp {",
-                           "  valueOf(5)",
-                           "  vo(\"5\")",
-                           "  toBinaryString(27)",
-                           "}"
-                         ),
-                         write = true,
-                         encoding = encoding)
+      val file = srcFile(
+        dir,
+        "tmp-contents",
+        contents(
+          "package org.ensime.testing",
+          "",
+          "trait Temp {",
+          "  valueOf(5)",
+          "  vo(\"5\")",
+          "  toBinaryString(27)",
+          "}"
+        ),
+        write = true,
+        encoding = encoding
+      )
 
       val analyzer = analyzerRef.underlyingActor
 
@@ -346,21 +352,23 @@ class RefactoringHandlerSpec
       //when 3 imports exist
       // "produce a diff file in the unified output format"
 
-      val file = srcFile(dir,
-                         "tmp-contents",
-                         contents(
-                           "import java.lang.Integer.{valueOf => vo}",
-                           "import java.lang.Integer.toBinaryString",
-                           "import java.lang.String.valueOf",
-                           " ",
-                           "trait Temp {",
-                           "  valueOf(5)",
-                           "  vo(\"5\")",
-                           "  toBinaryString(27)",
-                           "}"
-                         ),
-                         write = true,
-                         encoding = encoding)
+      val file = srcFile(
+        dir,
+        "tmp-contents",
+        contents(
+          "import java.lang.Integer.{valueOf => vo}",
+          "import java.lang.Integer.toBinaryString",
+          "import java.lang.String.valueOf",
+          " ",
+          "trait Temp {",
+          "  valueOf(5)",
+          "  vo(\"5\")",
+          "  toBinaryString(27)",
+          "}"
+        ),
+        write = true,
+        encoding = encoding
+      )
 
       val analyzer = analyzerRef.underlyingActor
 
@@ -398,22 +406,24 @@ class RefactoringHandlerSpec
     withAnalyzer { (dir, analyzerRef) =>
       import org.ensime.util.file._
 
-      val file = srcFile(dir,
-                         "tmp-contents",
-                         contents(
-                           "import scala._",
-                           "import java.lang.Integer",
-                           "import scala.Int",
-                           "import java._",
-                           " ",
-                           "trait Temp {",
-                           "  def i(): Int",
-                           "  def j(): Integer",
-                           "}",
-                           ""
-                         ),
-                         write = true,
-                         encoding = encoding)
+      val file = srcFile(
+        dir,
+        "tmp-contents",
+        contents(
+          "import scala._",
+          "import java.lang.Integer",
+          "import scala.Int",
+          "import java._",
+          " ",
+          "trait Temp {",
+          "  def i(): Int",
+          "  def j(): Integer",
+          "}",
+          ""
+        ),
+        write = true,
+        encoding = encoding
+      )
 
       val analyzer = analyzerRef.underlyingActor
 

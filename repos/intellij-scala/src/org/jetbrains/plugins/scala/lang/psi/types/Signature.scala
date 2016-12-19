@@ -311,12 +311,14 @@ object PhysicalSignature {
 
 class PhysicalSignature(val method: PsiMethod,
                         override val substitutor: ScSubstitutor)
-    extends Signature(method.name,
-                      PhysicalSignature.typesEval(method),
-                      PhysicalSignature.paramLength(method),
-                      TypeParameter.fromArray(method.getTypeParameters),
-                      substitutor,
-                      method,
-                      PhysicalSignature.hasRepeatedParam(method)) {
+    extends Signature(
+      method.name,
+      PhysicalSignature.typesEval(method),
+      PhysicalSignature.paramLength(method),
+      TypeParameter.fromArray(method.getTypeParameters),
+      substitutor,
+      method,
+      PhysicalSignature.hasRepeatedParam(method)
+    ) {
   override def isJava = method.getLanguage == JavaFileType.INSTANCE.getLanguage
 }

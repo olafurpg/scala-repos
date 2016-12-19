@@ -222,7 +222,8 @@ final case class PreRestartException private[akka] (actor: ActorRef,
         (messageOption match {
           case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
         }) + ")",
-      cause)
+      cause
+    )
 
 /**
   * A PostRestartException is thrown when constructor or postRestart() method

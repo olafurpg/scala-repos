@@ -741,12 +741,14 @@ object Defaults extends BuildCommon {
       def intlStamp(f: File, analysis: Analysis, s: Set[File]): Long = {
         if (s contains f) Long.MinValue
         else
-          stamps.getOrElseUpdate(f, {
-            import analysis.{relations => rel, apis}
-            rel.internalSrcDeps(f).map(intlStamp(_, analysis, s + f)) ++ rel
-              .externalDeps(f)
-              .map(stamp) + apis.internal(f).compilation.startTime
-          }.max)
+          stamps.getOrElseUpdate(
+            f, {
+              import analysis.{relations => rel, apis}
+              rel.internalSrcDeps(f).map(intlStamp(_, analysis, s + f)) ++ rel
+                .externalDeps(f)
+                .map(stamp) + apis.internal(f).compilation.startTime
+            }.max
+          )
       }
       def noSuccessYet(test: String) = succeeded.get(test) match {
         case None => true
@@ -774,15 +776,17 @@ object Defaults extends BuildCommon {
       val modifiedOpts =
         Tests.Filters(filter(selected)) +: Tests.Argument(frameworkOptions: _*) +: config.options
       val newConfig = config.copy(options = modifiedOpts)
-      val output = allTestGroupsTask(s,
-                                     loadedTestFrameworks.value,
-                                     testLoader.value,
-                                     testGrouping.value,
-                                     newConfig,
-                                     fullClasspath.value,
-                                     javaHome.value,
-                                     testForkedParallel.value,
-                                     javaOptions.value)
+      val output = allTestGroupsTask(
+        s,
+        loadedTestFrameworks.value,
+        testLoader.value,
+        testGrouping.value,
+        newConfig,
+        fullClasspath.value,
+        javaHome.value,
+        testForkedParallel.value,
+        javaOptions.value
+      )
       val taskName = display(resolvedScoped.value)
       val trl = testResultLogger.value
       val processed = output.map(out => trl.run(s.log, out, taskName))
@@ -1327,16 +1331,18 @@ object Defaults extends BuildCommon {
           override def apply(className: String): Boolean = dc(f)(className)
         }
     }
-    new Setup(f1(t => o2m(analysisMap(dependencyClasspath.value)(t))),
-              f1(dc),
-              (skip in compile).value,
-              // TODO - this is kind of a bad way to grab the cache directory for streams...
-              streams.value.cacheDirectory / compileAnalysisFilename.value,
-              compilerCache.value,
-              incOptions.value,
-              (compilerReporter in compile).value,
-              // TODO - task / setting for extra,
-              Array.empty)
+    new Setup(
+      f1(t => o2m(analysisMap(dependencyClasspath.value)(t))),
+      f1(dc),
+      (skip in compile).value,
+      // TODO - this is kind of a bad way to grab the cache directory for streams...
+      streams.value.cacheDirectory / compileAnalysisFilename.value,
+      compilerCache.value,
+      incOptions.value,
+      (compilerReporter in compile).value,
+      // TODO - task / setting for extra,
+      Array.empty
+    )
   }
   def compileInputsSettings: Seq[Setting[_]] = {
     Seq(
@@ -1348,7 +1354,8 @@ object Defaults extends BuildCommon {
         javacOptions.value.toArray,
         maxErrors.value,
         f1(Compiler.foldMappers(sourcePositionMappers.value)),
-        compileOrder.value),
+        compileOrder.value
+      ),
       compilerReporter := new LoggerReporter(
         maxErrors.value,
         streams.value.log,
@@ -1867,26 +1874,32 @@ object Classpaths {
                       logging = ivyLoggingLevel.value),
       deliverConfiguration <<= deliverLocalConfiguration,
       publishConfiguration :=
-        publishConfig(packagedArtifacts.in(publish).value,
-                      if (publishMavenStyle.value) None
-                      else Some(deliver.value),
-                      resolverName = getPublishTo(publishTo.value).name,
-                      checksums = checksums.in(publish).value,
-                      logging = ivyLoggingLevel.value,
-                      overwrite = isSnapshot.value),
+        publishConfig(
+          packagedArtifacts.in(publish).value,
+          if (publishMavenStyle.value) None
+          else Some(deliver.value),
+          resolverName = getPublishTo(publishTo.value).name,
+          checksums = checksums.in(publish).value,
+          logging = ivyLoggingLevel.value,
+          overwrite = isSnapshot.value
+        ),
       publishLocalConfiguration :=
-        publishConfig(packagedArtifacts.in(publishLocal).value,
-                      Some(deliverLocal.value),
-                      checksums.in(publishLocal).value,
-                      logging = ivyLoggingLevel.value,
-                      overwrite = isSnapshot.value),
+        publishConfig(
+          packagedArtifacts.in(publishLocal).value,
+          Some(deliverLocal.value),
+          checksums.in(publishLocal).value,
+          logging = ivyLoggingLevel.value,
+          overwrite = isSnapshot.value
+        ),
       publishM2Configuration :=
-        publishConfig(packagedArtifacts.in(publishM2).value,
-                      None,
-                      resolverName = Resolver.publishMavenLocal.name,
-                      checksums = checksums.in(publishM2).value,
-                      logging = ivyLoggingLevel.value,
-                      overwrite = isSnapshot.value),
+        publishConfig(
+          packagedArtifacts.in(publishM2).value,
+          None,
+          resolverName = Resolver.publishMavenLocal.name,
+          checksums = checksums.in(publishM2).value,
+          logging = ivyLoggingLevel.value,
+          overwrite = isSnapshot.value
+        ),
       ivySbt <<= ivySbt0,
       ivyModule := {
         val is = ivySbt.value; new is.Module(moduleSettings.value)
@@ -1959,7 +1972,8 @@ object Classpaths {
               LogicalClock(state.value.hashCode),
               Some(depDir),
               Vector.empty,
-              s.log)
+              s.log
+            )
         }
       } tag (Tags.Update, Tags.Network)
     )
@@ -2027,17 +2041,19 @@ object Classpaths {
       new IvySbt(conf)
     }
   def moduleSettings0: Initialize[Task[ModuleSettings]] = Def.task {
-    new InlineConfigurationWithExcludes(projectID.value,
-                                        projectInfo.value,
-                                        allDependencies.value,
-                                        dependencyOverrides.value,
-                                        excludeDependencies.value,
-                                        ivyXML.value,
-                                        ivyConfigurations.value,
-                                        defaultConfiguration.value,
-                                        ivyScala.value,
-                                        ivyValidate.value,
-                                        conflictManager.value)
+    new InlineConfigurationWithExcludes(
+      projectID.value,
+      projectInfo.value,
+      allDependencies.value,
+      dependencyOverrides.value,
+      excludeDependencies.value,
+      ivyXML.value,
+      ivyConfigurations.value,
+      defaultConfiguration.value,
+      ivyScala.value,
+      ivyValidate.value,
+      conflictManager.value
+    )
   }
 
   private[this] def sbtClassifiersGlobalDefaults =
@@ -2068,7 +2084,8 @@ object Classpaths {
           checksums.value,
           Some(target.value / "resolution-cache"),
           UpdateOptions(),
-          streams.value.log),
+          streams.value.log
+        ),
         ivySbt <<= ivySbt0,
         classifiersModule <<=
           (projectID,
@@ -2116,7 +2133,8 @@ object Classpaths {
                 uwConfig,
                 LogicalClock(state.value.hashCode),
                 Some(depDir),
-                s.log)
+                s.log
+              )
           }
         } tag (Tags.Update, Tags.Network)
       )) ++ Seq(
@@ -2149,17 +2167,20 @@ object Classpaths {
       f: Map[ModuleID, Set[String]] => UpdateReport): UpdateReport = {
     val exclName = "exclude_classifiers"
     val file = out / exclName
-    lock(out / (exclName + ".lock"), new Callable[UpdateReport] {
-      def call = {
-        val excludes = CacheIO.fromFile[Map[ModuleID, Set[String]]](
-          excludeMap,
-          Map.empty[ModuleID, Set[String]])(file)
-        val report = f(excludes)
-        val allExcludes = excludes ++ IvyActions.extractExcludes(report)
-        CacheIO.toFile(excludeMap)(allExcludes)(file)
-        IvyActions.addExcluded(report, classifiers, allExcludes)
+    lock(
+      out / (exclName + ".lock"),
+      new Callable[UpdateReport] {
+        def call = {
+          val excludes = CacheIO.fromFile[Map[ModuleID, Set[String]]](
+            excludeMap,
+            Map.empty[ModuleID, Set[String]])(file)
+          val report = f(excludes)
+          val allExcludes = excludes ++ IvyActions.extractExcludes(report)
+          CacheIO.toFile(excludeMap)(allExcludes)(file)
+          IvyActions.addExcluded(report, classifiers, allExcludes)
+        }
       }
-    })
+    )
   }
 
   def updateTask: Initialize[Task[UpdateReport]] = Def.task {
@@ -2222,21 +2243,23 @@ object Classpaths {
       if (executionRoots.value exists { _.key == evicted.key })
         EvictionWarningOptions.empty
       else (evictionWarningOptions in update).value
-    cachedUpdate(s.cacheDirectory / updateCacheName.value,
-                 show,
-                 ivyModule.value,
-                 uc,
-                 transform,
-                 skip = (skip in update).value,
-                 force = isRoot || forceUpdateByTime,
-                 depsUpdated = depsUpdated,
-                 uwConfig = uwConfig,
-                 logicalClock = logicalClock,
-                 depDir = Some(depDir),
-                 ewo = ewo,
-                 mavenStyle = ms,
-                 compatWarning = cw,
-                 log = s.log)
+    cachedUpdate(
+      s.cacheDirectory / updateCacheName.value,
+      show,
+      ivyModule.value,
+      uc,
+      transform,
+      skip = (skip in update).value,
+      force = isRoot || forceUpdateByTime,
+      depsUpdated = depsUpdated,
+      uwConfig = uwConfig,
+      logicalClock = logicalClock,
+      depDir = Some(depDir),
+      ewo = ewo,
+      mavenStyle = ms,
+      compatWarning = cw,
+      log = s.log
+    )
   }
   @deprecated(
     "Use cachedUpdate with the variant that takes unresolvedHandler instead.",
@@ -2250,21 +2273,23 @@ object Classpaths {
                    force: Boolean,
                    depsUpdated: Boolean,
                    log: Logger): UpdateReport =
-    cachedUpdate(cacheFile,
-                 label,
-                 module,
-                 config,
-                 transform,
-                 skip,
-                 force,
-                 depsUpdated,
-                 UnresolvedWarningConfiguration(),
-                 LogicalClock.unknown,
-                 None,
-                 EvictionWarningOptions.empty,
-                 true,
-                 CompatibilityWarningOptions.default,
-                 log)
+    cachedUpdate(
+      cacheFile,
+      label,
+      module,
+      config,
+      transform,
+      skip,
+      force,
+      depsUpdated,
+      UnresolvedWarningConfiguration(),
+      LogicalClock.unknown,
+      None,
+      EvictionWarningOptions.empty,
+      true,
+      CompatibilityWarningOptions.default,
+      log
+    )
   private[sbt] def cachedUpdate(cacheFile: File,
                                 label: String,
                                 module: IvySbt#Module,
@@ -2587,8 +2612,8 @@ object Classpaths {
       self: Configuration,
       data: Settings[Scope],
       includeSelf: Boolean,
-      f: (ProjectRef, String,
-          Settings[Scope]) => Task[Classpath]): Task[Classpath] = {
+      f: (ProjectRef, String, Settings[Scope]) => Task[Classpath])
+    : Task[Classpath] = {
     val visited = interSort(projectRef, conf, data, deps)
     val tasks = asScalaSet(new LinkedHashSet[Task[Classpath]])
     for ((dep, c) <- visited)
@@ -3149,8 +3174,8 @@ trait BuildCommon {
       s)
 
   // intended for use in constructing InputTasks
-  def loadForParser[P, T](task: TaskKey[T])(f: (State,
-                                                Option[T]) => Parser[P])(
+  def loadForParser[P, T](task: TaskKey[T])(
+      f: (State, Option[T]) => Parser[P])(
       implicit format: sbinary.Format[T]): Initialize[State => Parser[P]] =
     loadForParserI(task)(Def value f)(format)
   def loadForParserI[P, T](task: TaskKey[T])(

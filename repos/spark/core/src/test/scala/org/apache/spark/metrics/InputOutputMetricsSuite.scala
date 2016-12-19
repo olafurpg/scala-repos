@@ -434,7 +434,8 @@ class OldCombineTextInputFormat
       split.asInstanceOf[OldCombineFileSplit],
       reporter,
       classOf[OldCombineTextRecordReaderWrapper]
-        .asInstanceOf[Class[OldRecordReader[LongWritable, Text]]])
+        .asInstanceOf[Class[OldRecordReader[LongWritable, Text]]]
+    )
   }
 }
 

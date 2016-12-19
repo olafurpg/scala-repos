@@ -442,12 +442,14 @@ private[history] class CacheMetrics(prefix: String) extends Source {
   val updateTriggeredCount = new Counter()
 
   /** all the counters: for registration and string conversion. */
-  private val counters = Seq(("lookup.count", lookupCount),
-                             ("lookup.failure.count", lookupFailureCount),
-                             ("eviction.count", evictionCount),
-                             ("load.count", loadCount),
-                             ("update.probe.count", updateProbeCount),
-                             ("update.triggered.count", updateTriggeredCount))
+  private val counters = Seq(
+    ("lookup.count", lookupCount),
+    ("lookup.failure.count", lookupFailureCount),
+    ("eviction.count", evictionCount),
+    ("load.count", loadCount),
+    ("update.probe.count", updateProbeCount),
+    ("update.triggered.count", updateTriggeredCount)
+  )
 
   /** all metrics, including timers */
   private val allMetrics =

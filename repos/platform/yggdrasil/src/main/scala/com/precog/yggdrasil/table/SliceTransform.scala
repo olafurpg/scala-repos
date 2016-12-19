@@ -640,18 +640,20 @@ trait SliceTransforms[M[+ _]]
 
         case MapWith(source, mapper0) =>
           composeSliceTransform2(source) andThen {
-            mapper0.fold({ mapper =>
-              SliceTransform1.liftM[Unit]((), { (_: Unit, slice: Slice) =>
-                val cols = mapper.map(slice.columns, 0 until slice.size)
-                ((), Slice(cols, slice.size))
-              })
-            }, { mapper =>
-              SliceTransform1[Unit]((), { (_: Unit, slice: Slice) =>
-                mapper.map(slice.columns, 0 until slice.size) map { cols =>
+            mapper0.fold(
+              { mapper =>
+                SliceTransform1.liftM[Unit]((), { (_: Unit, slice: Slice) =>
+                  val cols = mapper.map(slice.columns, 0 until slice.size)
                   ((), Slice(cols, slice.size))
-                }
-              })
-            })
+                })
+              }, { mapper =>
+                SliceTransform1[Unit]((), { (_: Unit, slice: Slice) =>
+                  mapper.map(slice.columns, 0 until slice.size) map { cols =>
+                    ((), Slice(cols, slice.size))
+                  }
+                })
+              }
+            )
           }
 
         case DerefMetadataStatic(source, field) =>
@@ -831,21 +833,23 @@ trait SliceTransforms[M[+ _]]
           })
 
         case (sta, stb) =>
-          SliceTransform1[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), s0) =>
-              for (ares <- sta.f(a0, s0); bres <- stb.f(b0, s0)) yield {
-                val (a, sa) = ares
-                val (b, sb) = bres
-                assert(sa.size == sb.size)
-                ((a, b), combine(sa, sb))
-              }
-          })
+          SliceTransform1[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), s0) =>
+                for (ares <- sta.f(a0, s0); bres <- stb.f(b0, s0)) yield {
+                  val (a, sa) = ares
+                  val (b, sb) = bres
+                  assert(sa.size == sb.size)
+                  ((a, b), combine(sa, sb))
+                }
+            }
+          )
       }
     }
 
     def zip2[B, C](t: SliceTransform1[B], t2: SliceTransform1[C])(
-        combine: (Slice, Slice,
-                  Slice) => Slice): SliceTransform1[(A, B, C)] = {
+        combine: (Slice, Slice, Slice) => Slice)
+      : SliceTransform1[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.
@@ -854,28 +858,32 @@ trait SliceTransforms[M[+ _]]
         case (sta: SliceTransform1S[_],
               stb: SliceTransform1S[_],
               stc: SliceTransform1S[_]) =>
-          SliceTransform1S((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), s0) =>
-              val (a, sa) = sta.f0(a0, s0)
-              val (b, sb) = stb.f0(b0, s0)
-              val (c, sc) = stc.f0(c0, s0)
-              ((a, b, c), combine(sa, sb, sc))
-          })
+          SliceTransform1S(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), s0) =>
+                val (a, sa) = sta.f0(a0, s0)
+                val (b, sb) = stb.f0(b0, s0)
+                val (c, sc) = stc.f0(c0, s0)
+                ((a, b, c), combine(sa, sb, sc))
+            }
+          )
 
         case (sta, stb, stc) =>
-          SliceTransform1M((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), s0) =>
-              for {
-                resa <- sta.f(a0, s0)
-                resb <- stb.f(b0, s0)
-                resc <- stc.f(c0, s0)
-              } yield {
-                val (a, sa) = resa
-                val (b, sb) = resb
-                val (c, sc) = resc
-                ((a, b, c), combine(sa, sb, sc))
-              }
-          })
+          SliceTransform1M(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), s0) =>
+                for {
+                  resa <- sta.f(a0, s0)
+                  resb <- stb.f(b0, s0)
+                  resc <- stc.f(c0, s0)
+                } yield {
+                  val (a, sa) = resa
+                  val (b, sb) = resb
+                  val (c, sc) = resc
+                  ((a, b, c), combine(sa, sb, sc))
+                }
+            }
+          )
       }
     }
 
@@ -1022,9 +1030,9 @@ trait SliceTransforms[M[+ _]]
           } <-: f0(initial, s))
     }
 
-    private[table] case class SliceTransform1M[A](initial: A,
-                                                  f: (A,
-                                                      Slice) => M[(A, Slice)])
+    private[table] case class SliceTransform1M[A](
+        initial: A,
+        f: (A, Slice) => M[(A, Slice)])
         extends SliceTransform1[A] {
       def advance(s: Slice): M[(SliceTransform1[A], Slice)] = apply(s) map {
         case (next, slice) =>
@@ -1093,53 +1101,61 @@ trait SliceTransforms[M[+ _]]
         combine: (Slice, Slice) => Slice): SliceTransform2[(A, B)] = {
       (this, that) match {
         case (sta: SliceTransform2S[_], stb: SliceTransform2S[_]) =>
-          SliceTransform2S[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              val (b, sb) = stb.f0(b0, sl0, sr0)
-              assert(sa.size == sb.size)
-              ((a, b), combine(sa, sb))
-          })
-
-        case (sta: SliceTransform2S[_], stb) =>
-          SliceTransform2M[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              stb.f(b0, sl0, sr0) map {
-                case (b, sb) =>
-                  assert(sa.size == sb.size)
-                  ((a, b), combine(sa, sb))
-              }
-          })
-
-        case (sta, stb: SliceTransform2S[_]) =>
-          SliceTransform2M[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              sta.f(a0, sl0, sr0) map {
-                case (a, sa) =>
-                  val (b, sb) = stb.f0(b0, sl0, sr0)
-                  assert(sa.size == sb.size)
-                  ((a, b), combine(sa, sb))
-              }
-          })
-
-        case (sta, stb) =>
-          SliceTransform2[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              for (ares <- sta.f(a0, sl0, sr0);
-                   bres <- stb.f(b0, sl0, sr0)) yield {
-                val (a, sa) = ares
-                val (b, sb) = bres
+          SliceTransform2S[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                val (b, sb) = stb.f0(b0, sl0, sr0)
                 assert(sa.size == sb.size)
                 ((a, b), combine(sa, sb))
-              }
-          })
+            }
+          )
+
+        case (sta: SliceTransform2S[_], stb) =>
+          SliceTransform2M[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                stb.f(b0, sl0, sr0) map {
+                  case (b, sb) =>
+                    assert(sa.size == sb.size)
+                    ((a, b), combine(sa, sb))
+                }
+            }
+          )
+
+        case (sta, stb: SliceTransform2S[_]) =>
+          SliceTransform2M[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                sta.f(a0, sl0, sr0) map {
+                  case (a, sa) =>
+                    val (b, sb) = stb.f0(b0, sl0, sr0)
+                    assert(sa.size == sb.size)
+                    ((a, b), combine(sa, sb))
+                }
+            }
+          )
+
+        case (sta, stb) =>
+          SliceTransform2[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                for (ares <- sta.f(a0, sl0, sr0);
+                     bres <- stb.f(b0, sl0, sr0)) yield {
+                  val (a, sa) = ares
+                  val (b, sb) = bres
+                  assert(sa.size == sb.size)
+                  ((a, b), combine(sa, sb))
+                }
+            }
+          )
       }
     }
 
     def zip2[B, C](t: SliceTransform2[B], t2: SliceTransform2[C])(
-        combine: (Slice, Slice,
-                  Slice) => Slice): SliceTransform2[(A, B, C)] = {
+        combine: (Slice, Slice, Slice) => Slice)
+      : SliceTransform2[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.
@@ -1148,28 +1164,32 @@ trait SliceTransforms[M[+ _]]
         case (sta: SliceTransform2S[_],
               stb: SliceTransform2S[_],
               stc: SliceTransform2S[_]) =>
-          SliceTransform2S((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              val (b, sb) = stb.f0(b0, sl0, sr0)
-              val (c, sc) = stc.f0(c0, sl0, sr0)
-              ((a, b, c), combine(sa, sb, sc))
-          })
+          SliceTransform2S(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                val (b, sb) = stb.f0(b0, sl0, sr0)
+                val (c, sc) = stc.f0(c0, sl0, sr0)
+                ((a, b, c), combine(sa, sb, sc))
+            }
+          )
 
         case (sta, stb, stc) =>
-          SliceTransform2M((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), sl0, sr0) =>
-              for {
-                resa <- sta.f(a0, sl0, sr0)
-                resb <- stb.f(b0, sl0, sr0)
-                resc <- stc.f(c0, sl0, sr0)
-              } yield {
-                val (a, sa) = resa
-                val (b, sb) = resb
-                val (c, sc) = resc
-                ((a, b, c), combine(sa, sb, sc))
-              }
-          })
+          SliceTransform2M(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), sl0, sr0) =>
+                for {
+                  resa <- sta.f(a0, sl0, sr0)
+                  resb <- stb.f(b0, sl0, sr0)
+                  resc <- stc.f(c0, sl0, sr0)
+                } yield {
+                  val (a, sa) = resa
+                  val (b, sb) = resb
+                  val (c, sc) = resc
+                  ((a, b, c), combine(sa, sb, sc))
+                }
+            }
+          )
       }
     }
 
@@ -1300,9 +1320,9 @@ trait SliceTransforms[M[+ _]]
           } <-: f0(initial, sl, sr))
     }
 
-    private case class SliceTransform2M[A](initial: A,
-                                           f: (A, Slice,
-                                               Slice) => M[(A, Slice)])
+    private case class SliceTransform2M[A](
+        initial: A,
+        f: (A, Slice, Slice) => M[(A, Slice)])
         extends SliceTransform2[A] {
       def advance(sl: Slice, sr: Slice): M[(SliceTransform2[A], Slice)] =
         apply(sl, sr) map {

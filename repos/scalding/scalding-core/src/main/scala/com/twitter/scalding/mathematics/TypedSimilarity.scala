@@ -141,16 +141,18 @@ object TypedSimilarity extends Serializable {
      * = \sum_k E_ki E_kj
      */
     // First compute (i,j) => E_{ki} E_{kj}
-    maybeWithReducers(g.join(g)
-                        .values
-                        .flatMap {
-                          case ((node1, deg1), (node2, deg2)) =>
-                            if (smallpred(node1) && bigpred(node2))
-                              Some(((node1, node2), (1, deg1, deg2)))
-                            else None
-                        }
-                        .group,
-                      g.reducers)
+    maybeWithReducers(
+      g.join(g)
+        .values
+        .flatMap {
+          case ((node1, deg1), (node2, deg2)) =>
+            if (smallpred(node1) && bigpred(node2))
+              Some(((node1, node2), (1, deg1, deg2)))
+            else None
+        }
+        .group,
+      g.reducers
+    )
     // Use reduceLeft to push to reducers, no benefit in mapside here
       .reduceLeft { (left, right) =>
         // The degrees we always take the left:
@@ -199,7 +201,8 @@ object TypedSimilarity extends Serializable {
         }
         .values
         .group,
-      smallG.reducers).forceToReducers.sum.map {
+      smallG.reducers
+    ).forceToReducers.sum.map {
       case ((node1, node2), sim) => Edge(node1, node2, sim)
     }
   }
@@ -218,7 +221,8 @@ object TypedSimilarity extends Serializable {
     maybeWithReducers(
       smallG
         .cogroup(bigG) {
-          (n: N, leftit: Iterator[(N, Double, Double)],
+          (n: N,
+           leftit: Iterator[(N, Double, Double)],
            rightit: Iterable[(N, Double, Double)]) =>
             // Use a co-group to ensure this happens in the reducer:
             leftit.flatMap {
@@ -240,7 +244,8 @@ object TypedSimilarity extends Serializable {
         }
         .values
         .group,
-      smallG.reducers).forceToReducers.sum.map {
+      smallG.reducers
+    ).forceToReducers.sum.map {
       case ((node1, node2), sim) => Edge(node1, node2, sim)
     }
   }

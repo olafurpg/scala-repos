@@ -235,18 +235,20 @@ final class JsonView(chatApi: lila.chat.ChatApi,
         import pov._
         val fen = Forsyth >> game.toChess
         Json.obj(
-          "game" -> Json.obj("id" -> gameId,
-                             "variant" -> game.variant,
-                             "opening" -> game.opening,
-                             "initialFen" -> {
-                               if (pov.game.pgnMoves.isEmpty) fen
-                               else
-                                 (initialFen | chess.format.Forsyth.initial)
-                             },
-                             "fen" -> fen,
-                             "turns" -> game.turns,
-                             "player" -> game.turnColor.name,
-                             "status" -> game.status),
+          "game" -> Json.obj(
+            "id" -> gameId,
+            "variant" -> game.variant,
+            "opening" -> game.opening,
+            "initialFen" -> {
+              if (pov.game.pgnMoves.isEmpty) fen
+              else
+                (initialFen | chess.format.Forsyth.initial)
+            },
+            "fen" -> fen,
+            "turns" -> game.turns,
+            "player" -> game.turnColor.name,
+            "status" -> game.status
+          ),
           "player" -> Json.obj(
             "id" -> owner.option(pov.playerId),
             "color" -> color.name
@@ -373,12 +375,14 @@ object JsonView {
   }
 
   implicit val clockWriter: OWrites[Clock] = OWrites { c =>
-    Json.obj("running" -> c.isRunning,
-             "initial" -> c.limit,
-             "increment" -> c.increment,
-             "white" -> truncateAt(c.remainingTime(Color.White), 2),
-             "black" -> truncateAt(c.remainingTime(Color.Black), 2),
-             "emerg" -> c.emergTime)
+    Json.obj(
+      "running" -> c.isRunning,
+      "initial" -> c.limit,
+      "increment" -> c.increment,
+      "white" -> truncateAt(c.remainingTime(Color.White), 2),
+      "black" -> truncateAt(c.remainingTime(Color.Black), 2),
+      "emerg" -> c.emergTime
+    )
   }
 
   implicit val correspondenceWriter: OWrites[CorrespondenceClock] = OWrites {

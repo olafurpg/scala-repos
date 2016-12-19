@@ -61,7 +61,8 @@ final class RelationApi(coll: Coll,
               "_id" -> BSONDocument(
                 "$setIntersection" -> BSONArray("$u1", "$u2"))
             ))
-        ))
+        )
+      )
       .map {
         ~_.documents.headOption.flatMap(_.getAs[Set[String]]("_id")) - userId
       }

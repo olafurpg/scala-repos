@@ -107,25 +107,23 @@ object Multipart {
             }
 
             parseError orElse bufferExceededError getOrElse {
-              Future.successful(
-                Right(
-                  MultipartFormData(
-                    parts
-                      .collect {
-                        case dp: DataPart => dp
-                      }
-                      .groupBy(_.key)
-                      .map {
-                        case (key, partValues) =>
-                          key -> partValues.map(_.value)
-                      },
-                    parts.collect {
-                      case fp: FilePart[A] => fp
-                    },
-                    parts.collect {
-                      case bad: BadPart => bad
-                    }
-                  )))
+              Future.successful(Right(MultipartFormData(
+                parts
+                  .collect {
+                    case dp: DataPart => dp
+                  }
+                  .groupBy(_.key)
+                  .map {
+                    case (key, partValues) =>
+                      key -> partValues.map(_.value)
+                  },
+                parts.collect {
+                  case fp: FilePart[A] => fp
+                },
+                parts.collect {
+                  case bad: BadPart => bad
+                }
+              )))
             }
         }
 

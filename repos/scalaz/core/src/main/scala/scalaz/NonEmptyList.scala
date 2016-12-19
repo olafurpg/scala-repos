@@ -195,8 +195,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       }
 
       // would otherwise use traverse1Impl
-      override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B,
-                                                                 A) => B): B =
+      override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(
+          f: (B, A) => B): B =
         fa.tail.foldLeft(f(z, fa.head))(f)
 
       def bind[A, B](fa: NonEmptyList[A])(

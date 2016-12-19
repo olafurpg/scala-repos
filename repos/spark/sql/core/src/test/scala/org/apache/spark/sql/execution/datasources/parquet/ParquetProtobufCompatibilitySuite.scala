@@ -29,11 +29,13 @@ class ParquetProtobufCompatibilitySuite
   }
 
   test("unannotated array of struct") {
-    checkAnswer(readResourceParquetFile("old-repeated-message.parquet"),
-                Row(
-                  Seq(Row("First inner", null, null),
-                      Row(null, "Second inner", null),
-                      Row(null, null, "Third inner"))))
+    checkAnswer(
+      readResourceParquetFile("old-repeated-message.parquet"),
+      Row(
+        Seq(Row("First inner", null, null),
+            Row(null, "Second inner", null),
+            Row(null, null, "Third inner")))
+    )
 
     checkAnswer(
       readResourceParquetFile("proto-repeated-struct.parquet"),
@@ -41,15 +43,18 @@ class ParquetProtobufCompatibilitySuite
 
     checkAnswer(
       readResourceParquetFile("proto-struct-with-array-many.parquet"),
-      Seq(Row(
-            Seq(Row("0 - 0 - 1", "0 - 0 - 2", "0 - 0 - 3"),
-                Row("0 - 1 - 1", "0 - 1 - 2", "0 - 1 - 3"))),
-          Row(
-            Seq(Row("1 - 0 - 1", "1 - 0 - 2", "1 - 0 - 3"),
-                Row("1 - 1 - 1", "1 - 1 - 2", "1 - 1 - 3"))),
-          Row(
-            Seq(Row("2 - 0 - 1", "2 - 0 - 2", "2 - 0 - 3"),
-                Row("2 - 1 - 1", "2 - 1 - 2", "2 - 1 - 3")))))
+      Seq(
+        Row(
+          Seq(Row("0 - 0 - 1", "0 - 0 - 2", "0 - 0 - 3"),
+              Row("0 - 1 - 1", "0 - 1 - 2", "0 - 1 - 3"))),
+        Row(
+          Seq(Row("1 - 0 - 1", "1 - 0 - 2", "1 - 0 - 3"),
+              Row("1 - 1 - 1", "1 - 1 - 2", "1 - 1 - 3"))),
+        Row(
+          Seq(Row("2 - 0 - 1", "2 - 0 - 2", "2 - 0 - 3"),
+              Row("2 - 1 - 1", "2 - 1 - 2", "2 - 1 - 3")))
+      )
+    )
   }
 
   test("struct with unannotated array") {
@@ -58,10 +63,12 @@ class ParquetProtobufCompatibilitySuite
   }
 
   test("unannotated array of struct with unannotated array") {
-    checkAnswer(readResourceParquetFile("nested-array-struct.parquet"),
-                Seq(Row(2, Seq(Row(1, Seq(Row(3))))),
-                    Row(5, Seq(Row(4, Seq(Row(6))))),
-                    Row(8, Seq(Row(7, Seq(Row(9)))))))
+    checkAnswer(
+      readResourceParquetFile("nested-array-struct.parquet"),
+      Seq(Row(2, Seq(Row(1, Seq(Row(3))))),
+          Row(5, Seq(Row(4, Seq(Row(6))))),
+          Row(8, Seq(Row(7, Seq(Row(9))))))
+    )
   }
 
   test("unannotated array of string") {

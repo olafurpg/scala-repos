@@ -23,6 +23,7 @@ trait WordSpecSingleTestTest extends WordSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, wordSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "ignore other tests"),
-      debug = true)
+      debug = true
+    )
   }
 }

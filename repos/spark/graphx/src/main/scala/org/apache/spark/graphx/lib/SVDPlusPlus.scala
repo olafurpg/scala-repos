@@ -89,7 +89,8 @@ object SVDPlusPlus {
 
     val gJoinT0 = g
       .outerJoinVertices(t0) {
-        (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
+        (vid: VertexId,
+         vd: (Array[Double], Array[Double], Double, Double),
          msg: Option[(Long, Double)]) =>
           (vd._1,
            vd._2,
@@ -142,7 +143,8 @@ object SVDPlusPlus {
         })
       val gJoinT1 = g
         .outerJoinVertices(t1) {
-          (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
+          (vid: VertexId,
+           vd: (Array[Double], Array[Double], Double, Double),
            msg: Option[Array[Double]]) =>
             if (msg.isDefined) {
               val out = vd._1.clone()
@@ -168,10 +170,12 @@ object SVDPlusPlus {
           val out2 = g2._2.clone()
           blas.daxpy(out2.length, 1.0, g2._2, 1, out2, 1)
           (out1, out2, g1._3 + g2._3)
-        })
+        }
+      )
       val gJoinT2 = g
         .outerJoinVertices(t2) {
-          (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
+          (vid: VertexId,
+           vd: (Array[Double], Array[Double], Double, Double),
            msg: Option[(Array[Double], Array[Double], Double)]) =>
             {
               val out1 = vd._1.clone()
@@ -205,7 +209,8 @@ object SVDPlusPlus {
     val t3 = g.aggregateMessages[Double](sendMsgTestF(conf, u), _ + _)
     val gJoinT3 = g
       .outerJoinVertices(t3) {
-        (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
+        (vid: VertexId,
+         vd: (Array[Double], Array[Double], Double, Double),
          msg: Option[Double]) =>
           if (msg.isDefined) (vd._1, vd._2, vd._3, msg.get) else vd
       }

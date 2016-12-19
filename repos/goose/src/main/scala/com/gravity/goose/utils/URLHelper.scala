@@ -58,7 +58,8 @@ object URLHelper extends Logging {
           urlToCrawl,
           unknown.getClass.getCanonicalName,
           unknown.getMessage,
-          unknown.getStackTraceString)
+          unknown.getStackTraceString
+        )
 
         None
       }

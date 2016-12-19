@@ -130,14 +130,17 @@ class SorterSuite extends SparkFunSuite with Logging {
     val prepareKvTupleArray = () => {
       System.arraycopy(kvTuples, 0, kvTupleArray, 0, numElements)
     }
-    runExperiment("Tuple-sort using Arrays.sort()")({
-      Arrays.sort(kvTupleArray, new Comparator[AnyRef] {
-        override def compare(x: AnyRef, y: AnyRef): Int =
-          x.asInstanceOf[(JFloat, _)]
-            ._1
-            .compareTo(y.asInstanceOf[(JFloat, _)]._1)
-      })
-    }, prepareKvTupleArray)
+    runExperiment("Tuple-sort using Arrays.sort()")(
+      {
+        Arrays.sort(kvTupleArray, new Comparator[AnyRef] {
+          override def compare(x: AnyRef, y: AnyRef): Int =
+            x.asInstanceOf[(JFloat, _)]
+              ._1
+              .compareTo(y.asInstanceOf[(JFloat, _)]._1)
+        })
+      },
+      prepareKvTupleArray
+    )
 
     // Test our Sorter where each element alternates between Float and Integer, non-primitive
 

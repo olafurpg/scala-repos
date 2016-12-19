@@ -4,9 +4,9 @@ object Test {
   (1 *
     (List[BigInt]()
       .map(((x0) =>
-              x0 match {
-                case x => x
-              }))
+        x0 match {
+          case x => x
+        }))
       .sum))
 
   // okay

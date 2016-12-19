@@ -645,8 +645,8 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
           val todo =
             equalitySyms filterNot
               (b =>
-                 (b.const == sym.const) ||
-                   excludedPair(ExcludedPair(b.const, sym.const)))
+                (b.const == sym.const) ||
+                  excludedPair(ExcludedPair(b.const, sym.const)))
           val (excluded, notExcluded) =
             todo partition (b => excludes(sym.const, b.const))
           val implied = notExcluded filter (b => implies(sym.const, b.const))

@@ -65,10 +65,10 @@ object fasta {
     var cp = 0.0
     a map
       (frequency =>
-         frequency match {
-           case (code, percent) =>
-             cp = cp + percent; new Frequency(code.toByte, cp)
-         })
+        frequency match {
+          case (code, percent) =>
+            cp = cp + percent; new Frequency(code.toByte, cp)
+        })
   }
 }
 

@@ -76,7 +76,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Washington (CNN) -- Wall Street should have seen it coming. After all, market forces were at work.",
       expectedImage =
-        "http://i.cdn.turner.com/cnn/2011/POLITICS/10/06/tea.party.left/t1larg.occupydc2.jpg")
+        "http://i.cdn.turner.com/cnn/2011/POLITICS/10/06/tea.party.left/t1larg.occupydc2.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -253,7 +254,8 @@ class GoldSitesTestIT {
       expectedStart =
         "General Motors just filed with the Securities and Exchange ",
       expectedImage =
-        "http://i.usatoday.net/communitymanager/_photos/drive-on/2010/08/18/cruzex-wide-community.jpg")
+        "http://i.usatoday.net/communitymanager/_photos/drive-on/2010/08/18/cruzex-wide-community.jpg"
+    )
   }
 
   @Test
@@ -267,7 +269,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Timothy McIntosh, a Tampa financial planner, has always been able to soothe his customers after a rough patch in the stock market. Until now.",
       expectedImage =
-        "http://i.usatoday.net/money/_photos/2011/10/05/many-quit-stocks-is-it-time-to-buy-blen936-x.jpg")
+        "http://i.usatoday.net/money/_photos/2011/10/05/many-quit-stocks-is-it-time-to-buy-blen936-x.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -282,7 +285,8 @@ class GoldSitesTestIT {
       expectedStart =
         "If you believe what college football coaches have said about sports",
       expectedImage =
-        "http://a.espncdn.com/photo/2010/0813/pg2_g_bush3x_300.jpg")
+        "http://a.espncdn.com/photo/2010/0813/pg2_g_bush3x_300.jpg"
+    )
   }
 
   @Test
@@ -295,7 +299,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "The Supreme Court sounded ",
       expectedImage =
-        "http://media3.washingtonpost.com/wp-dyn/content/photo/2010/10/09/PH2010100904575.jpg")
+        "http://media3.washingtonpost.com/wp-dyn/content/photo/2010/10/09/PH2010100904575.jpg"
+    )
   }
 
   @Test
@@ -309,7 +314,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Today's 5.9 magnitude earthquake was felt throughout the Mid-Atlantic",
       expectedImage =
-        "http://cache.gizmodo.com/assets/images/4/2011/08/fb_aftershock-earthquake-in-new-york-original.jpg")
+        "http://cache.gizmodo.com/assets/images/4/2011/08/fb_aftershock-earthquake-in-new-york-original.jpg"
+    )
   }
 
   @Test
@@ -324,7 +330,8 @@ class GoldSitesTestIT {
         expectedStart =
           "Streaming and downloading TV content to mobiles is nice",
         expectedImage =
-          "http://www.blogcdn.com/www.engadget.com/media/2010/08/44ni600.jpg")
+          "http://www.blogcdn.com/www.engadget.com/media/2010/08/44ni600.jpg"
+      )
   }
 
   @Test
@@ -337,7 +344,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "This month, the federal government released",
       expectedImage =
-        "http://img.timeinc.net/time/daily/2010/1008/bp_oil_spill_0817.jpg")
+        "http://img.timeinc.net/time/daily/2010/1008/bp_oil_spill_0817.jpg"
+    )
   }
 
   @Test
@@ -351,7 +359,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Despite what the jeers of jaded Californians might suggest",
       expectedImage =
-        "http://timenewsfeed.files.wordpress.com/2011/08/newsfeed_0824.jpg?w=150")
+        "http://timenewsfeed.files.wordpress.com/2011/08/newsfeed_0824.jpg?w=150"
+    )
   }
 
   @Test
@@ -386,7 +395,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "The phone company is adding bells and whistles to",
       expectedImage =
-        "http://i.i.com.com/cnwk.1d/i/tim//2010/08/18/Verizon_iPad_and_live_TV_610x458.JPG")
+        "http://i.i.com.com/cnwk.1d/i/tim//2010/08/18/Verizon_iPad_and_live_TV_610x458.JPG"
+    )
   }
 
   @Test
@@ -400,7 +410,8 @@ class GoldSitesTestIT {
       expectedStart =
         "When I heard that Steve Jobs had passed away, I was boarding a train from New York to Philadelphia to visit my son.",
       expectedImage =
-        "http://www.wired.com/images_blogs/business/2011/10/Apple-Siri-Blind-660x375.jpg")
+        "http://www.wired.com/images_blogs/business/2011/10/Apple-Siri-Blind-660x375.jpg"
+    )
   }
 
   @Test
@@ -414,7 +425,8 @@ class GoldSitesTestIT {
       expectedStart =
         "\"Head to the supermarket an hour before closing time. Some stores mark down ",
       expectedImage =
-        "http://blu.stb.s-msn.com/i/6D/1235D306AF18A532BCDC8EB1CC42.jpg")
+        "http://blu.stb.s-msn.com/i/6D/1235D306AF18A532BCDC8EB1CC42.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -428,7 +440,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart =
         "(AP) — The number of athletic children going to hospitals with concussions is up 60 percent in the past decade",
-      expectedImage = null)
+      expectedImage = null
+    )
     TestUtils.printReport()
   }
 
@@ -443,7 +456,8 @@ class GoldSitesTestIT {
       expectedStart =
         "SAN FRANCISCO (AP) — Steve Jobs, the mind behind the iPhone",
       expectedImage =
-        "http://l1.yimg.com/bt/api/res/1.2/rQjGYdY_uYh6LpCnzkGFvQ--/YXBwaWQ9eW5ld3M7Zmk9ZmlsbDtoPTc1O3E9ODU7dz0xMDA-/http://media.zenfs.com/en_us/News/ap_webfeeds/89854c5c8090bd15df0e6a706700dfbc.jpg")
+        "http://l1.yimg.com/bt/api/res/1.2/rQjGYdY_uYh6LpCnzkGFvQ--/YXBwaWQ9eW5ld3M7Zmk9ZmlsbDtoPTc1O3E9ODU7dz0xMDA-/http://media.zenfs.com/en_us/News/ap_webfeeds/89854c5c8090bd15df0e6a706700dfbc.jpg"
+    )
   }
 
   @Test
@@ -457,7 +471,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Steve Jobs was just 30 years old, wildly successful, fabulously wealthy and a global celebrity. And then it all came crashing down.",
       expectedImage =
-        "http://a.abcnews.com/images/Technology/gty_steve_jobs_port_4_dm_111006_wg.jpg")
+        "http://a.abcnews.com/images/Technology/gty_steve_jobs_port_4_dm_111006_wg.jpg"
+    )
   }
 
   @Test
@@ -470,7 +485,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "And now we're looking at two down days in a",
       expectedImage =
-        "http://static7.businessinsider.com/image/4df5d311ccd1d5591f190000/major-rally-collapses-ahead-of-huge-day-heres-what-you-need-to-know.jpg")
+        "http://static7.businessinsider.com/image/4df5d311ccd1d5591f190000/major-rally-collapses-ahead-of-huge-day-heres-what-you-need-to-know.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -511,7 +527,8 @@ class GoldSitesTestIT {
       expectedStart =
         "MONTGOMERY, Ala. -- Alabama's strict new immigration law may be backfiring.",
       expectedImage =
-        "http://i.huffpost.com/gen/369284/thumbs/s-ALABAMA-WORKERS-IMMIGRATION-LAW-large.jpg")
+        "http://i.huffpost.com/gen/369284/thumbs/s-ALABAMA-WORKERS-IMMIGRATION-LAW-large.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -541,7 +558,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Please. Someone, everyone, do something to save the American Folk Art Museum from dissolution and dispersa",
       expectedImage =
-        "http://graphics8.nytimes.com/images/2011/09/20/arts/20folkart-web/20folkart-web-articleLarge.jpg")
+        "http://graphics8.nytimes.com/images/2011/09/20/arts/20folkart-web/20folkart-web-articleLarge.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -556,7 +574,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart =
         "Healthy men should no longer receive a P.S.A. blood test to screen for prostate cancer because the test does not save lives",
-      expectedImage = null)
+      expectedImage = null
+    )
     TestUtils.printReport()
   }
 
@@ -595,7 +614,8 @@ class GoldSitesTestIT {
       expectedStart =
         "Existing home sales rose more than expected in August to the fastest annual",
       expectedImage =
-        "http://media.cnbc.com/i/CNBC/Sections/News_And_Analysis/__Story_Inserts/graphics/__REAL_ESTATE/home_sales13.jpg")
+        "http://media.cnbc.com/i/CNBC/Sections/News_And_Analysis/__Story_Inserts/graphics/__REAL_ESTATE/home_sales13.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -622,7 +642,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "SAN FRANCISCO (AP) -- As trial balloons go",
       expectedImage =
-        "http://chart.finance.yahoo.com/instrument/1.0/HPQ/chart;range=1d/image;size=239x110?lang=en-US&region=US")
+        "http://chart.finance.yahoo.com/instrument/1.0/HPQ/chart;range=1d/image;size=239x110?lang=en-US&region=US"
+    )
     TestUtils.printReport()
   }
 
@@ -664,7 +685,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "As everyone in the world was transfixed on the Fed",
       expectedImage =
-        "http://static5.businessinsider.com/image/4e77323e69beddba4c00001c/meanwhile-developments-in-greece.jpg")
+        "http://static5.businessinsider.com/image/4e77323e69beddba4c00001c/meanwhile-developments-in-greece.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -679,7 +701,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "From Goldman on the FOMC operation twist announcement",
       expectedImage =
-        "http://static8.businessinsider.com/image/4e7a0dd26bb3f7da4800003d/goldman-4-key-points-on-the-fomc-announcement.jpg")
+        "http://static8.businessinsider.com/image/4e7a0dd26bb3f7da4800003d/goldman-4-key-points-on-the-fomc-announcement.jpg"
+    )
     TestUtils.printReport()
   }
 
@@ -693,7 +716,8 @@ class GoldSitesTestIT {
       expectedStart =
         "If the newest Census Bureau estimates stay close to form",
       expectedImage =
-        "http://images.politico.com/global/news/100927_obama22_ap_328.jpg")
+        "http://images.politico.com/global/news/100927_obama22_ap_328.jpg"
+    )
   }
 
   @Test
@@ -706,7 +730,8 @@ class GoldSitesTestIT {
       article = article,
       expectedStart = "We've had so many false hopes with the new No Doubt CD.",
       expectedImage =
-        "http://img.buzznet.com/assets/imgx/2/0/8/2/2/2/1/3/orig-20822213.jpg")
+        "http://img.buzznet.com/assets/imgx/2/0/8/2/2/2/1/3/orig-20822213.jpg"
+    )
   }
 
   @Test
@@ -720,7 +745,8 @@ class GoldSitesTestIT {
       expectedStart =
         "It was a scene fit for a front-runner: an overflow crowd spilling out the doors of a Rockwellian",
       expectedImage =
-        "http://timeswampland.files.wordpress.com/2012/01/sl_santprotest_0109_blog.jpg?w=600&h=400&crop=1")
+        "http://timeswampland.files.wordpress.com/2012/01/sl_santprotest_0109_blog.jpg?w=600&h=400&crop=1"
+    )
   }
 
   @Test
@@ -734,7 +760,8 @@ class GoldSitesTestIT {
       expectedStart =
         "NEW YORK (CNNMoney) -- CNBC's outspoken financial adviser, Suze",
       expectedImage =
-        "http://i2.cdn.turner.com/money/2012/01/09/pf/suze_orman_prepaid_card/suze-orman.top.jpg")
+        "http://i2.cdn.turner.com/money/2012/01/09/pf/suze_orman_prepaid_card/suze-orman.top.jpg"
+    )
   }
 
   @Test

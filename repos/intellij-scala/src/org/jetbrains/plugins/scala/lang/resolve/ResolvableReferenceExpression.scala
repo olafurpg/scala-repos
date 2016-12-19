@@ -643,7 +643,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             mrp.noImplicitsForArgs,
             mrp.enableTupling,
             mrp.selfConstructorResolve,
-            isDynamic = true)
+            isDynamic = true
+          )
 
           newProcessor.processType(
             aType,

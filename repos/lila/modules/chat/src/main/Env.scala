@@ -33,9 +33,11 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "chat" boot new Env(config = lila.common.PlayApp loadConfig "chat",
-                        db = lila.db.Env.current,
-                        flood = lila.security.Env.current.flood,
-                        shutup = lila.hub.Env.current.actor.shutup,
-                        system = lila.common.PlayApp.system)
+    "chat" boot new Env(
+      config = lila.common.PlayApp loadConfig "chat",
+      db = lila.db.Env.current,
+      flood = lila.security.Env.current.flood,
+      shutup = lila.hub.Env.current.actor.shutup,
+      system = lila.common.PlayApp.system
+    )
 }

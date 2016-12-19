@@ -110,15 +110,17 @@ trait LogisticRegressionSpecs[M[+ _]]
   def makeDAG(points: String) = {
     val line = Line(1, 1, "")
 
-    dag.Morph2(LogisticRegression,
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(1))(line))(line),
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(0))(line))(line))(line)
+    dag.Morph2(
+      LogisticRegression,
+      dag.Join(DerefArray,
+               Cross(Some(TableModule.CrossOrder.CrossLeft)),
+               dag.AbsoluteLoad(Const(CString(points))(line))(line),
+               dag.Const(CLong(1))(line))(line),
+      dag.Join(DerefArray,
+               Cross(Some(TableModule.CrossOrder.CrossLeft)),
+               dag.AbsoluteLoad(Const(CString(points))(line))(line),
+               dag.Const(CLong(0))(line))(line)
+    )(line)
   }
 
   def returnestimate(obj: Map[String, SValue]) = {
@@ -301,7 +303,8 @@ trait LogisticRegressionSpecs[M[+ _]]
               CPathField("baz"),
               CPathIndex(0)),
         CPath(CPathIndex(0), CPathField("foo")),
-        CPath(CPathIndex(1))) sorted
+        CPath(CPathIndex(1))
+      ) sorted
 
       val samples = {
         val samples0 = createLogisticSamplePoints(num, 100, actualThetas)

@@ -22,20 +22,22 @@ import sbtrelease.ReleasePlugin._
 object SaddleBuild extends sbt.Build {
 
   lazy val root =
-    project(id = "saddle",
-            settings = Seq(
-              /* 'console' in root acts as if in core. */
-              console <<= (console in core in Compile) { identity },
-              assembleArtifact in packageScala := false,
-              publishArtifact := false,
-              mergeStrategy in assembly := {
-                case "META-INF/MANIFEST.MF" | "META-INF/LICENSE" |
-                    "META-INF/BCKEY.DSA" =>
-                  MergeStrategy.discard
-                case _ => MergeStrategy.first
-              }
-            ),
-            base = file(".")) aggregate (core, hdf5, test_framework)
+    project(
+      id = "saddle",
+      settings = Seq(
+        /* 'console' in root acts as if in core. */
+        console <<= (console in core in Compile) { identity },
+        assembleArtifact in packageScala := false,
+        publishArtifact := false,
+        mergeStrategy in assembly := {
+          case "META-INF/MANIFEST.MF" | "META-INF/LICENSE" |
+              "META-INF/BCKEY.DSA" =>
+            MergeStrategy.discard
+          case _ => MergeStrategy.first
+        }
+      ),
+      base = file(".")
+    ) aggregate (core, hdf5, test_framework)
 
   lazy val core = project(
     id = "saddle-core",
@@ -60,24 +62,27 @@ object SaddleBuild extends sbt.Build {
             "it.unimi.dsi" % "dsiutils" % "2.0.15"
           ) ++ Shared.testDeps(v)),
       testOptions in Test += Tests.Argument("console", "junitxml")
-    ))
+    )
+  )
 
   lazy val hdf5 =
-    project(id = "saddle-hdf5",
-            base = file("saddle-hdf5"),
-            settings = Seq(
-              initialCommands := """
+    project(
+      id = "saddle-hdf5",
+      base = file("saddle-hdf5"),
+      settings = Seq(
+        initialCommands := """
                 |import org.joda.time.DateTime
                 |import org.saddle._
                 |import org.saddle.time._
                 |import org.saddle.io._""".stripMargin('|'),
-              libraryDependencies <++= scalaVersion(
-                v =>
-                  Seq(
-                    "org.scala-saddle" % "jhdf5" % "2.9"
-                  ) ++ Shared.testDeps(v)),
-              testOptions in Test += Tests.Argument("console", "junitxml")
-            )) dependsOn (core)
+        libraryDependencies <++= scalaVersion(
+          v =>
+            Seq(
+              "org.scala-saddle" % "jhdf5" % "2.9"
+            ) ++ Shared.testDeps(v)),
+        testOptions in Test += Tests.Argument("console", "junitxml")
+      )
+    ) dependsOn (core)
 
   lazy val test_framework =
     project(

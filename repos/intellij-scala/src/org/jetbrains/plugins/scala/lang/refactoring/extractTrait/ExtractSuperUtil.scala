@@ -61,10 +61,16 @@ object ExtractSuperUtil {
             }
           }
           NavigationUtil
-            .getPsiElementPopup(classes, new PsiClassListCellRenderer() {
-              override def getElementText(element: PsiClass): String =
-                super.getElementText(element).replace("$", "")
-            }, "Choose class", processor, selection)
+            .getPsiElementPopup(
+              classes,
+              new PsiClassListCellRenderer() {
+                override def getElementText(element: PsiClass): String =
+                  super.getElementText(element).replace("$", "")
+              },
+              "Choose class",
+              processor,
+              selection
+            )
             .showInBestPositionFor(editor)
       }
     } catch {

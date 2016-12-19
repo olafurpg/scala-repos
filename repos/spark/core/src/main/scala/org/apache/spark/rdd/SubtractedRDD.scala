@@ -83,7 +83,8 @@ private[spark] class SubtractedRDD[K: ClassTag, V: ClassTag, W: ClassTag](
                   Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
               }
           }
-          .toArray)
+          .toArray
+      )
     }
     array
   }

@@ -23,8 +23,9 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
   }
 
   def addFeatureSpec() {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FeatureSpecViewTest extends FeatureSpec {
@@ -38,7 +39,8 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
         |   scenario("ignored_inner") {}
         | }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testFeatureSpecNormal(): Unit =

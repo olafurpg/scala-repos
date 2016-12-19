@@ -363,7 +363,8 @@ trait StreamTest extends QueryTest with Timeouts {
               verify(
                 exception.cause.getClass === ef.causeClass,
                 "incorrect cause in exception returned by query.exception()\n" +
-                  s"\tExpected: ${ef.causeClass}\n\tReturned: ${exception.cause.getClass}")
+                  s"\tExpected: ${ef.causeClass}\n\tReturned: ${exception.cause.getClass}"
+              )
             } catch {
               case _: InterruptedException =>
               case _: org.scalatest.exceptions.TestFailedDueToTimeoutException =>

@@ -585,7 +585,8 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
         combOp = (c1, c2) =>
           (c1, c2) match {
             case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
-        })
+        }
+      )
 
     (aftAggregator.loss, aftAggregator.gradient)
   }

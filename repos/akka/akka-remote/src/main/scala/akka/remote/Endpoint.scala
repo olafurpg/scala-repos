@@ -93,7 +93,8 @@ private[remote] class DefaultMessageDispatcher(
               log.debug(
                 "operating in UntrustedMode, dropping inbound actor selection to [{}], " +
                   "allow it by adding the path to 'akka.remote.trusted-selection-paths' configuration",
-                sel.elements.mkString("/", "/", ""))
+                sel.elements.mkString("/", "/", "")
+              )
             else
               // run the receive logic for ActorSelectionMessage here to make sure it is not stuck on busy user actor
               ActorSelection.deliverSelection(l, sender, sel)
@@ -118,7 +119,8 @@ private[remote] class DefaultMessageDispatcher(
             payloadClass,
             r,
             recipientAddress,
-            provider.transport.addresses.mkString(", "))
+            provider.transport.addresses.mkString(", ")
+          )
 
       case r ⇒
         log.error(
@@ -126,7 +128,8 @@ private[remote] class DefaultMessageDispatcher(
           payloadClass,
           r,
           recipientAddress,
-          provider.transport.addresses.mkString(", "))
+          provider.transport.addresses.mkString(", ")
+        )
     }
   }
 }
@@ -268,7 +271,8 @@ private[remote] class ReliableDeliverySupervisor(
         remoteAddress,
         settings.RetryGateClosedFor.toMillis,
         e.getMessage,
-        causedBy)
+        causedBy
+      )
       uidConfirmed = false // Need confirmation of UID again
       if (bufferWasInUse) {
         if ((resendBuffer.nacked.nonEmpty || resendBuffer.nonAcked.nonEmpty) &&
@@ -357,7 +361,8 @@ private[remote] class ReliableDeliverySupervisor(
               new IllegalStateException(
                 s"Error encountered while processing system message " +
                   s"acknowledgement buffer: $resendBuffer ack: $ack",
-                e))
+                e)
+            )
         }
 
         resendNacked()
@@ -446,7 +451,8 @@ private[remote] class ReliableDeliverySupervisor(
         remoteAddress,
         uid,
         new TimeoutException("Remote system has been silent for too long. " +
-          s"(more than ${settings.QuarantineSilentSystemTimeout.toUnit(TimeUnit.HOURS)} hours)"))
+          s"(more than ${settings.QuarantineSilentSystemTimeout.toUnit(TimeUnit.HOURS)} hours)")
+      )
     case EndpointWriter.FlushAndStop ⇒ context.stop(self)
     case EndpointWriter.StopReading(w, replyTo) ⇒
       replyTo ! EndpointWriter.StoppedReading(w)
@@ -511,18 +517,20 @@ private[remote] class ReliableDeliverySupervisor(
     context.watch(
       context.actorOf(
         RARP(context.system)
-          .configureDispatcher(
-            EndpointWriter.props(handleOrActive = currentHandle,
-                                 localAddress = localAddress,
-                                 remoteAddress = remoteAddress,
-                                 refuseUid,
-                                 transport = transport,
-                                 settings = settings,
-                                 AkkaPduProtobufCodec,
-                                 receiveBuffers = receiveBuffers,
-                                 reliableDeliverySupervisor = Some(self)))
+          .configureDispatcher(EndpointWriter.props(
+            handleOrActive = currentHandle,
+            localAddress = localAddress,
+            remoteAddress = remoteAddress,
+            refuseUid,
+            transport = transport,
+            settings = settings,
+            AkkaPduProtobufCodec,
+            receiveBuffers = receiveBuffers,
+            reliableDeliverySupervisor = Some(self)
+          ))
           .withDeploy(Deploy.local),
-        "endpointWriter"))
+        "endpointWriter"
+      ))
   }
 }
 
@@ -846,7 +854,8 @@ private[remote] class EndpointWriter(
             "[{}] buffered messages in EndpointWriter for [{}]. " +
               "You should probably implement flow control to avoid flooding the remote connection.",
             size,
-            remoteAddress)
+            remoteAddress
+          )
           largeBufferLogTimestamp = now
         }
       }
@@ -1004,21 +1013,23 @@ private[remote] class EndpointWriter(
   private def startReadEndpoint(handle: AkkaProtocolHandle): Some[ActorRef] = {
     val newReader =
       context.watch(
-        context.actorOf(RARP(context.system)
-                          .configureDispatcher(
-                            EndpointReader.props(localAddress,
-                                                 remoteAddress,
-                                                 transport,
-                                                 settings,
-                                                 codec,
-                                                 msgDispatch,
-                                                 inbound,
-                                                 handle.handshakeInfo.uid,
-                                                 reliableDeliverySupervisor,
-                                                 receiveBuffers))
-                          .withDeploy(Deploy.local),
-                        "endpointReader-" + AddressUrlEncoder(remoteAddress) +
-                          "-" + readerId.next()))
+        context.actorOf(
+          RARP(context.system)
+            .configureDispatcher(
+              EndpointReader.props(localAddress,
+                                   remoteAddress,
+                                   transport,
+                                   settings,
+                                   codec,
+                                   msgDispatch,
+                                   inbound,
+                                   handle.handshakeInfo.uid,
+                                   reliableDeliverySupervisor,
+                                   receiveBuffers))
+            .withDeploy(Deploy.local),
+          "endpointReader-" + AddressUrlEncoder(remoteAddress) +
+            "-" + readerId.next()
+        ))
     handle.readHandlerPromise.success(ActorHandleEventListener(newReader))
     Some(newReader)
   }
@@ -1152,7 +1163,8 @@ private[remote] class EndpointReader(
         new OversizedPayloadException(
           s"Discarding oversized payload received: " +
             s"max allowed size [${transport.maximumPayloadBytes}] bytes, actual size [${oversized.size}] bytes."),
-        "Transient error while reading from association (association remains live)")
+        "Transient error while reading from association (association remains live)"
+      )
 
     case StopReading(writer, replyTo) ⇒
       saveState()
@@ -1189,7 +1201,8 @@ private[remote] class EndpointReader(
         remoteAddress,
         InvalidAssociationException("The remote system has quarantined this system. No further associations " +
           "to the remote system are possible until this system is restarted."),
-        Some(AssociationHandle.Quarantined))
+        Some(AssociationHandle.Quarantined)
+      )
   }
 
   private def deliverAndAck(): Unit = {

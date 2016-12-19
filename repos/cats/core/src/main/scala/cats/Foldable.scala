@@ -41,11 +41,11 @@ trait Foldable[F[_]] { self =>
     * For more detailed information about how this method works see the
     * documentation for `Eval[_]`.
     */
-  def foldRight[A, B](fa: F[A], lb: Eval[B])(f: (A,
-                                                 Eval[B]) => Eval[B]): Eval[B]
+  def foldRight[A, B](fa: F[A], lb: Eval[B])(
+      f: (A, Eval[B]) => Eval[B]): Eval[B]
 
-  def reduceLeftToOption[A, B](fa: F[A])(f: A => B)(g: (B,
-                                                        A) => B): Option[B] =
+  def reduceLeftToOption[A, B](fa: F[A])(f: A => B)(
+      g: (B, A) => B): Option[B] =
     foldLeft(fa, Option.empty[B]) {
       case (Some(b), a) => Some(g(b, a))
       case (None, a) => Some(f(a))

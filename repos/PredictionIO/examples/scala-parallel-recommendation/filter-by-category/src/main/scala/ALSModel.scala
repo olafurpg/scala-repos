@@ -84,6 +84,7 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         .first,
       categoryItemsMap = sc.get
         .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
-        .first)
+        .first
+    )
   }
 }

@@ -586,7 +586,8 @@ object ConsumerGroupCommand {
             parser,
             s"Option $deleteOpt is not valid with $newConsumerOpt. Note that " +
               "there's no need to delete group metadata for the new consumer as it is automatically deleted when the last " +
-              "member leaves")
+              "member leaves"
+          )
       } else {
         CommandLineUtils.checkRequiredArgs(parser, options, zkConnectOpt)
 

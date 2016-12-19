@@ -54,7 +54,8 @@ class PolynomialExpansionSuite
     Vectors.dense(-2.0, 4.0, 2.3, -4.6, 5.29),
     Vectors.dense(new Array[Double](9)),
     Vectors.dense(0.6, 0.36, -1.1, -0.66, 1.21, -3.0, -1.8, 3.3, 9.0),
-    Vectors.sparse(9, Array.empty, Array.empty))
+    Vectors.sparse(9, Array.empty, Array.empty)
+  )
 
   private val threeDegreeExpansion: Array[Vector] = Array(
     Vectors.sparse(
@@ -82,7 +83,8 @@ class PolynomialExpansionSuite
                   5.4,
                   -9.9,
                   -27.0),
-    Vectors.sparse(19, Array.empty, Array.empty))
+    Vectors.sparse(19, Array.empty, Array.empty)
+  )
 
   test("Polynomial expansion with default parameter") {
     val df = sqlContext

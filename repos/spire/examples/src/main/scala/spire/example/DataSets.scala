@@ -112,7 +112,8 @@ object DataSet {
     Continuous("Sepal Width", Rational(_)),
     Continuous("Petal Length", Rational(_)),
     Continuous("Petal Width", Rational(_)),
-    Ignored("Species"))
+    Ignored("Species")
+  )
 
   def Iris =
     fromResource[Vector, Rational, String]("Iris",
@@ -121,16 +122,18 @@ object DataSet {
                                            IrisVars,
                                            (4, identity))(CoordinateSpace.seq)
 
-  private val YeastVars = List[Variable[Double]](Ignored("Protein"),
-                                                 Continuous("mcg", _.toDouble),
-                                                 Continuous("gvh", _.toDouble),
-                                                 Continuous("alm", _.toDouble),
-                                                 Continuous("mit", _.toDouble),
-                                                 Continuous("erl", _.toDouble),
-                                                 Continuous("pox", _.toDouble),
-                                                 Continuous("vac", _.toDouble),
-                                                 Continuous("nuc", _.toDouble),
-                                                 Ignored("Location"))
+  private val YeastVars = List[Variable[Double]](
+    Ignored("Protein"),
+    Continuous("mcg", _.toDouble),
+    Continuous("gvh", _.toDouble),
+    Continuous("alm", _.toDouble),
+    Continuous("mit", _.toDouble),
+    Continuous("erl", _.toDouble),
+    Continuous("pox", _.toDouble),
+    Continuous("vac", _.toDouble),
+    Continuous("nuc", _.toDouble),
+    Ignored("Location")
+  )
 
   def Yeast =
     fromResource[Array, Double, String]("Yeast",
@@ -148,7 +151,8 @@ object DataSet {
     Continuous("Acceleration", _.toDouble),
     Continuous("Model Year", _.toDouble),
     Categorical[Double]("Country of Origin"),
-    Ignored("Model Name"))
+    Ignored("Model Name")
+  )
 
   def MPG =
     fromResource[Array, Double, Double]("MPG",

@@ -479,11 +479,13 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
     }
 
     // Validate memory fractions
-    val deprecatedMemoryKeys = Seq("spark.storage.memoryFraction",
-                                   "spark.shuffle.memoryFraction",
-                                   "spark.shuffle.safetyFraction",
-                                   "spark.storage.unrollFraction",
-                                   "spark.storage.safetyFraction")
+    val deprecatedMemoryKeys = Seq(
+      "spark.storage.memoryFraction",
+      "spark.shuffle.memoryFraction",
+      "spark.shuffle.safetyFraction",
+      "spark.storage.unrollFraction",
+      "spark.storage.safetyFraction"
+    )
     val memoryKeys =
       Seq("spark.memory.fraction", "spark.memory.storageFraction") ++ deprecatedMemoryKeys
     for (key <- memoryKeys) {
@@ -638,7 +640,8 @@ private[spark] object SparkConf extends Logging {
         "1.4",
         "Please use spark.kryoserializer.buffer instead. The default value for " +
           "spark.kryoserializer.buffer.mb was previously specified as '0.064'. Fractional values " +
-          "are no longer accepted. To specify the equivalent now, one may use '64k'."),
+          "are no longer accepted. To specify the equivalent now, one may use '64k'."
+      ),
       DeprecatedConfig("spark.rpc", "2.0", "Not used any more.")
     )
 
@@ -659,7 +662,8 @@ private[spark] object SparkConf extends Logging {
     "spark.history.fs.update.interval" -> Seq(
       AlternateConfig("spark.history.fs.update.interval.seconds", "1.4"),
       AlternateConfig("spark.history.fs.updateInterval", "1.3"),
-      AlternateConfig("spark.history.updateInterval", "1.3")),
+      AlternateConfig("spark.history.updateInterval", "1.3")
+    ),
     "spark.history.fs.cleaner.interval" -> Seq(
       AlternateConfig("spark.history.fs.cleaner.interval.seconds", "1.4")),
     "spark.history.fs.cleaner.maxAge" -> Seq(

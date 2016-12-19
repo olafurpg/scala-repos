@@ -53,42 +53,33 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         "ssl" -> trim(label("Enable SSL", optional(boolean()))),
         "fromAddress" -> trim(label("FROM Address", optional(text()))),
         "fromName" -> trim(label("FROM Name", optional(text())))
-      )(Smtp.apply)),
+      )(Smtp.apply)
+    ),
     "ldapAuthentication" -> trim(label("LDAP", boolean())),
-    "ldap" -> optionalIfNotChecked("ldapAuthentication",
-                                   mapping(
-                                     "host" -> trim(
-                                       label("LDAP host", text(required))),
-                                     "port" -> trim(
-                                       label("LDAP port", optional(number()))),
-                                     "bindDN" -> trim(
-                                       label("Bind DN", optional(text()))),
-                                     "bindPassword" -> trim(
-                                       label("Bind Password",
-                                             optional(text()))),
-                                     "baseDN" -> trim(
-                                       label("Base DN", text(required))),
-                                     "userNameAttribute" -> trim(
-                                       label("User name attribute",
-                                             text(required))),
-                                     "additionalFilterCondition" -> trim(
-                                       label("Additional filter condition",
-                                             optional(text()))),
-                                     "fullNameAttribute" -> trim(
-                                       label("Full name attribute",
-                                             optional(text()))),
-                                     "mailAttribute" -> trim(
-                                       label("Mail address attribute",
-                                             optional(text()))),
-                                     "tls" -> trim(label("Enable TLS",
-                                                         optional(boolean()))),
-                                     "ssl" -> trim(label("Enable SSL",
-                                                         optional(boolean()))),
-                                     "keystore" -> trim(
-                                       label("Keystore",
-                                             optional(text(
-                                               ))))
-                                   )(Ldap.apply))
+    "ldap" -> optionalIfNotChecked(
+      "ldapAuthentication",
+      mapping(
+        "host" -> trim(label("LDAP host", text(required))),
+        "port" -> trim(label("LDAP port", optional(number()))),
+        "bindDN" -> trim(label("Bind DN", optional(text()))),
+        "bindPassword" -> trim(label("Bind Password", optional(text()))),
+        "baseDN" -> trim(label("Base DN", text(required))),
+        "userNameAttribute" -> trim(
+          label("User name attribute", text(required))),
+        "additionalFilterCondition" -> trim(
+          label("Additional filter condition", optional(text()))),
+        "fullNameAttribute" -> trim(
+          label("Full name attribute", optional(text()))),
+        "mailAttribute" -> trim(
+          label("Mail address attribute", optional(text()))),
+        "tls" -> trim(label("Enable TLS", optional(boolean()))),
+        "ssl" -> trim(label("Enable SSL", optional(boolean()))),
+        "keystore" -> trim(
+          label("Keystore",
+                optional(text(
+                  ))))
+      )(Ldap.apply)
+    )
   )(SystemSettings.apply).verifying { settings =>
     Vector(
       if (settings.ssh && settings.baseUrl.isEmpty) {
@@ -259,13 +250,14 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         }
 
         updateAccount(
-          account.copy(password =
-                         form.password.map(sha1).getOrElse(account.password),
-                       fullName = form.fullName,
-                       mailAddress = form.mailAddress,
-                       isAdmin = form.isAdmin,
-                       url = form.url,
-                       isRemoved = form.isRemoved))
+          account.copy(
+            password = form.password.map(sha1).getOrElse(account.password),
+            fullName = form.fullName,
+            mailAddress = form.mailAddress,
+            isAdmin = form.isAdmin,
+            url = form.url,
+            isRemoved = form.isRemoved
+          ))
 
         updateImage(userName, form.fileId, form.clearImage)
         redirect("/admin/users")

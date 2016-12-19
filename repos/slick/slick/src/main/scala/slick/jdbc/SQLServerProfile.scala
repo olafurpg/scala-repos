@@ -330,21 +330,27 @@ class ProtectGroupBy extends Phase {
   val name = "protectGroupBy"
 
   def apply(state: CompilerState) =
-    state.map(_.replace({
-      case n @ Bind(s1, g1 @ GroupBy(s2, f1, b1, ts1), Pure(str1, ts2)) =>
-        logger.debug("Examining GroupBy", g1)
-        val (b2, b2s) = source(s2, b1, f1)
-        logger.debug(s"Narrowed 'by' clause down to: (over $b2s)", b2)
-        val refsOK =
-          ProductNode(ConstArray(b2)).flatten.children.forall(_.findNode {
-            case Ref(s) if s == b2s => true
-            case _ => false
-          }.isDefined)
-        logger.debug("All columns reference the source: " + refsOK)
-        if (refsOK) n
-        else
-          n.copy(from = g1.copy(from = Subquery(f1, Subquery.Default))).infer()
-    }, bottomUp = true, keepType = true))
+    state.map(
+      _.replace(
+        {
+          case n @ Bind(s1, g1 @ GroupBy(s2, f1, b1, ts1), Pure(str1, ts2)) =>
+            logger.debug("Examining GroupBy", g1)
+            val (b2, b2s) = source(s2, b1, f1)
+            logger.debug(s"Narrowed 'by' clause down to: (over $b2s)", b2)
+            val refsOK =
+              ProductNode(ConstArray(b2)).flatten.children.forall(_.findNode {
+                case Ref(s) if s == b2s => true
+                case _ => false
+              }.isDefined)
+            logger.debug("All columns reference the source: " + refsOK)
+            if (refsOK) n
+            else
+              n.copy(from = g1.copy(from = Subquery(f1, Subquery.Default)))
+                .infer()
+        },
+        bottomUp = true,
+        keepType = true
+      ))
 
   def source(bs: TermSymbol, b: Node, n: Node): (Node, TermSymbol) = n match {
     case Filter(_, f, _) => source(bs, b, f)

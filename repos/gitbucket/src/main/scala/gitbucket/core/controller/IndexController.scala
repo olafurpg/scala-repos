@@ -65,7 +65,8 @@ trait IndexControllerBase extends ControllerBase {
           .map { account =>
             getUserRepositories(account.userName, withoutPhysicalInfo = true)
           }
-          .getOrElse(Nil))
+          .getOrElse(Nil)
+      )
     } else {
       val loginUserName = loginAccount.get.userName
       val loginUserGroups = getGroupsByUserName(loginUserName)
@@ -80,7 +81,8 @@ trait IndexControllerBase extends ControllerBase {
           .map { account =>
             getUserRepositories(account.userName, withoutPhysicalInfo = true)
           }
-          .getOrElse(Nil))
+          .getOrElse(Nil)
+      )
     }
   }
 

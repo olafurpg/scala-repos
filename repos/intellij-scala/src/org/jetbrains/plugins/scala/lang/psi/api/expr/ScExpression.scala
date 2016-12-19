@@ -231,7 +231,8 @@ trait ScExpression
               filterTypeParams = false,
               expectedType = expectedType(fromUnderscore),
               expr = ScExpression.this,
-              check = checkExpectedType) match {
+              check = checkExpectedType
+            ) match {
               case Success(newRes, _) => res = newRes
               case _ =>
             }

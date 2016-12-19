@@ -65,20 +65,23 @@ import scala.collection.{Set, mutable}
 class ScImplicitlyConvertible(place: PsiElement,
                               placeType: Boolean => Option[ScType]) {
   def this(expr: ScExpression) {
-    this(expr, fromUnder => {
-      //this code is required, because compiler works in the same way
-      //otherwise we will see strange error messages like:
-      // def foo(x: Map[String, Int]) {}
-      // def foo(x: String) {}
-      // foo(Map(y -> 1)) //Error is here
-      expr.getTypeWithoutImplicits(fromUnderscore = fromUnder).toOption.map {
-        case tp =>
-          ScType.extractDesignatorSingletonType(tp) match {
-            case Some(res) => res
-            case _ => tp
-          }
+    this(
+      expr,
+      fromUnder => {
+        //this code is required, because compiler works in the same way
+        //otherwise we will see strange error messages like:
+        // def foo(x: Map[String, Int]) {}
+        // def foo(x: String) {}
+        // foo(Map(y -> 1)) //Error is here
+        expr.getTypeWithoutImplicits(fromUnderscore = fromUnder).toOption.map {
+          case tp =>
+            ScType.extractDesignatorSingletonType(tp) match {
+              case Some(res) => res
+              case _ => tp
+            }
+        }
       }
-    })
+    )
   }
 
   import org.jetbrains.plugins.scala.lang.psi.implicits.ScImplicitlyConvertible._

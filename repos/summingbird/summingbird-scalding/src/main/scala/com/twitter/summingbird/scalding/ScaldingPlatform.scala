@@ -100,13 +100,17 @@ object Scalding {
                        options: Map[String, Options],
                        s: Summer[Scalding, _, _]): Commutativity = {
 
-    val commutativity = getOrElse(options, names, s, {
-      val default = MonoidIsCommutative.default
-      logger.warn(
-        "Store: %s has no commutativity setting. Assuming %s".format(names,
-                                                                     default))
-      default
-    }).commutativity
+    val commutativity = getOrElse(
+      options,
+      names,
+      s, {
+        val default = MonoidIsCommutative.default
+        logger.warn(
+          "Store: %s has no commutativity setting. Assuming %s"
+            .format(names, default))
+        default
+      }
+    ).commutativity
 
     commutativity match {
       case Commutative =>

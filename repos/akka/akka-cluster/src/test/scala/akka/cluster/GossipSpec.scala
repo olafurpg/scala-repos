@@ -195,11 +195,13 @@ class GossipSpec extends WordSpec with Matchers {
                    .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
       g1.youngestMember should ===(b1)
       val g2 =
-        Gossip(members = SortedSet(a2, b1.copyUp(3), e1),
-               overview = GossipOverview(
-                 reachability = Reachability.empty
-                   .unreachable(a2.uniqueAddress, b1.uniqueAddress)
-                   .unreachable(a2.uniqueAddress, e1.uniqueAddress)))
+        Gossip(
+          members = SortedSet(a2, b1.copyUp(3), e1),
+          overview = GossipOverview(
+            reachability = Reachability.empty
+              .unreachable(a2.uniqueAddress, b1.uniqueAddress)
+              .unreachable(a2.uniqueAddress, e1.uniqueAddress))
+        )
       g2.youngestMember should ===(b1)
       val g3 = Gossip(members = SortedSet(a2, b1.copyUp(3), e2.copyUp(4)))
       g3.youngestMember should ===(e2)

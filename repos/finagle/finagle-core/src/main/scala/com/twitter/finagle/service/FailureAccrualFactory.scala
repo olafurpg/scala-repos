@@ -265,15 +265,17 @@ class FailureAccrualFactory[Req, Rep] private[finagle] (
       endpoint: Address,
       responseClassifier: ResponseClassifier
   ) =
-    this(underlying,
-         FailureAccrualPolicy.consecutiveFailures(numFailures,
-                                                  Backoff.const(markDeadFor)),
-         timer,
-         statsReceiver,
-         label,
-         logger,
-         endpoint,
-         responseClassifier)
+    this(
+      underlying,
+      FailureAccrualPolicy.consecutiveFailures(numFailures,
+                                               Backoff.const(markDeadFor)),
+      timer,
+      statsReceiver,
+      label,
+      logger,
+      endpoint,
+      responseClassifier
+    )
 
   def this(
       underlying: ServiceFactory[Req, Rep],

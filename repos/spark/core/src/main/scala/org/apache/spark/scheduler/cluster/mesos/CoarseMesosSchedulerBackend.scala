@@ -487,7 +487,8 @@ private[spark] class CoarseMesosSchedulerBackend(
           sc.conf.getTimeAsMs(
             "spark.storage.blockManagerSlaveTimeoutMs",
             s"${sc.conf.getTimeAsMs("spark.network.timeout", "120s")}ms"),
-          sc.conf.getTimeAsMs("spark.executor.heartbeatInterval", "10s"))
+          sc.conf.getTimeAsMs("spark.executor.heartbeatInterval", "10s")
+        )
         slave.shuffleRegistered = true
       }
 

@@ -29,7 +29,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: for=192.0.2.61;proto=https
           |Forwarded: for=unknown
         """.stripMargin
-        ))
+        )
+      )
       results.length must_== 8
       results(0)._1 must_== ForwardedEntry(Some("_gazonk"), None)
       results(0)._2 must beLeft
@@ -67,7 +68,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |X-Forwarded-For: 192.168.1.1, ::1, [2001:db8:cafe::17], 127.0.0.1
           |X-Forwarded-Proto: https, http, https, http
         """.stripMargin
-        ))
+        )
+      )
       results.length must_== 4
       results(0)._1 must_== ForwardedEntry(Some("192.168.1.1"), Some("https"))
       results(0)._2 must beRight(ConnectionInfo(addr("192.168.1.1"), true))
@@ -103,7 +105,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
           |Forwarded: for=192.0.2.43, for=198.51.100.17, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(localhost, false)
+        """.stripMargin)
+      ) mustEqual ConnectionInfo(localhost, false)
     }
 
     "get first untrusted proxy host with rfc7239 with ipv4 localhost" in {
@@ -115,8 +118,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
           |Forwarded: for=192.0.2.43, for=198.51.100.17, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(addr("198.51.100.17"),
-                                                   false)
+        """.stripMargin)
+      ) mustEqual ConnectionInfo(addr("198.51.100.17"), false)
     }
 
     "get first untrusted proxy host with rfc7239 with ipv6 localhost" in {
@@ -128,7 +131,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
           |Forwarded: for=192.0.2.43, for=[::1]
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.43"), false)
+        """.stripMargin)
+      ) mustEqual ConnectionInfo(addr("192.0.2.43"), false)
     }
 
     "get first untrusted proxy with rfc7239 with trusted proxy subnet" in {
@@ -142,7 +146,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
           |Forwarded: for=192.168.1.10, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.60"), false)
+        """.stripMargin)
+        ) mustEqual ConnectionInfo(addr("192.0.2.60"), false)
     }
 
     "get first untrusted proxy protocol with rfc7239 with trusted localhost proxy" in {
@@ -155,7 +160,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=http;by=203.0.113.43
           |Forwarded: for=192.168.1.10, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
+        """.stripMargin)
+        ) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
     }
 
     "get first untrusted proxy protocol with rfc7239 with subnet mask" in {
@@ -169,7 +175,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
           |Forwarded: For="[2001:db8:cafe::17]:4711"
           |Forwarded: for=192.0.2.60;proto=https;by=203.0.113.43
           |Forwarded: for=192.168.1.10, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.60"), true)
+        """.stripMargin)
+        ) mustEqual ConnectionInfo(addr("192.0.2.60"), true)
     }
 
     "handle IPv6 addresses with rfc7239" in {
@@ -287,14 +294,16 @@ class ForwardedHeaderHandlerSpec extends Specification {
     "kind of unquote rfc7239 header field with three \" characters" in {
       handler(
         version("rfc7239") ++ trustedProxies("192.168.1.1/24", "127.0.0.1"))
-        .remoteConnection(localhost,
-                          false,
-                          headers(
-                            """
+        .remoteConnection(
+          localhost,
+          false,
+          headers(
+            """
           |Forwarded: for=""" + '"' + '"' +
-                              '"' + """
+              '"' + """
           |Forwarded: for=192.168.1.10, for=127.0.0.1
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
+        """.stripMargin)
+        ) mustEqual ConnectionInfo(addr("192.168.1.10"), false)
     }
 
     "default to trusting IPv4 and IPv6 localhost with x-forwarded when there is no config" in {
@@ -304,7 +313,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
         headers("""
           |X-Forwarded-For: 192.0.2.43, ::1, 127.0.0.1, [::1]
           |X-Forwarded-Proto: https, http, http, https
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.43"), true)
+        """.stripMargin)
+      ) mustEqual ConnectionInfo(addr("192.0.2.43"), true)
     }
 
     "trust IPv4 and IPv6 localhost with x-forwarded when there is config with default settings" in {
@@ -378,12 +388,14 @@ class ForwardedHeaderHandlerSpec extends Specification {
       handler(
         version("x-forwarded") ++ trustedProxies("192.168.1.1/24",
                                                  "127.0.0.1"))
-        .remoteConnection(localhost,
-                          false,
-                          headers("""
+        .remoteConnection(
+          localhost,
+          false,
+          headers("""
           |X-Forwarded-For: 203.0.113.43, 192.168.1.43
           |X-Forwarded-Proto: https, https, https
-        """.stripMargin)) mustEqual ConnectionInfo(addr("203.0.113.43"), false)
+        """.stripMargin)
+        ) mustEqual ConnectionInfo(addr("203.0.113.43"), false)
     }
 
     "assume http protocol with x-forwarded when proto is unrecognized" in {
@@ -448,7 +460,8 @@ class ForwardedHeaderHandlerSpec extends Specification {
         headers("""
           |X-Forwarded-For: 192.0.2.43, "::1", ::1, "[::1]", [::1]
           |X-Forwarded-Proto: "https", http, http,    "http", http
-        """.stripMargin)) mustEqual ConnectionInfo(addr("192.0.2.43"), true)
+        """.stripMargin)
+      ) mustEqual ConnectionInfo(addr("192.0.2.43"), true)
     }
 
     "ignore x-forward header with empty addresses" in {

@@ -140,7 +140,8 @@ class ThreadUtilsSuite extends SparkFunSuite {
         .mkString("\n")
         .contains(
           "... run in separate thread using org.apache.spark.util.ThreadUtils ...") === true,
-      "stack trace does not contain expected place holder")
+      "stack trace does not contain expected place holder"
+    )
     assert(exception.getStackTrace
              .mkString("\n")
              .contains("ThreadUtils.scala") === false,

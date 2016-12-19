@@ -171,7 +171,8 @@ class BigIntegerConvertTest {
       0,
       0,
       0,
-      0)
+      0
+    )
     val aSign = -1
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(Double.NegativeInfinity, aNumber, 0.0)
@@ -306,7 +307,8 @@ class BigIntegerConvertTest {
       0,
       0,
       0,
-      0)
+      0
+    )
     val aSign = -1
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(-8.98846567431158E307, aNumber, 0.0)
@@ -442,7 +444,8 @@ class BigIntegerConvertTest {
       -1,
       -1,
       -1,
-      -1)
+      -1
+    )
     val aSign = -1
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(-Double.MaxValue, aNumber, 0.0)
@@ -615,7 +618,8 @@ class BigIntegerConvertTest {
       0,
       0,
       0,
-      0)
+      0
+    )
     val aSign = 1
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(Double.PositiveInfinity, aNumber, 0.0)
@@ -761,7 +765,8 @@ class BigIntegerConvertTest {
       0,
       0,
       0,
-      0)
+      0
+    )
     val aSign = 1
     val result = 8.98846567431158E307
     val aNumber = new BigInteger(aSign, a).doubleValue()
@@ -898,7 +903,8 @@ class BigIntegerConvertTest {
       -1,
       -1,
       -1,
-      -1)
+      -1
+    )
     val aSign = 1
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(Double.MaxValue, aNumber, 0.0)

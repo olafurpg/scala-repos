@@ -112,18 +112,22 @@ object ClassPathImplComparator {
           println(s"Iteration no $iteration")
 
         println("Recursive (old) classpath representation:")
-        doTest(PathResolverFactory.create(oldCpSettings).result,
-               oldCpCreationStats,
-               oldCpSearchingStats,
-               oldCpSettings.cpCreationRepetitions.value,
-               oldCpSettings.cpLookupRepetitions.value)
+        doTest(
+          PathResolverFactory.create(oldCpSettings).result,
+          oldCpCreationStats,
+          oldCpSearchingStats,
+          oldCpSettings.cpCreationRepetitions.value,
+          oldCpSettings.cpLookupRepetitions.value
+        )
 
         println("Flat classpath representation:")
-        doTest(PathResolverFactory.create(flatCpSettings).result,
-               flatCpCreationStats,
-               flatCpSearchingStats,
-               flatCpSettings.cpCreationRepetitions.value,
-               flatCpSettings.cpLookupRepetitions.value)
+        doTest(
+          PathResolverFactory.create(flatCpSettings).result,
+          flatCpCreationStats,
+          flatCpSearchingStats,
+          flatCpSettings.cpCreationRepetitions.value,
+          flatCpSettings.cpLookupRepetitions.value
+        )
       }
 
       if (oldCpSettings.requiredIterations.value > 1) {

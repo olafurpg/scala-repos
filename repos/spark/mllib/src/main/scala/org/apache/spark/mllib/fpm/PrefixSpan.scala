@@ -418,7 +418,8 @@ object PrefixSpan extends Logging {
       require(
         partialStarts.head >= start,
         "The first partial start cannot be smaller than the start index," +
-          s"but got partialStarts.head = ${partialStarts.head} < start = $start.")
+          s"but got partialStarts.head = ${partialStarts.head} < start = $start."
+      )
     }
 
     /**

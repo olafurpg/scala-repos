@@ -90,7 +90,8 @@ final class RegressionEvaluator @Since("1.4.0")(
     require(
       predictionType == FloatType || predictionType == DoubleType,
       s"Prediction column $predictionColName must be of type float or double, " +
-        s" but not $predictionType")
+        s" but not $predictionType"
+    )
     val labelColName = $(labelCol)
     val labelType = schema($(labelCol)).dataType
     require(

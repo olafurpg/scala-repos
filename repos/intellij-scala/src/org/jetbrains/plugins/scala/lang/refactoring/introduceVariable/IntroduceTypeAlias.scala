@@ -161,7 +161,8 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
           dialog.isReplaceAllOccurrences,
           dialog.isReplaceOccurrenceIncompanionObject,
           dialog.isReplaceOccurrenceInInheritors,
-          dialog.getSelectedScope)
+          dialog.getSelectedScope
+        )
 
         runRefactoringForTypes(file,
                                editor,
@@ -198,51 +199,56 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
             suggestedNames(0),
             scopeItem)
 
-          CommandProcessor.getInstance.executeCommand(project, new Runnable {
-            def run() {
-              val computable = ApplicationManager.getApplication
-                .runWriteAction(introduceRunnable)
+          CommandProcessor.getInstance.executeCommand(
+            project,
+            new Runnable {
+              def run() {
+                val computable = ApplicationManager.getApplication
+                  .runWriteAction(introduceRunnable)
 
-              val namedElement: ScNamedElement =
-                computable._1.getElement match {
-                  case typeAlias: ScTypeAliasDefinition =>
-                    typeAlias
+                val namedElement: ScNamedElement =
+                  computable._1.getElement match {
+                    case typeAlias: ScTypeAliasDefinition =>
+                      typeAlias
+                    case _ => null
+                  }
+
+                val mtypeElement = computable._2.getElement match {
+                  case typeElement: ScTypeElement =>
+                    typeElement
                   case _ => null
                 }
 
-              val mtypeElement = computable._2.getElement match {
-                case typeElement: ScTypeElement =>
-                  typeElement
-                case _ => null
-              }
+                if (mtypeElement != null && mtypeElement.isValid) {
+                  editor.getCaretModel.moveToOffset(mtypeElement.getTextOffset)
+                  editor.getSelectionModel.removeSelection()
+                  if (ScalaRefactoringUtil.isInplaceAvailable(editor)) {
 
-              if (mtypeElement != null && mtypeElement.isValid) {
-                editor.getCaretModel.moveToOffset(mtypeElement.getTextOffset)
-                editor.getSelectionModel.removeSelection()
-                if (ScalaRefactoringUtil.isInplaceAvailable(editor)) {
+                    PsiDocumentManager
+                      .getInstance(project)
+                      .commitDocument(editor.getDocument)
+                    PsiDocumentManager
+                      .getInstance(project)
+                      .doPostponedOperationsAndUnblockDocument(
+                        editor.getDocument)
 
-                  PsiDocumentManager
-                    .getInstance(project)
-                    .commitDocument(editor.getDocument)
-                  PsiDocumentManager
-                    .getInstance(project)
-                    .doPostponedOperationsAndUnblockDocument(
-                      editor.getDocument)
+                    val typeAliasIntroducer =
+                      ScalaInplaceTypeAliasIntroducer(namedElement,
+                                                      namedElement,
+                                                      editor,
+                                                      namedElement.getName,
+                                                      namedElement.getName,
+                                                      scopeItem)
 
-                  val typeAliasIntroducer =
-                    ScalaInplaceTypeAliasIntroducer(namedElement,
-                                                    namedElement,
-                                                    editor,
-                                                    namedElement.getName,
-                                                    namedElement.getName,
-                                                    scopeItem)
-
-                  typeAliasIntroducer.performInplaceRefactoring(
-                    suggestedNamesSet)
+                    typeAliasIntroducer.performInplaceRefactoring(
+                      suggestedNamesSet)
+                  }
                 }
               }
-            }
-          }, INTRODUCE_TYPEALIAS_REFACTORING_NAME, null)
+            },
+            INTRODUCE_TYPEALIAS_REFACTORING_NAME,
+            null
+          )
         }
 
         val currentScope = currentDataObject.currentScope
@@ -526,26 +532,29 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
     }
     val list = JListCompatibility.createJListFromModel(model)
     JListCompatibility
-      .setCellRenderer(list, new DefaultListCellRendererAdapter {
-        def getListCellRendererComponentAdapter(
-            container: JListCompatibility.JListContainer,
-            value: Object,
-            index: Int,
-            isSelected: Boolean,
-            cellHasFocus: Boolean): Component = {
-          val rendererComponent: Component =
-            getSuperListCellRendererComponent(container.getList,
-                                              value,
-                                              index,
-                                              isSelected,
-                                              cellHasFocus)
-          val element: T = value.asInstanceOf[T]
-          //        if (element.isValid) {
-          setText(elementName(element))
-          //        }
-          rendererComponent
+      .setCellRenderer(
+        list,
+        new DefaultListCellRendererAdapter {
+          def getListCellRendererComponentAdapter(
+              container: JListCompatibility.JListContainer,
+              value: Object,
+              index: Int,
+              isSelected: Boolean,
+              cellHasFocus: Boolean): Component = {
+            val rendererComponent: Component =
+              getSuperListCellRendererComponent(container.getList,
+                                                value,
+                                                index,
+                                                isSelected,
+                                                cellHasFocus)
+            val element: T = value.asInstanceOf[T]
+            //        if (element.isValid) {
+            setText(elementName(element))
+            //        }
+            rendererComponent
+          }
         }
-      })
+      )
     list.addListSelectionListener(new ListSelectionListener {
       def valueChanged(e: ListSelectionEvent) {
         highlighter.dropHighlight()

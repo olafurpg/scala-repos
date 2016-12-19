@@ -112,8 +112,8 @@ trait Foldable[F[_]] { self =>
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B =
     foldRight(fa, z)((a, b) => f(a)(b))
-  def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(f: (A,
-                                                      => B) => B): Option[B] =
+  def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(
+      f: (A, => B) => B): Option[B] =
     foldRight(fa, None: Option[B])((a, optB) =>
       optB map (f(a, _)) orElse Some(z(a)))
   def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] =

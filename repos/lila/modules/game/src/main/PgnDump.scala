@@ -90,17 +90,19 @@ final class PgnDump(netBaseUrl: String,
           }),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)),
           Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
-          Tag(_.Termination, {
-            import chess.Status._
-            game.status match {
-              case Created | Started => "Unterminated"
-              case Aborted | NoStart => "Abandoned"
-              case Timeout | Outoftime => "Time forfeit"
-              case Resign | Draw | Stalemate | Mate | VariantEnd => "Normal"
-              case Cheat => "Rules infraction"
-              case UnknownFinish => "Unknown"
+          Tag(
+            _.Termination, {
+              import chess.Status._
+              game.status match {
+                case Created | Started => "Unterminated"
+                case Aborted | NoStart => "Abandoned"
+                case Timeout | Outoftime => "Time forfeit"
+                case Resign | Draw | Stalemate | Mate | VariantEnd => "Normal"
+                case Cheat => "Rules infraction"
+                case UnknownFinish => "Unknown"
+              }
             }
-          })
+          )
         ) ::: customStartPosition(game.variant).??(
           List(
             Tag(_.FEN, initialFen | "?"),

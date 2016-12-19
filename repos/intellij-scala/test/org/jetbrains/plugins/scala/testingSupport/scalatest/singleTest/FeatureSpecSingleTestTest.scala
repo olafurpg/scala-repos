@@ -27,6 +27,7 @@ trait FeatureSpecSingleTestTest extends FeatureSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, featureSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "Scenario: Scenario B"),
-      debug = true)
+      debug = true
+    )
   }
 }

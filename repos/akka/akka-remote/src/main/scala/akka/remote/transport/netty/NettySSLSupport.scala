@@ -198,13 +198,16 @@ private[akka] object NettySSLSupport {
           initializeCustomSecureRandom(settings.SSLRandomNumberGenerator, log)
         val factory =
           KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
-        factory.init({
-          val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
-          val fin = new FileInputStream(keyStorePath)
-          try keyStore.load(fin, keyStorePassword.toCharArray)
-          finally Try(fin.close())
-          keyStore
-        }, keyPassword.toCharArray)
+        factory.init(
+          {
+            val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
+            val fin = new FileInputStream(keyStorePath)
+            try keyStore.load(fin, keyStorePassword.toCharArray)
+            finally Try(fin.close())
+            keyStore
+          },
+          keyPassword.toCharArray
+        )
 
         val trustManagers: Option[Array[TrustManager]] =
           settings.SSLTrustStore map { path ⇒

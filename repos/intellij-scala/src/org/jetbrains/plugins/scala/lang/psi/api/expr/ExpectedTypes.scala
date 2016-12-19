@@ -580,12 +580,15 @@ private[expr] object ExpectedTypes {
                 else tp
               }
               var polyType: TypeResult[ScType] =
-                Success(s.subst(fun.polymorphicType()) match {
-                  case ScTypePolymorphicType(internal, params) =>
-                    update(
-                      ScTypePolymorphicType(internal, params ++ typeParams))
-                  case tp => update(ScTypePolymorphicType(tp, typeParams))
-                }, Some(expr))
+                Success(
+                  s.subst(fun.polymorphicType()) match {
+                    case ScTypePolymorphicType(internal, params) =>
+                      update(
+                        ScTypePolymorphicType(internal, params ++ typeParams))
+                    case tp => update(ScTypePolymorphicType(tp, typeParams))
+                  },
+                  Some(expr)
+                )
               call.foreach(call =>
                 polyType = call.updateAccordingToExpectedType(polyType))
               processArgsExpected(res,

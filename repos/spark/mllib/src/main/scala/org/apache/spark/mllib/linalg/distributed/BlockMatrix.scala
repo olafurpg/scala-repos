@@ -313,7 +313,8 @@ class BlockMatrix @Since("1.3.0")(
     require(
       numRows() * numCols() < Int.MaxValue,
       "The length of the values array must be " +
-        s"less than Int.MaxValue. Currently numRows * numCols: ${numRows() * numCols()}")
+        s"less than Int.MaxValue. Currently numRows * numCols: ${numRows() * numCols()}"
+    )
     val m = numRows().toInt
     val n = numCols().toInt
     val mem = m * n / 125000
@@ -491,7 +492,8 @@ class BlockMatrix @Since("1.3.0")(
       "The number of columns of A and the number of rows " +
         s"of B must be equal. A.numCols: ${numCols()}, B.numRows: ${other.numRows()}. If you " +
         "think they should be equal, try setting the dimensions of A and B explicitly while " +
-        "initializing them.")
+        "initializing them."
+    )
     if (colsPerBlock == other.rowsPerBlock) {
       val resultPartitioner = GridPartitioner(
         numRowBlocks,

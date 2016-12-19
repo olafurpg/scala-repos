@@ -316,7 +316,8 @@ object build extends Build {
       buildInfoPackage := "scalaz",
       buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
+    )
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
       scalajsProjectSettings ++ Seq(

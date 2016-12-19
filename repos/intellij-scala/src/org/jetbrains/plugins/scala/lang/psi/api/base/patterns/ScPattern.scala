@@ -134,7 +134,9 @@ trait ScPattern extends ScalaPsiElement {
                   case inf: ScInfixPattern => inf.expectedType
                   case constr: ScConstructorPattern => constr.expectedType
                   case _ => None
-                }))
+                }
+              )
+            )
         }
         if (resolve.length != 1) None
         else {

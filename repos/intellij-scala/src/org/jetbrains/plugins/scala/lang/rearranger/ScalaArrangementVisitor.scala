@@ -136,7 +136,8 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
                      pat.pList.patterns.toList.head.bindings(0).getName,
                      canArrange = true),
       pat,
-      pat.expr.orNull)
+      pat.expr.orNull
+    )
   }
 
   override def visitElement(v: ScalaPsiElement) = v match {
@@ -145,13 +146,15 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
   }
 
   override def visitClass(scClass: ScClass) =
-    processEntry(createNewEntry(scClass.getParent,
-                                expandTextRangeToComment(scClass),
-                                CLASS,
-                                scClass.getName,
-                                canArrange = true),
-                 scClass,
-                 scClass.extendsBlock.templateBody.orNull)
+    processEntry(
+      createNewEntry(scClass.getParent,
+                     expandTextRangeToComment(scClass),
+                     CLASS,
+                     scClass.getName,
+                     canArrange = true),
+      scClass,
+      scClass.extendsBlock.templateBody.orNull
+    )
 
   override def visitValueDeclaration(v: ScValueDeclaration) =
     processEntry(createNewEntry(v.getParent,
@@ -183,15 +186,17 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
                  null)
 
   override def visitTypeDefinition(typedef: ScTypeDefinition) {
-    val entry = createNewEntry(typedef.getParent,
-                               expandTextRangeToComment(typedef),
-                               typedef match {
-                                 case _: ScClass => CLASS
-                                 case _: ScTrait => TRAIT
-                                 case _ => OBJECT
-                               },
-                               typedef.getName,
-                               canArrange = true)
+    val entry = createNewEntry(
+      typedef.getParent,
+      expandTextRangeToComment(typedef),
+      typedef match {
+        case _: ScClass => CLASS
+        case _: ScTrait => TRAIT
+        case _ => OBJECT
+      },
+      typedef.getName,
+      canArrange = true
+    )
     processEntry(entry, typedef, typedef.extendsBlock.templateBody.orNull)
   }
 
@@ -401,7 +406,8 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
          else StringUtil.decapitalize(methodName.substring(2)),
          psiParent),
         method,
-        entry)
+        entry
+      )
     } else if (ScalaArrangementVisitor.isJavaSetter(method)) {
       parseInfo.registerJavaSetter(
         (StringUtil.decapitalize(methodName.substring(3)), psiParent),

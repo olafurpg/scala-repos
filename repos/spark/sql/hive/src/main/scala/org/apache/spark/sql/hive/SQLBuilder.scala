@@ -411,19 +411,21 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object Canonicalizer extends RuleExecutor[LogicalPlan] {
     override protected def batches: Seq[Batch] = Seq(
-      Batch("Prepare",
-            FixedPoint(100),
-            // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
-            // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
-            // `Aggregate`s.
-            CollapseProject,
-            // Parser is unable to parse the following query:
-            // SELECT  `u_1`.`id`
-            // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
-            // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
-            CombineUnions),
+      Batch(
+        "Prepare",
+        FixedPoint(100),
+        // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
+        // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
+        // `Aggregate`s.
+        CollapseProject,
+        // Parser is unable to parse the following query:
+        // SELECT  `u_1`.`id`
+        // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
+        // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
+        CombineUnions
+      ),
       Batch(
         "Recover Scoping Info",
         Once,

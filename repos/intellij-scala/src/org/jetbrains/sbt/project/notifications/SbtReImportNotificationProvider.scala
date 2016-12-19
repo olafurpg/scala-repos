@@ -59,7 +59,8 @@ class SbtReImportNotificationProvider(project: Project,
           refreshProject()
           notifications.updateAllNotifications()
         }
-      })
+      }
+    )
     panel
       .createActionLabel(SbtBundle("sbt.notification.ignore"), new Runnable {
         override def run() = {

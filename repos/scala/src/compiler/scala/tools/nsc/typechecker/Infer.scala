@@ -241,24 +241,26 @@ trait Infer extends Checkable { self: Analyzer =>
             " " + context.outer.enclClass.owner + " " + sym.owner.thisType +
             (pre =:= sym.owner.thisType))
       }
-      ErrorUtils.issueTypeError(AccessError(
-        tree,
-        sym,
-        pre,
-        context.enclClass.owner,
-        if (settings.check.isDefault) analyzer.lastAccessCheckDetails
-        else
-          ptBlock(
-            "because of an internal error (no accessible symbol)",
-            "sym.ownerChain" -> sym.ownerChain,
-            "underlyingSymbol(sym)" -> underlyingSymbol(sym),
-            "pre" -> pre,
-            "site" -> site,
-            "tree" -> tree,
-            "sym.accessBoundary(sym.owner)" -> sym.accessBoundary(sym.owner),
-            "context.owner" -> context.owner,
-            "context.outer.enclClass.owner" -> context.outer.enclClass.owner)))(
-        context)
+      ErrorUtils.issueTypeError(
+        AccessError(
+          tree,
+          sym,
+          pre,
+          context.enclClass.owner,
+          if (settings.check.isDefault) analyzer.lastAccessCheckDetails
+          else
+            ptBlock(
+              "because of an internal error (no accessible symbol)",
+              "sym.ownerChain" -> sym.ownerChain,
+              "underlyingSymbol(sym)" -> underlyingSymbol(sym),
+              "pre" -> pre,
+              "site" -> site,
+              "tree" -> tree,
+              "sym.accessBoundary(sym.owner)" -> sym.accessBoundary(sym.owner),
+              "context.owner" -> context.owner,
+              "context.outer.enclClass.owner" -> context.outer.enclClass.owner
+            )
+        ))(context)
 
       setError(tree)
     }
@@ -291,8 +293,7 @@ trait Infer extends Checkable { self: Analyzer =>
       }
       def accessible =
         sym filter
-          (alt =>
-             context.isAccessible(alt, pre, site.isInstanceOf[Super])) match {
+          (alt => context.isAccessible(alt, pre, site.isInstanceOf[Super])) match {
           case NoSymbol if sym.isJavaDefined && context.unit.isJava =>
             sym // don't try to second guess Java; see #4402
           case sym1 => sym1
@@ -702,11 +703,12 @@ trait Infer extends Checkable { self: Analyzer =>
       case OverloadedType(pre, alts) =>
         // followApply may return an OverloadedType (tpe is a value type with multiple `apply` methods)
         alts exists
-          (alt =>
-             isApplicableBasedOnArity(pre memberType alt,
-                                      argsCount,
-                                      varargsStar,
-                                      tuplingAllowed))
+          (
+              alt =>
+                isApplicableBasedOnArity(pre memberType alt,
+                                         argsCount,
+                                         varargsStar,
+                                         tuplingAllowed))
       case _ =>
         val paramsCount = tpe.params.length
         // simpleMatch implies we're not using defaults
@@ -926,7 +928,7 @@ trait Infer extends Checkable { self: Analyzer =>
         case OverloadedType(pre, alts) =>
           alts exists
             (alt =>
-               isApplicable(undetparams, pre memberType alt, argtpes0, pt))
+              isApplicable(undetparams, pre memberType alt, argtpes0, pt))
         case ExistentialType(_, qtpe) =>
           isApplicable(undetparams, qtpe, argtpes0, pt)
         case mt @ MethodType(_, _) =>
@@ -1313,32 +1315,31 @@ trait Infer extends Checkable { self: Analyzer =>
       def inferForApproxPt =
         if (isFullyDefined(pt)) {
           inferFor(
-            pt.instantiateTypeParams(ptparams,
-                                     ptparams map (x =>
-                                                     WildcardType))) flatMap {
-            targs =>
-              val ctorTpInst =
-                tree.tpe.instantiateTypeParams(undetparams, targs)
-              val resTpInst = skipImplicit(ctorTpInst.finalResultType)
-              val ptvars =
-                ptparams map {
-                  // since instantiateTypeVar wants to modify the skolem that corresponds to the method's type parameter,
-                  // and it uses the TypeVar's origin to locate it, deskolemize the existential skolem to the method tparam skolem
-                  // (the existential skolem was created by adaptConstrPattern to introduce the type slack necessary to soundly deal with variant type parameters)
-                  case skolem if skolem.isGADTSkolem =>
-                    freshVar(skolem.deSkolemize.asInstanceOf[TypeSymbol])
-                  case p => freshVar(p)
-                }
+            pt.instantiateTypeParams(
+              ptparams,
+              ptparams map (x => WildcardType))) flatMap { targs =>
+            val ctorTpInst =
+              tree.tpe.instantiateTypeParams(undetparams, targs)
+            val resTpInst = skipImplicit(ctorTpInst.finalResultType)
+            val ptvars =
+              ptparams map {
+                // since instantiateTypeVar wants to modify the skolem that corresponds to the method's type parameter,
+                // and it uses the TypeVar's origin to locate it, deskolemize the existential skolem to the method tparam skolem
+                // (the existential skolem was created by adaptConstrPattern to introduce the type slack necessary to soundly deal with variant type parameters)
+                case skolem if skolem.isGADTSkolem =>
+                  freshVar(skolem.deSkolemize.asInstanceOf[TypeSymbol])
+                case p => freshVar(p)
+              }
 
-              val ptV = pt.instantiateTypeParams(ptparams, ptvars)
+            val ptV = pt.instantiateTypeParams(ptparams, ptvars)
 
-              if (isPopulated(resTpInst, ptV)) {
-                ptvars foreach instantiateTypeVar
-                debuglog(
-                  "isPopulated " + resTpInst + ", " + ptV + " vars= " +
-                    ptvars)
-                Some(targs)
-              } else None
+            if (isPopulated(resTpInst, ptV)) {
+              ptvars foreach instantiateTypeVar
+              debuglog(
+                "isPopulated " + resTpInst + ", " + ptV + " vars= " +
+                  ptvars)
+              Some(targs)
+            } else None
           }
         } else None
 
@@ -1635,10 +1636,11 @@ trait Infer extends Checkable { self: Analyzer =>
         case Nil => Nil
         case names =>
           eligible filter
-            (m =>
-               names forall
-                 (name =>
-                    m.info.params exists (p => paramMatchesName(p, name))))
+            (
+                m =>
+                  names forall
+                    (name =>
+                      m.info.params exists (p => paramMatchesName(p, name))))
       }
       if (eligible.isEmpty || eligible.tail.isEmpty) eligible
       else
@@ -1652,10 +1654,10 @@ trait Infer extends Checkable { self: Analyzer =>
             // TODO: should we really allow tupling here?? (If we don't, this is the only call-site with `tuplingAllowed = true`)
             eligible filter
               (alt =>
-                 isApplicableBasedOnArity(alt.tpe,
-                                          argtpes.length,
-                                          varargsStar,
-                                          tuplingAllowed = true))
+                isApplicableBasedOnArity(alt.tpe,
+                                         argtpes.length,
+                                         varargsStar,
+                                         tuplingAllowed = true))
         }
     }
 
@@ -1781,10 +1783,8 @@ trait Infer extends Checkable { self: Analyzer =>
         case Nil => fail()
         case alt :: Nil => finish(alt, pre memberType alt)
         case _ =>
-          checkWithinBounds(
-            matchingLength filter
-              (alt =>
-                 isWithinBounds(pre, alt.owner, alt.typeParams, argtypes)))
+          checkWithinBounds(matchingLength filter
+            (alt => isWithinBounds(pre, alt.owner, alt.typeParams, argtypes)))
       }
     }
   }

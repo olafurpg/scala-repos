@@ -83,7 +83,8 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
                   }
                   end
                 },
-                offset)
+                offset
+              )
               result.add(tRange)
             }
             //adding dummy range for recursion

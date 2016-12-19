@@ -591,7 +591,8 @@ class AccountServiceHandlers(
       AboutMetadata(
         ParameterMetadata('resetToken, None),
         DescriptionMetadata(
-          "The account reset token sent to the email address of the account whose password is being reset.")),
+          "The account reset token sent to the email address of the account whose password is being reset.")
+      ),
       DescriptionMetadata(
         """The request body must be of the form: {"password": "my new password"}"""),
       DescriptionMetadata(

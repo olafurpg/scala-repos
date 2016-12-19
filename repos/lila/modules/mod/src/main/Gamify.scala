@@ -77,16 +77,15 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
 
   private val leaderboardsCache =
     AsyncCache
-      .single[Leaderboards](f = mixedLeaderboard(DateTime.now minusDays 1,
-                                                 none) zip mixedLeaderboard(
-                                DateTime.now minusWeeks 1,
-                                none) zip mixedLeaderboard(
-                                DateTime.now minusMonths 1,
-                                none) map {
-                              case ((daily, weekly), monthly) =>
-                                Leaderboards(daily, weekly, monthly)
-                            },
-                            timeToLive = 10 seconds)
+      .single[Leaderboards](
+        f = mixedLeaderboard(DateTime.now minusDays 1, none) zip mixedLeaderboard(
+            DateTime.now minusWeeks 1,
+            none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
+          case ((daily, weekly), monthly) =>
+            Leaderboards(daily, weekly, monthly)
+        },
+        timeToLive = 10 seconds
+      )
 
   private def mixedLeaderboard(after: DateTime,
                                before: Option[DateTime]): Fu[List[ModMixed]] =
@@ -125,13 +124,15 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   private def reportLeaderboard(after: DateTime,
                                 before: Option[DateTime]): Fu[List[ModCount]] =
     reportColl
-      .aggregate(Match(
-                   BSONDocument(
-                     "createdAt" -> dateRange(after, before),
-                     "processedBy" -> notLichess
-                   )),
-                 List(GroupField("processedBy")("nb" -> SumValue(1)),
-                      Sort(Descending("nb"))))
+      .aggregate(
+        Match(
+          BSONDocument(
+            "createdAt" -> dateRange(after, before),
+            "processedBy" -> notLichess
+          )),
+        List(GroupField("processedBy")("nb" -> SumValue(1)),
+             Sort(Descending("nb")))
+      )
       .map {
         _.documents.flatMap { obj =>
           obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply

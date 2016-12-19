@@ -169,15 +169,19 @@ object ScalaWrapManager {
                             _.asInstanceOf[ScInfixExpr].rOp,
                             _.asInstanceOf[ScInfixExpr].lOp)
       case inf: ScInfixPattern =>
-        return arrageBinary(_.isInstanceOf[ScInfixPattern],
-                            _.asInstanceOf[ScInfixPattern].reference,
-                            _.asInstanceOf[ScInfixPattern].rightPattern.orNull,
-                            _.asInstanceOf[ScInfixPattern].leftPattern)
+        return arrageBinary(
+          _.isInstanceOf[ScInfixPattern],
+          _.asInstanceOf[ScInfixPattern].reference,
+          _.asInstanceOf[ScInfixPattern].rightPattern.orNull,
+          _.asInstanceOf[ScInfixPattern].leftPattern
+        )
       case inf: ScInfixTypeElement =>
-        return arrageBinary(_.isInstanceOf[ScInfixTypeElement],
-                            _.asInstanceOf[ScInfixTypeElement].ref,
-                            _.asInstanceOf[ScInfixTypeElement].rOp.orNull,
-                            _.asInstanceOf[ScInfixTypeElement].lOp)
+        return arrageBinary(
+          _.isInstanceOf[ScInfixTypeElement],
+          _.asInstanceOf[ScInfixTypeElement].ref,
+          _.asInstanceOf[ScInfixTypeElement].rOp.orNull,
+          _.asInstanceOf[ScInfixTypeElement].lOp
+        )
       case psi: ScCompositePattern =>
         if (childPsi.isInstanceOf[ScPattern]) return suggestedWrap
         else return null

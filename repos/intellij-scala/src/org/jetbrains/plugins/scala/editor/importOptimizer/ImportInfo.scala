@@ -74,16 +74,18 @@ case class ImportInfo(prefixQualifier: String,
   def merge(second: ImportInfo): ImportInfo = {
     val relative = this.relative.orElse(second.relative)
     val rootUsed = relative.isEmpty && (this.rootUsed || second.rootUsed)
-    new ImportInfo(this.prefixQualifier,
-                   relative,
-                   this.allNames ++ second.allNames,
-                   this.singleNames ++ second.singleNames,
-                   this.renames ++ second.renames,
-                   this.hiddenNames ++ second.hiddenNames,
-                   this.hasWildcard || second.hasWildcard,
-                   rootUsed,
-                   this.isStableImport && second.isStableImport,
-                   this.allNamesForWildcard)
+    new ImportInfo(
+      this.prefixQualifier,
+      relative,
+      this.allNames ++ second.allNames,
+      this.singleNames ++ second.singleNames,
+      this.renames ++ second.renames,
+      this.hiddenNames ++ second.hiddenNames,
+      this.hasWildcard || second.hasWildcard,
+      rootUsed,
+      this.isStableImport && second.isStableImport,
+      this.allNamesForWildcard
+    )
   }
 
   def isSimpleWildcard =
@@ -335,17 +337,19 @@ object ImportInfo {
     }
 
     Some(
-      new ImportInfo(prefixQualifier,
-                     relativeQualifier,
-                     allNames.toSet,
-                     singleNames.toSet,
-                     renames.toMap,
-                     hiddenNames.toSet,
-                     hasWildcard,
-                     rootUsed,
-                     isStableImport,
-                     namesForWildcard.toSet,
-                     hasNonUsedImplicits))
+      new ImportInfo(
+        prefixQualifier,
+        relativeQualifier,
+        allNames.toSet,
+        singleNames.toSet,
+        renames.toMap,
+        hiddenNames.toSet,
+        hasWildcard,
+        rootUsed,
+        isStableImport,
+        namesForWildcard.toSet,
+        hasNonUsedImplicits
+      ))
   }
 
   def merge(infos: Seq[ImportInfo]): Option[ImportInfo] =

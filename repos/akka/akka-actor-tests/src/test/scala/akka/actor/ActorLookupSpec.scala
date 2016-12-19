@@ -277,7 +277,8 @@ class ActorLookupSpec extends AkkaSpec with DefaultTimeout {
                LookupPath(looker.path descendant Seq("a", "b").asJava) -> empty(
                  lookname + "a/b"), // test Java API
                LookupElems(Seq()) -> system.deadLetters,
-               LookupElems(Seq("a")) -> empty(lookname + "a")))
+               LookupElems(Seq("a")) -> empty(lookname + "a")
+             ))
           checkOne(looker, l, r)
       }
       for (looker ← all) check(looker)

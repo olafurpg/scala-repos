@@ -90,7 +90,8 @@ object Setup extends LilaController with TheftPrevention {
                         case _ => Left("no_sid")
                       },
                       destUser = destUser,
-                      rematchOf = none)
+                      rematchOf = none
+                    )
                     env.processor.saveFriendConfig(config) >>
                       (Env.challenge.api create challenge) >> negotiate(
                       html = fuccess(

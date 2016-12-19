@@ -47,7 +47,8 @@ class WeightedLeastSquaresSuite
         Instance(23.0, 3.0, Vectors.dense(2.0, 11.0)),
         Instance(29.0, 4.0, Vectors.dense(3.0, 13.0))
       ),
-      2)
+      2
+    )
 
     /*
        R code:
@@ -63,7 +64,8 @@ class WeightedLeastSquaresSuite
         Instance(17.0, 3.0, Vectors.dense(2.0, 11.0)),
         Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
       ),
-      2)
+      2
+    )
   }
 
   test("WLS against lm") {

@@ -259,7 +259,8 @@ trait IssuesService { self: AccountService =>
               } toList,
               milestone,
               commentCount,
-              status.get(issue.userName, issue.repositoryName, issue.issueId))
+              status.get(issue.userName, issue.repositoryName, issue.issueId)
+          )
       }
     } toList
   }
@@ -425,14 +426,16 @@ trait IssuesService { self: AccountService =>
                     issueId: Int,
                     content: String,
                     action: String)(implicit s: Session): Int =
-    IssueComments.autoInc insert IssueComment(userName = owner,
-                                              repositoryName = repository,
-                                              issueId = issueId,
-                                              action = action,
-                                              commentedUserName = loginUser,
-                                              content = content,
-                                              registeredDate = currentDate,
-                                              updatedDate = currentDate)
+    IssueComments.autoInc insert IssueComment(
+      userName = owner,
+      repositoryName = repository,
+      issueId = issueId,
+      action = action,
+      commentedUserName = loginUser,
+      content = content,
+      registeredDate = currentDate,
+      updatedDate = currentDate
+    )
 
   def updateIssue(owner: String,
                   repository: String,

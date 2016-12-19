@@ -143,12 +143,14 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
 
     "resume after multiple failures" in assertAllStagesStopped {
       val futures: List[Future[String]] =
-        List(Future.failed(Utils.TE("failure1")),
-             Future.failed(Utils.TE("failure2")),
-             Future.failed(Utils.TE("failure3")),
-             Future.failed(Utils.TE("failure4")),
-             Future.failed(Utils.TE("failure5")),
-             Future.successful("happy!"))
+        List(
+          Future.failed(Utils.TE("failure1")),
+          Future.failed(Utils.TE("failure2")),
+          Future.failed(Utils.TE("failure3")),
+          Future.failed(Utils.TE("failure4")),
+          Future.failed(Utils.TE("failure5")),
+          Future.successful("happy!")
+        )
 
       Await.result(Source(futures)
                      .mapAsyncUnordered(2)(identity)
@@ -159,18 +161,19 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
 
     "finish after future failure" in assertAllStagesStopped {
       import system.dispatcher
-      Await.result(Source(1 to 3)
-                     .mapAsyncUnordered(1)(n ⇒
-                       Future {
-                         if (n == 3)
-                           throw new RuntimeException("err3b")
-                           with NoStackTrace
-                         else n
-                     })
-                     .withAttributes(supervisionStrategy(resumingDecider))
-                     .grouped(10)
-                     .runWith(Sink.head),
-                   1.second) should be(Seq(1, 2))
+      Await.result(
+        Source(1 to 3)
+          .mapAsyncUnordered(1)(n ⇒
+            Future {
+              if (n == 3)
+                throw new RuntimeException("err3b") with NoStackTrace
+              else n
+          })
+          .withAttributes(supervisionStrategy(resumingDecider))
+          .grouped(10)
+          .runWith(Sink.head),
+        1.second
+      ) should be(Seq(1, 2))
     }
 
     "resume when mapAsyncUnordered throws" in {

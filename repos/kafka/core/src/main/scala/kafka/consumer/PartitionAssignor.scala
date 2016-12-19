@@ -95,7 +95,8 @@ class RoundRobinAssignor() extends PartitionAssignor with Logging {
               "Topic %s has the following available consumer streams: %s\n"
                 .format(topic, threadIdSet) +
               "Topic %s has the following available consumer streams: %s\n"
-                .format(headTopic, headThreadIdSet))
+                .format(headTopic, headThreadIdSet)
+          )
       }
 
       val threadAssignor =

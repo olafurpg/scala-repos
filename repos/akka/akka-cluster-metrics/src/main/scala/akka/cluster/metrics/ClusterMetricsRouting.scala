@@ -141,10 +141,12 @@ final case class AdaptiveLoadBalancingPool(
     extends Pool {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(nrOfInstances =
-           ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
-         metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances =
+        ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API
@@ -434,7 +436,8 @@ object MetricsSelector {
                 (s"Cannot instantiate metrics-selector [$fqn], " +
                   "make sure it extends [akka.cluster.routing.MetricsSelector] and " +
                   "has constructor with [com.typesafe.config.Config] parameter"),
-                exception)
+                exception
+              )
           })
           .get
     }

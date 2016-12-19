@@ -97,7 +97,8 @@ object BinaryFormat {
                   whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
                   blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
                   whiteBerserk = whiteBerserk,
-                  blackBerserk = blackBerserk)
+                  blackBerserk = blackBerserk
+                )
               case timer =>
                 RunningClock(
                   color = color,
@@ -107,18 +108,21 @@ object BinaryFormat {
                   blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
                   whiteBerserk = whiteBerserk,
                   blackBerserk = blackBerserk,
-                  timer = timer.toDouble / 100)
+                  timer = timer.toDouble / 100
+                )
             }
           // compatibility with 5 bytes timers
           // #TODO remove me! But fix the DB first!
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, _) =>
-            PausedClock(color = color,
-                        limit = readClockLimit(b1),
-                        increment = b2,
-                        whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                        blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                        whiteBerserk = whiteBerserk,
-                        blackBerserk = blackBerserk)
+            PausedClock(
+              color = color,
+              limit = readClockLimit(b1),
+              increment = b2,
+              whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+              blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+              whiteBerserk = whiteBerserk,
+              blackBerserk = blackBerserk
+            )
           case x =>
             sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
       }
@@ -202,7 +206,8 @@ object BinaryFormat {
         lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
         check = b6 flatMap { x =>
           posAt(x >> 3, x & 7)
-        })
+        }
+      )
   }
 
   object piece {

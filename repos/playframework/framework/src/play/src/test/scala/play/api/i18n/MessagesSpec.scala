@@ -17,13 +17,15 @@ object MessagesSpec extends Specification {
                      "foo" -> "English foo",
                      "bar" -> "English pub"),
     "fr" -> Map("title" -> "Titre francais", "foo" -> "foo francais"),
-    "fr-CH" -> Map("title" -> "Titre suisse"))
+    "fr-CH" -> Map("title" -> "Titre suisse")
+  )
   val api = new DefaultMessagesApi(
     new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
     Configuration.reference,
     new DefaultLangs(
       Configuration.reference ++ Configuration.from(
-        Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))) {
+        Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))
+  ) {
     override protected def loadAllMessages = testMessages
   }
 
@@ -107,8 +109,8 @@ object MessagesSpec extends Specification {
         Configuration.reference,
         new DefaultLangs(
           Configuration.reference ++ Configuration.from(
-            Map("play.i18n.langs" -> Seq("invalid_language"))))) must throwA[
-        PlayException]
+            Map("play.i18n.langs" -> Seq("invalid_language"))))
+      ) must throwA[PlayException]
     }
   }
 

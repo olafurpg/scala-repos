@@ -84,7 +84,8 @@ class SbtRunner(vmExecutable: File,
         s"""set SettingKey[String]("sbt-structure-options") in Global := "${options}" """,
         s"""apply -cp "${path(pluginFile)}" org.jetbrains.sbt.CreateTasks""",
         s"""*/*:dump-structure""",
-        s"""exit""")
+        s"""exit"""
+      )
 
       val processCommandsRaw =
         path(vmExecutable) +: "-Djline.terminal=jline.UnsupportedTerminal" +: "-Dsbt.log.noformat=true" +: "-Dfile.encoding=UTF-8" +:

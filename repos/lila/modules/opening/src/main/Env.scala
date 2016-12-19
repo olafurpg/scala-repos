@@ -27,7 +27,8 @@ final class Env(config: Config, db: lila.db.Env) {
     api = api,
     toleranceStep = config getInt "selector.tolerance.step",
     toleranceMax = config getInt "selector.tolerance.max",
-    modulo = config getInt "selector.modulo")
+    modulo = config getInt "selector.modulo"
+  )
 
   lazy val finisher = new Finisher(api = api, openingColl = openingColl)
 

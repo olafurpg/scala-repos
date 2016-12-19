@@ -48,14 +48,16 @@ private[streaming] class Checkpoint(ssc: StreamingContext,
 
     // Reload properties for the checkpoint application since user wants to set a reload property
     // or spark had changed its value and user wants to set it back.
-    val propertiesToReload = List("spark.yarn.app.id",
-                                  "spark.yarn.app.attemptId",
-                                  "spark.driver.host",
-                                  "spark.driver.port",
-                                  "spark.master",
-                                  "spark.yarn.keytab",
-                                  "spark.yarn.principal",
-                                  "spark.ui.filters")
+    val propertiesToReload = List(
+      "spark.yarn.app.id",
+      "spark.yarn.app.attemptId",
+      "spark.driver.host",
+      "spark.driver.port",
+      "spark.master",
+      "spark.yarn.keytab",
+      "spark.yarn.principal",
+      "spark.ui.filters"
+    )
 
     val newSparkConf = new SparkConf(loadDefaults = false)
       .setAll(sparkConfPairs)

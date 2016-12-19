@@ -1948,9 +1948,9 @@ class SparkContext(config: SparkConf)
   /**
     * Run a job on all partitions in an RDD and return the results in an array.
     */
-  def runJob[T, U: ClassTag](rdd: RDD[T],
-                             func: (TaskContext,
-                                    Iterator[T]) => U): Array[U] = {
+  def runJob[T, U: ClassTag](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) => U): Array[U] = {
     runJob(rdd, func, 0 until rdd.partitions.length)
   }
 
@@ -2024,13 +2024,13 @@ class SparkContext(config: SparkConf)
     assertNotStopped()
     val cleanF = clean(processPartition)
     val callSite = getCallSite
-    val waiter = dagScheduler.submitJob(rdd,
-                                        (context: TaskContext,
-                                         iter: Iterator[T]) => cleanF(iter),
-                                        partitions,
-                                        callSite,
-                                        resultHandler,
-                                        localProperties.get)
+    val waiter = dagScheduler.submitJob(
+      rdd,
+      (context: TaskContext, iter: Iterator[T]) => cleanF(iter),
+      partitions,
+      callSite,
+      resultHandler,
+      localProperties.get)
     new SimpleFutureAction(waiter, resultFunc)
   }
 

@@ -95,7 +95,8 @@ private object GroupMetadata {
     Dead -> Set(Stable, PreparingRebalance, AwaitingSync),
     AwaitingSync -> Set(PreparingRebalance),
     Stable -> Set(AwaitingSync),
-    PreparingRebalance -> Set(Stable, AwaitingSync))
+    PreparingRebalance -> Set(Stable, AwaitingSync)
+  )
 }
 
 /**

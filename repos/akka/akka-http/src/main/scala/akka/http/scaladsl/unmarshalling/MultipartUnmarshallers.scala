@@ -44,7 +44,8 @@ trait MultipartUnmarshallers {
       createBodyPart = Multipart.General.BodyPart(_, _),
       createStreamed = Multipart.General(_, _),
       createStrictBodyPart = Multipart.General.BodyPart.Strict,
-      createStrict = Multipart.General.Strict)
+      createStrict = Multipart.General.Strict
+    )
 
   implicit def multipartFormDataUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
@@ -63,7 +64,8 @@ trait MultipartUnmarshallers {
           .Strict(entity, headers)
           .toFormDataBodyPart
           .get,
-      createStrict = (_, parts) ⇒ Multipart.FormData.Strict(parts))
+      createStrict = (_, parts) ⇒ Multipart.FormData.Strict(parts)
+    )
 
   implicit def defaultMultipartByteRangesUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
@@ -88,7 +90,8 @@ trait MultipartUnmarshallers {
           .Strict(entity, headers)
           .toByteRangesBodyPart
           .get,
-      createStrict = (_, parts) ⇒ Multipart.ByteRanges.Strict(parts))
+      createStrict = (_, parts) ⇒ Multipart.ByteRanges.Strict(parts)
+    )
 
   def multipartUnmarshaller[T <: Multipart,
                             BP <: Multipart.BodyPart,

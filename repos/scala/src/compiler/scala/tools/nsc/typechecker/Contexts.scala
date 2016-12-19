@@ -1152,8 +1152,7 @@ trait Contexts { self: Analyzer =>
       }
 
       def lookupInScope(scope: Scope) =
-        (scope lookupUnshadowedEntries name filter (e =>
-                                                      qualifies(e.sym))).toList
+        (scope lookupUnshadowedEntries name filter (e => qualifies(e.sym))).toList
 
       def newOverloaded(owner: Symbol, pre: Type, entries: List[ScopeEntry]) =
         logResult(s"overloaded symbol in $pre")(

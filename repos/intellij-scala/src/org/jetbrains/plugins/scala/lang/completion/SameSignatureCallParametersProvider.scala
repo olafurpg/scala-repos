@@ -53,45 +53,53 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
     .withSuperParent(2, classOf[ScArgumentExprList])
     .withSuperParent(3, classOf[ScMethodCall])
 
-  extend(CompletionType.BASIC,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.SMART,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.BASIC,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    }
+  )
 
-  extend(CompletionType.SMART,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    }
+  )
 
   private def addSuperCallCompletions(parameters: CompletionParameters,
                                       result: CompletionResultSet): Unit = {

@@ -163,12 +163,14 @@ trait BaselineComparisons {
   def createBaseline(result: Tree[(PerfTest, Option[Statistics])]): JValue = {
 
     def statsJson(stats: Statistics): List[JField] =
-      List(JField("mean", JNum(stats.mean)),
-           JField("variance", JNum(stats.variance)),
-           JField("stdDev", JNum(stats.stdDev)),
-           JField("min", JNum(stats.min)),
-           JField("max", JNum(stats.max)),
-           JField("count", JNum(stats.count)))
+      List(
+        JField("mean", JNum(stats.mean)),
+        JField("variance", JNum(stats.variance)),
+        JField("stdDev", JNum(stats.stdDev)),
+        JField("min", JNum(stats.min)),
+        JField("max", JNum(stats.max)),
+        JField("count", JNum(stats.count))
+      )
 
     def values(path: List[JString],
                test: Tree[(PerfTest, Option[Statistics])]): List[JValue] = {

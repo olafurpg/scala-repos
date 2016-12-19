@@ -152,7 +152,8 @@ object CacheIvy {
           new ModuleReport(m, as, ms, s, pd map {
             new ju.Date(_)
           }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
-      })
+      }
+    )
   }
   implicit def artifactFormat(implicit sf: Format[String],
                               uf: Format[Option[URL]]): Format[Artifact] = {
@@ -192,17 +193,19 @@ object CacheIvy {
           Boolean,
           Boolean,
           Boolean,
-          Boolean)](c =>
-                      (c.caller,
-                       c.callerConfigurations,
-                       c.callerExtraAttributes,
-                       c.isForceDependency,
-                       c.isChangingDependency,
-                       c.isTransitiveDependency,
-                       c.isDirectlyForceDependency), {
-                      case (c, cc, ea, fd, cd, td, df) =>
-                        new Caller(c, cc, ea, fd, cd, td, df)
-                    })
+          Boolean)](
+      c =>
+        (c.caller,
+         c.callerConfigurations,
+         c.callerExtraAttributes,
+         c.isForceDependency,
+         c.isChangingDependency,
+         c.isTransitiveDependency,
+         c.isDirectlyForceDependency), {
+        case (c, cc, ea, fd, cd, td, df) =>
+          new Caller(c, cc, ea, fd, cd, td, df)
+      }
+    )
   implicit def exclusionRuleFormat(
       implicit sf: Format[String]): Format[InclExclRule] =
     wrap[InclExclRule, (String, String, String, Seq[String])](
@@ -212,15 +215,17 @@ object CacheIvy {
   implicit def crossVersionFormat: Format[CrossVersion] =
     wrap(crossToInt, crossFromInt)
   implicit def sourcePositionFormat: Format[SourcePosition] =
-    wrap[SourcePosition, (Int, String, Int, Int)]({
-      case NoPosition => (0, "", 0, 0)
-      case LinePosition(p, s) => (1, p, s, 0)
-      case RangePosition(p, LineRange(s, e)) => (2, p, s, e)
-    }, {
-      case (0, _, _, _) => NoPosition
-      case (1, p, s, _) => LinePosition(p, s)
-      case (2, p, s, e) => RangePosition(p, LineRange(s, e))
-    })
+    wrap[SourcePosition, (Int, String, Int, Int)](
+      {
+        case NoPosition => (0, "", 0, 0)
+        case LinePosition(p, s) => (1, p, s, 0)
+        case RangePosition(p, LineRange(s, e)) => (2, p, s, e)
+      }, {
+        case (0, _, _, _) => NoPosition
+        case (1, p, s, _) => LinePosition(p, s)
+        case (2, p, s, e) => RangePosition(p, LineRange(s, e))
+      }
+    )
   private[this] final val DisabledValue = 0
   private[this] final val BinaryValue = 1
   private[this] final val FullValue = 2

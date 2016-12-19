@@ -102,7 +102,8 @@ object Test extends DirectTest {
       "java/lang/invoke/MethodType",
       "fromMethodDescriptorString",
       "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;",
-      false)
+      false
+    )
     bootstrap.visitVarInsn(ASTORE, 5) // methodType
 
 //  val methodHandle = lookup.findStatic(thisClass, "target", methodType)
@@ -115,7 +116,8 @@ object Test extends DirectTest {
       "java/lang/invoke/MethodHandles$Lookup",
       "findStatic",
       "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;",
-      false)
+      false
+    )
     bootstrap.visitVarInsn(ASTORE, 6) // methodHandle
 
 //  new ConstantCallSite(methodHandle)

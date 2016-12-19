@@ -60,7 +60,8 @@ object DIMSUMModel
       itemStringIntMap = sc.get
         .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
         .first,
-      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
+      items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first
+    )
   }
 }
 

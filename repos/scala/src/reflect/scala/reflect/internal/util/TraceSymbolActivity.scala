@@ -124,15 +124,17 @@ trait TraceSymbolActivity {
     val nameFreq = allSymbols.values.toList groupBy (_.name)
     showHeader("frequency", "%-15s".format("name"), "owners")
     showMapFreq(nameFreq) { name =>
-      "%-15s %s".format(name.decode, {
-        val owners = freq(nameFreq(name))(_.owner)
+      "%-15s %s".format(
+        name.decode, {
+          val owners = freq(nameFreq(name))(_.owner)
 
-        "%4s owners (%s)".format(
-          owners.size,
-          owners.take(3).map({ case (k, v) => v + "/" + k }).mkString(", ") +
-            ", ..."
-        )
-      })
+          "%4s owners (%s)".format(
+            owners.size,
+            owners.take(3).map({ case (k, v) => v + "/" + k }).mkString(", ") +
+              ", ..."
+          )
+        }
+      )
     }
 
     allSymbols.keys.toList.sorted foreach showIdAndRemove

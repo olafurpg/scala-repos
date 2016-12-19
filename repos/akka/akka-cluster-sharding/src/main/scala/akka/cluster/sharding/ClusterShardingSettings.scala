@@ -63,7 +63,8 @@ object ClusterShardingSettings {
       snapshotPluginId = config.getString("snapshot-plugin-id"),
       stateStoreMode = config.getString("state-store-mode"),
       tuningParameters,
-      coordinatorSingletonSettings)
+      coordinatorSingletonSettings
+    )
   }
 
   /**

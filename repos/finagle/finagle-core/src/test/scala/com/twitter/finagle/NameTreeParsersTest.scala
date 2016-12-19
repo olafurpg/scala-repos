@@ -55,7 +55,8 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
           NameTree.Weighted(defaultWeight, NameTree.Leaf(Path.Utf8("bar")))),
         NameTree.Union(
           NameTree.Weighted(defaultWeight, NameTree.Leaf(Path.Utf8("bar"))),
-          NameTree.Weighted(defaultWeight, NameTree.Leaf(Path.Utf8("baz"))))))
+          NameTree.Weighted(defaultWeight, NameTree.Leaf(Path.Utf8("baz"))))
+      ))
 
     assert(
       NameTreeParsers.parseNameTree(
@@ -64,7 +65,8 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
                        NameTree.Weighted(2D, NameTree.Leaf(Path.Utf8("bar")))),
         NameTree.Union(
           NameTree.Weighted(0.5D, NameTree.Leaf(Path.Utf8("bar"))),
-          NameTree.Weighted(0.5D, NameTree.Leaf(Path.Utf8("baz"))))))
+          NameTree.Weighted(0.5D, NameTree.Leaf(Path.Utf8("baz"))))
+      ))
 
     intercept[IllegalArgumentException] { NameTreeParsers.parseNameTree("") }
     intercept[IllegalArgumentException] { NameTreeParsers.parseNameTree("#") }

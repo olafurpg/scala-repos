@@ -1143,11 +1143,13 @@ class TcpConnectionSpec extends AkkaSpec("""
                    duration: Duration): BeMatcher[SelectionKey] =
       new BeMatcher[SelectionKey] {
         def apply(key: SelectionKey) =
-          MatchResult(checkFor(key, interest, duration.toMillis.toInt),
-                      "%s key was not selected for %s after %s" format
-                        (key.attachment(), interestsDesc(interest), duration),
-                      "%s key was selected for %s after %s" format
-                        (key.attachment(), interestsDesc(interest), duration))
+          MatchResult(
+            checkFor(key, interest, duration.toMillis.toInt),
+            "%s key was not selected for %s after %s" format
+              (key.attachment(), interestsDesc(interest), duration),
+            "%s key was selected for %s after %s" format
+              (key.attachment(), interestsDesc(interest), duration)
+          )
       }
 
     val interestsNames = Seq(OP_ACCEPT -> "accepting",

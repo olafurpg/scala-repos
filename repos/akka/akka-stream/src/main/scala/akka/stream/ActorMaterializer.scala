@@ -76,7 +76,8 @@ object ActorMaterializer {
                         .withDispatcher(materializerSettings.dispatcher),
                       StreamSupervisor.nextName()),
       haveShutDown,
-      FlowNames(system).name.copy(namePrefix))
+      FlowNames(system).name.copy(namePrefix)
+    )
   }
 
   /**
@@ -237,16 +238,18 @@ object ActorMaterializerSettings {
             fuzzingMode: Boolean,
             autoFusing: Boolean,
             maxFixedBufferSize: Int) =
-    new ActorMaterializerSettings(initialInputBufferSize,
-                                  maxInputBufferSize,
-                                  dispatcher,
-                                  supervisionDecider,
-                                  subscriptionTimeoutSettings,
-                                  debugLogging,
-                                  outputBurstLimit,
-                                  fuzzingMode,
-                                  autoFusing,
-                                  maxFixedBufferSize)
+    new ActorMaterializerSettings(
+      initialInputBufferSize,
+      maxInputBufferSize,
+      dispatcher,
+      supervisionDecider,
+      subscriptionTimeoutSettings,
+      debugLogging,
+      outputBurstLimit,
+      fuzzingMode,
+      autoFusing,
+      maxFixedBufferSize
+    )
 
   /**
     * Create [[ActorMaterializerSettings]] from the settings of an [[akka.actor.ActorSystem]] (Scala).
@@ -285,16 +288,18 @@ object ActorMaterializerSettings {
              fuzzingMode: Boolean,
              autoFusing: Boolean,
              maxFixedBufferSize: Int) =
-    new ActorMaterializerSettings(initialInputBufferSize,
-                                  maxInputBufferSize,
-                                  dispatcher,
-                                  supervisionDecider,
-                                  subscriptionTimeoutSettings,
-                                  debugLogging,
-                                  outputBurstLimit,
-                                  fuzzingMode,
-                                  autoFusing,
-                                  maxFixedBufferSize)
+    new ActorMaterializerSettings(
+      initialInputBufferSize,
+      maxInputBufferSize,
+      dispatcher,
+      supervisionDecider,
+      subscriptionTimeoutSettings,
+      debugLogging,
+      outputBurstLimit,
+      fuzzingMode,
+      autoFusing,
+      maxFixedBufferSize
+    )
 
   /**
     * Create [[ActorMaterializerSettings]] from the settings of an [[akka.actor.ActorSystem]] (Java).
@@ -338,17 +343,19 @@ final class ActorMaterializerSettings private (
            fuzzingMode: Boolean,
            autoFusing: Boolean,
            maxFixedBufferSize: Int) {
-    this(initialInputBufferSize,
-         maxInputBufferSize,
-         dispatcher,
-         supervisionDecider,
-         subscriptionTimeoutSettings,
-         debugLogging,
-         outputBurstLimit,
-         fuzzingMode,
-         autoFusing,
-         maxFixedBufferSize,
-         defaultMaxFixedBufferSize)
+    this(
+      initialInputBufferSize,
+      maxInputBufferSize,
+      dispatcher,
+      supervisionDecider,
+      subscriptionTimeoutSettings,
+      debugLogging,
+      outputBurstLimit,
+      fuzzingMode,
+      autoFusing,
+      maxFixedBufferSize,
+      defaultMaxFixedBufferSize
+    )
   }
 
   require(initialInputBufferSize > 0, "initialInputBufferSize must be > 0")
@@ -372,17 +379,19 @@ final class ActorMaterializerSettings private (
       autoFusing: Boolean = this.autoFusing,
       maxFixedBufferSize: Int = this.maxFixedBufferSize,
       syncProcessingLimit: Int = this.syncProcessingLimit) = {
-    new ActorMaterializerSettings(initialInputBufferSize,
-                                  maxInputBufferSize,
-                                  dispatcher,
-                                  supervisionDecider,
-                                  subscriptionTimeoutSettings,
-                                  debugLogging,
-                                  outputBurstLimit,
-                                  fuzzingMode,
-                                  autoFusing,
-                                  maxFixedBufferSize,
-                                  syncProcessingLimit)
+    new ActorMaterializerSettings(
+      initialInputBufferSize,
+      maxInputBufferSize,
+      dispatcher,
+      supervisionDecider,
+      subscriptionTimeoutSettings,
+      debugLogging,
+      outputBurstLimit,
+      fuzzingMode,
+      autoFusing,
+      maxFixedBufferSize,
+      syncProcessingLimit
+    )
   }
 
   /**
@@ -551,7 +560,8 @@ object StreamSubscriptionTimeoutSettings {
         case "warn" ⇒ WarnTermination
         case "cancel" ⇒ CancelTermination
       },
-      timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis)
+      timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis
+    )
   }
 }
 

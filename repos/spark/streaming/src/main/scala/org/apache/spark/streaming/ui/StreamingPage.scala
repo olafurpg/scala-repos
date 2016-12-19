@@ -268,7 +268,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       maxBatchTime,
       minEventRate,
       maxEventRate,
-      "events/sec")
+      "events/sec"
+    )
     graphUIDataForEventRateOfAllStreams.generateDataJs(jsCollector)
 
     val graphUIDataForSchedulingDelay = new GraphUIData(
@@ -279,7 +280,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       maxBatchTime,
       minTime,
       maxTime,
-      formattedUnit)
+      formattedUnit
+    )
     graphUIDataForSchedulingDelay.generateDataJs(jsCollector)
 
     val graphUIDataForProcessingTime = new GraphUIData(
@@ -291,7 +293,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
       minTime,
       maxTime,
       formattedUnit,
-      Some(batchInterval))
+      Some(batchInterval)
+    )
     graphUIDataForProcessingTime.generateDataJs(jsCollector)
 
     val graphUIDataForTotalDelay = new GraphUIData(

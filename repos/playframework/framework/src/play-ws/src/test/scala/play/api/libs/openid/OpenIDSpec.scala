@@ -107,14 +107,16 @@ object OpenIDSpec extends Specification with Mockito {
       val ws = createMockWithValidOpDiscoveryAndVerification
       val openId = new WsOpenIdClient(ws, new WsDiscovery(ws))
       val redirectUrl = Await
-        .result(openId.redirectURL(
-                  "http://example.com",
-                  "http://foo.bar.com/returnto",
-                  axRequired =
-                    Seq("first" -> "http://axschema.org/namePerson/first"),
-                  axOptional =
-                    Seq("email" -> "http://schema.openid.net/contact/email")),
-                dur)
+        .result(
+          openId.redirectURL(
+            "http://example.com",
+            "http://foo.bar.com/returnto",
+            axRequired = Seq("first" -> "http://axschema.org/namePerson/first"),
+            axOptional =
+              Seq("email" -> "http://schema.openid.net/contact/email")
+          ),
+          dur
+        )
 
       val query = parseQueryString(redirectUrl)
 

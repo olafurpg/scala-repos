@@ -104,13 +104,15 @@ trait MultiNodeClusterSpec
 
   def muteLog(sys: ActorSystem = system): Unit = {
     if (!sys.log.isDebugEnabled) {
-      Seq(".*Metrics collection has started successfully.*",
-          ".*Metrics will be retreived from MBeans.*",
-          ".*Cluster Node.* - registered cluster JMX MBean.*",
-          ".*Cluster Node.* - is starting up.*",
-          ".*Shutting down cluster Node.*",
-          ".*Cluster node successfully shut down.*",
-          ".*Using a dedicated scheduler for cluster.*") foreach { s ⇒
+      Seq(
+        ".*Metrics collection has started successfully.*",
+        ".*Metrics will be retreived from MBeans.*",
+        ".*Cluster Node.* - registered cluster JMX MBean.*",
+        ".*Cluster Node.* - is starting up.*",
+        ".*Shutting down cluster Node.*",
+        ".*Cluster node successfully shut down.*",
+        ".*Using a dedicated scheduler for cluster.*"
+      ) foreach { s ⇒
         sys.eventStream.publish(Mute(EventFilter.info(pattern = s)))
       }
 
@@ -236,16 +238,20 @@ trait MultiNodeClusterSpec
       }
 
     cluster join joinNode
-    awaitCond({
-      clusterView.refreshCurrentState()
-      if (memberInState(joinNode, List(MemberStatus.up)) &&
-          memberInState(myself, List(MemberStatus.Joining, MemberStatus.Up)))
-        true
-      else {
-        cluster join joinNode
-        false
-      }
-    }, max, interval)
+    awaitCond(
+      {
+        clusterView.refreshCurrentState()
+        if (memberInState(joinNode, List(MemberStatus.up)) &&
+            memberInState(myself, List(MemberStatus.Joining, MemberStatus.Up)))
+          true
+        else {
+          cluster join joinNode
+          false
+        }
+      },
+      max,
+      interval
+    )
   }
 
   /**

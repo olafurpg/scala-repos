@@ -269,10 +269,12 @@ class OrphansTest {
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(
       "project(coproduct(project(product(project(<loop>), emptyProduct)), coproduct(project(emptyProduct), emptyCoproduct)))",
-      implicitly[Eq[SimpleRec]].toString)
+      implicitly[Eq[SimpleRec]].toString
+    )
     assertEquals(
       "project(coproduct(project(product(Eq.eqInt, emptyProduct)), coproduct(project(product(project(<loop>), product(project(<loop>), emptyProduct))), emptyCoproduct)))",
-      implicitly[Eq[Tree[Int]]].toString)
+      implicitly[Eq[Tree[Int]]].toString
+    )
   }
 
   @Test
@@ -287,10 +289,12 @@ class OrphansTest {
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(
       "project(coproduct(project(product(project(<loop>), emptyProduct)), coproduct(project(emptyProduct), emptyCoproduct)))",
-      implicitly[Eq[SimpleRec]].toString)
+      implicitly[Eq[SimpleRec]].toString
+    )
     assertEquals(
       "project(coproduct(project(product(Eq.eqInt, emptyProduct)), coproduct(project(product(project(<loop>), product(project(<loop>), emptyProduct))), emptyCoproduct)))",
-      implicitly[Eq[Tree[Int]]].toString)
+      implicitly[Eq[Tree[Int]]].toString
+    )
   }
 
   @Test
@@ -305,9 +309,11 @@ class OrphansTest {
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(
       "project(coproduct(project(product(project(<loop>), emptyProduct)), coproduct(project(emptyProduct), emptyCoproduct)))",
-      implicitly[Eq[SimpleRec]].toString)
+      implicitly[Eq[SimpleRec]].toString
+    )
     assertEquals(
       "project(coproduct(project(product(Eq.eqInt, emptyProduct)), coproduct(project(product(project(<loop>), product(project(<loop>), emptyProduct))), emptyCoproduct)))",
-      implicitly[Eq[Tree[Int]]].toString)
+      implicitly[Eq[Tree[Int]]].toString
+    )
   }
 }

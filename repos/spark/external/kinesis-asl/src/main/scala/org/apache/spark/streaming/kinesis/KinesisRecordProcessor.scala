@@ -94,7 +94,8 @@ private[kinesis] class KinesisRecordProcessor[T](receiver: KinesisReceiver[T],
           logError(
             s"Exception:  WorkerId $workerId encountered and exception while storing " +
               s" or checkpointing a batch for workerId $workerId and shardId $shardId.",
-            e)
+            e
+          )
 
           /* Rethrow the exception to the Kinesis Worker that is managing this RecordProcessor. */
           throw e

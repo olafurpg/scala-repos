@@ -195,7 +195,8 @@ object Tournament extends LilaController {
         setup =>
           env.api.createTournament(setup, me) map { tour =>
             Redirect(routes.Tournament.show(tour.id))
-        })
+        }
+      )
     }
   }
 

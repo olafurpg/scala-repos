@@ -72,7 +72,8 @@ object JsonQuestion {
         .map {
           case Filter(dimension, selected) =>
             dimension.key -> selected.map(Dimension.valueKey(dimension))
-      } toMap)
+      } toMap
+    )
 
   implicit val QuestionFormats = Json.format[JsonQuestion]
 }

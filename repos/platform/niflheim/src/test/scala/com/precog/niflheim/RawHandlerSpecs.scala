@@ -90,7 +90,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
         {"a": 123, "b": true, "c": false, "d": null, "e": "cat", "f": {"aa": 11.0, "bb": 22.0}}
         {"a": 9999.0, "b": "xyz", "arr": [1,2,3]}
         {"a": 0, "b": false, "c": 0.0, "y": [], "z": {}}
-        """))
+        """)
+      )
 
       h.length must_== 3
 
@@ -363,16 +364,18 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       snap1.toSet must_== Set()
       snap2.toSet must_== Set(
         ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
-      snap3.toSet must_== Set(ArraySegment(blockid,
-                                           cpa,
-                                           CString,
-                                           bitset(0, 1, 2, 3),
-                                           Array("foo", "bar", "qux", "baz")),
-                              ArraySegment(blockid,
-                                           cpb,
-                                           CString,
-                                           bitset(2, 3),
-                                           Array(null, null, "xyz", "bla")))
+      snap3.toSet must_== Set(
+        ArraySegment(blockid,
+                     cpa,
+                     CString,
+                     bitset(0, 1, 2, 3),
+                     Array("foo", "bar", "qux", "baz")),
+        ArraySegment(blockid,
+                     cpb,
+                     CString,
+                     bitset(2, 3),
+                     Array(null, null, "xyz", "bla"))
+      )
       snap3 mustEqual snap3R
 
       val a3 = h.snapshot(Some(Set(cpa))).segments

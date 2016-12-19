@@ -43,7 +43,8 @@ object RichXHandler {
     classOf[AbstractMethodError] -> BinaryProblem,
     classOf[NoSuchMethodError] -> BinaryProblem,
     classOf[InvalidSourceException] -> DataIsMissing,
-    classOf[PlannerException] -> RequireSinks)
+    classOf[PlannerException] -> RequireSinks
+  )
 
   val gitHubUrl =
     "https://github.com/twitter/scalding/wiki/Common-Exceptions-and-possible-reasons#"

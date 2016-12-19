@@ -77,15 +77,17 @@ private object BSONHandlers {
     }
   implicit def MoveBSONHandler = new BSON[Move] {
     def reads(r: Reader) =
-      Move(phase = r.get[Phase]("p"),
-           tenths = r.get[Int]("t"),
-           role = r.get[Role]("r"),
-           eval = r.intO("e"),
-           mate = r.intO("m"),
-           cpl = r.intO("c"),
-           material = r.int("i"),
-           opportunism = r.boolO("o"),
-           luck = r.boolO("l"))
+      Move(
+        phase = r.get[Phase]("p"),
+        tenths = r.get[Int]("t"),
+        role = r.get[Role]("r"),
+        eval = r.intO("e"),
+        mate = r.intO("m"),
+        cpl = r.intO("c"),
+        material = r.int("i"),
+        opportunism = r.boolO("o"),
+        luck = r.boolO("l")
+      )
     def writes(w: Writer, b: Move) =
       BSONDocument("p" -> b.phase,
                    "t" -> b.tenths,
@@ -122,23 +124,25 @@ private object BSONHandlers {
         date = r.date(date)
       )
     def writes(w: Writer, e: Entry) =
-      BSONDocument(id -> e.id,
-                   number -> e.number,
-                   userId -> e.userId,
-                   color -> e.color,
-                   perf -> e.perf,
-                   eco -> e.eco,
-                   myCastling -> e.myCastling,
-                   opponentRating -> e.opponentRating,
-                   opponentStrength -> e.opponentStrength,
-                   opponentCastling -> e.opponentCastling,
-                   moves -> e.moves,
-                   queenTrade -> e.queenTrade,
-                   result -> e.result,
-                   termination -> e.termination,
-                   ratingDiff -> e.ratingDiff,
-                   analysed -> w.boolO(e.analysed),
-                   provisional -> w.boolO(e.provisional),
-                   date -> e.date)
+      BSONDocument(
+        id -> e.id,
+        number -> e.number,
+        userId -> e.userId,
+        color -> e.color,
+        perf -> e.perf,
+        eco -> e.eco,
+        myCastling -> e.myCastling,
+        opponentRating -> e.opponentRating,
+        opponentStrength -> e.opponentStrength,
+        opponentCastling -> e.opponentCastling,
+        moves -> e.moves,
+        queenTrade -> e.queenTrade,
+        result -> e.result,
+        termination -> e.termination,
+        ratingDiff -> e.ratingDiff,
+        analysed -> w.boolO(e.analysed),
+        provisional -> w.boolO(e.provisional),
+        date -> e.date
+      )
   }
 }

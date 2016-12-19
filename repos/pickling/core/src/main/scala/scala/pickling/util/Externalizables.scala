@@ -173,15 +173,17 @@ object Externalizables {
        writeChar(int v)
        ...
      */
-    val storage = Map(BooleanTpe -> BooleanTpe,
-                      ByteTpe -> IntTpe,
-                      CharTpe -> IntTpe,
-                      DoubleTpe -> DoubleTpe,
-                      FloatTpe -> FloatTpe,
-                      IntTpe -> IntTpe,
-                      LongTpe -> LongTpe,
-                      ShortTpe -> IntTpe,
-                      typeOf[AnyRef] -> typeOf[Any])
+    val storage = Map(
+      BooleanTpe -> BooleanTpe,
+      ByteTpe -> IntTpe,
+      CharTpe -> IntTpe,
+      DoubleTpe -> DoubleTpe,
+      FloatTpe -> FloatTpe,
+      IntTpe -> IntTpe,
+      LongTpe -> LongTpe,
+      ShortTpe -> IntTpe,
+      typeOf[AnyRef] -> typeOf[Any]
+    )
 
     /* Byte, Byte, Array[Byte], Byte, Long, Object
           0,    1,           2,    3,    4,      5

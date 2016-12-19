@@ -65,21 +65,20 @@ class ScalaJsonSpec extends Specification {
           "name" -> JsString("Watership Down"),
           "location" -> JsObject(
             Seq("lat" -> JsNumber(51.235685), "long" -> JsNumber(-1.309197))),
-          "residents" -> JsArray(
-            Seq(
-              JsObject(
-                Seq(
-                  "name" -> JsString("Fiver"),
-                  "age" -> JsNumber(4),
-                  "role" -> JsNull
-                )),
-              JsObject(
-                Seq(
-                  "name" -> JsString("Bigwig"),
-                  "age" -> JsNumber(6),
-                  "role" -> JsString("Owsla")
-                ))
-            ))
+          "residents" -> JsArray(Seq(
+            JsObject(
+              Seq(
+                "name" -> JsString("Fiver"),
+                "age" -> JsNumber(4),
+                "role" -> JsNull
+              )),
+            JsObject(
+              Seq(
+                "name" -> JsString("Bigwig"),
+                "age" -> JsNumber(6),
+                "role" -> JsString("Owsla")
+              ))
+          ))
         ))
       //#convert-from-classes
       (json \ "name").get must_== JsString("Watership Down")

@@ -19,7 +19,8 @@ final class LightUserApi(coll: Coll) {
       LightUser(
         id = doc.getAs[String](F.id) err "LightUser id missing",
         name = doc.getAs[String](F.username) err "LightUser username missing",
-        title = doc.getAs[String](F.title))
+        title = doc.getAs[String](F.title)
+      )
   }
 
   private val cache = lila.memo.MixedCache[String, Option[LightUser]](
@@ -32,5 +33,6 @@ final class LightUserApi(coll: Coll) {
         .one[LightUser],
     timeToLive = 20 minutes,
     default = id => LightUser(id, id, None).some,
-    logger = logger branch "LightUserApi")
+    logger = logger branch "LightUserApi"
+  )
 }

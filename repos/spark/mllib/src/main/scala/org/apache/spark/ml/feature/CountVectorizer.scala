@@ -71,7 +71,8 @@ private[feature] trait CountVectorizerParams
       " different documents a term must appear in to be included in the vocabulary." +
       " If this is an integer >= 1, this specifies the number of documents the term must" +
       " appear in; if this is a double in [0,1), then this specifies the fraction of documents.",
-    ParamValidators.gtEq(0.0))
+    ParamValidators.gtEq(0.0)
+  )
 
   /** @group getParam */
   def getMinDF: Double = $(minDF)
@@ -107,7 +108,8 @@ private[feature] trait CountVectorizerParams
       " appear in the document); if this is a double in [0,1), then this specifies a fraction (out" +
       " of the document's token count). Note that the parameter is only used in transform of" +
       " CountVectorizerModel and does not affect fitting.",
-    ParamValidators.gtEq(0.0))
+    ParamValidators.gtEq(0.0)
+  )
 
   setDefault(minTF -> 1)
 
@@ -248,7 +250,8 @@ class CountVectorizerModel(override val uid: String,
     "binary",
     "If True, all non zero counts are set to 1. " +
       "This is useful for discrete probabilistic models that model binary events rather " +
-      "than integer counts")
+      "than integer counts"
+  )
 
   /** @group getParam */
   def getBinary: Boolean = $(binary)

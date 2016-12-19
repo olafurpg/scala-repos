@@ -213,7 +213,8 @@ object CreateWorkflow extends Logging {
         skipSanityCheck = wfc.skipSanityCheck,
         stopAfterRead = wfc.stopAfterRead,
         stopAfterPrepare = wfc.stopAfterPrepare,
-        sparkEnv = WorkflowParams().sparkEnv ++ customSparkConf)
+        sparkEnv = WorkflowParams().sparkEnv ++ customSparkConf
+      )
 
       // Evaluator Not Specified. Do training.
       if (!engine.isInstanceOf[Engine[_, _, _, _, _, _]]) {
@@ -269,7 +270,8 @@ object CreateWorkflow extends Logging {
         skipSanityCheck = wfc.skipSanityCheck,
         stopAfterRead = wfc.stopAfterRead,
         stopAfterPrepare = wfc.stopAfterPrepare,
-        sparkEnv = WorkflowParams().sparkEnv)
+        sparkEnv = WorkflowParams().sparkEnv
+      )
       val evaluationInstance = EvaluationInstance(
         evaluationClass = wfc.evaluationClass.get,
         engineParamsGeneratorClass = wfc.engineParamsGeneratorClass.get,

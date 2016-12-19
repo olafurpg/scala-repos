@@ -123,17 +123,19 @@ object InfoSerializers {
         val accessedModules = readStrings()
         val usedInstanceTests = readStrings()
         val accessedClassData = readStrings()
-        MethodInfo(encodedName,
-                   isStatic,
-                   isAbstract,
-                   isExported,
-                   methodsCalled,
-                   methodsCalledStatically,
-                   staticMethodsCalled,
-                   instantiatedClasses,
-                   accessedModules,
-                   usedInstanceTests,
-                   accessedClassData)
+        MethodInfo(
+          encodedName,
+          isStatic,
+          isAbstract,
+          isExported,
+          methodsCalled,
+          methodsCalledStatically,
+          staticMethodsCalled,
+          instantiatedClasses,
+          accessedModules,
+          usedInstanceTests,
+          accessedClassData
+        )
       }
 
       val methods0 = readList(readMethod())

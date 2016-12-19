@@ -188,12 +188,14 @@ class VectorsSuite extends SparkFunSuite with Logging {
   }
 
   test("parse vectors") {
-    val vectors = Seq(Vectors.dense(Array.empty[Double]),
-                      Vectors.dense(1.0),
-                      Vectors.dense(1.0E6, 0.0, -2.0e-7),
-                      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
-                      Vectors.sparse(1, Array(0), Array(1.0)),
-                      Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0)))
+    val vectors = Seq(
+      Vectors.dense(Array.empty[Double]),
+      Vectors.dense(1.0),
+      Vectors.dense(1.0E6, 0.0, -2.0e-7),
+      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
+      Vectors.sparse(1, Array(0), Array(1.0)),
+      Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0))
+    )
     vectors.foreach { v =>
       val v1 = Vectors.parse(v.toString)
       assert(v.getClass === v1.getClass)

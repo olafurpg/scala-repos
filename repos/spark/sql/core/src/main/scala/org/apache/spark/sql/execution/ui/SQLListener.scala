@@ -377,7 +377,8 @@ private[spark] class SQLHistoryListener(conf: SparkConf, sparkUI: SparkUI)
           None
         }
       },
-      finishTask = true)
+      finishTask = true
+    )
   }
 
   override def onOtherEvent(event: SparkListenerEvent): Unit = event match {

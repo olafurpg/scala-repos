@@ -170,7 +170,8 @@ private[rest] class StandaloneSubmitRequestServlet(
       environmentVariables,
       extraClassPath,
       extraLibraryPath,
-      javaOpts)
+      javaOpts
+    )
     val actualDriverMemory =
       driverMemory.map(Utils.memoryStringToMb).getOrElse(DEFAULT_MEMORY)
     val actualDriverCores = driverCores.map(_.toInt).getOrElse(DEFAULT_CORES)

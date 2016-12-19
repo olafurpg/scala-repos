@@ -947,7 +947,8 @@ case class Configuration(underlying: Config) {
         Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
         value
       },
-      TimeUnit.NANOSECONDS)
+      TimeUnit.NANOSECONDS
+    )
   }
 
   /**

@@ -51,16 +51,18 @@ case class HookConfig(variant: chess.variant.Variant,
     timeMode match {
       case TimeMode.RealTime =>
         Left(
-          Hook.make(uid = uid,
-                    variant = variant,
-                    clock = justMakeClock,
-                    mode = mode,
-                    allowAnon = allowAnon,
-                    color = color.name,
-                    user = user,
-                    blocking = blocking,
-                    sid = sid,
-                    ratingRange = ratingRange))
+          Hook.make(
+            uid = uid,
+            variant = variant,
+            clock = justMakeClock,
+            mode = mode,
+            allowAnon = allowAnon,
+            color = color.name,
+            user = user,
+            blocking = blocking,
+            sid = sid,
+            ratingRange = ratingRange
+          ))
       case _ =>
         Right(user map { u =>
           Seek.make(variant = variant,
@@ -76,12 +78,14 @@ case class HookConfig(variant: chess.variant.Variant,
   def noRatedUnlimited = mode.casual || hasClock || makeDaysPerTurn.isDefined
 
   def updateFrom(game: lila.game.Game) =
-    copy(variant = game.variant,
-         timeMode = TimeMode ofGame game,
-         time = game.clock.map(_.limitInMinutes) | time,
-         increment = game.clock.map(_.increment) | increment,
-         days = game.daysPerTurn | days,
-         mode = game.mode)
+    copy(
+      variant = game.variant,
+      timeMode = TimeMode ofGame game,
+      time = game.clock.map(_.limitInMinutes) | time,
+      increment = game.clock.map(_.increment) | increment,
+      days = game.daysPerTurn | days,
+      mode = game.mode
+    )
 }
 
 object HookConfig extends BaseHumanConfig {
@@ -108,18 +112,21 @@ object HookConfig extends BaseHumanConfig {
       ratingRange = e
         .filter(_ => useRatingRange)
         .fold(RatingRange.default)(RatingRange.orDefault),
-      color = Color(c) err "Invalid color " + c)
+      color = Color(c) err "Invalid color " + c
+    )
   }
 
-  val default = HookConfig(variant = variantDefault,
-                           timeMode = TimeMode.RealTime,
-                           time = 5d,
-                           increment = 8,
-                           days = 2,
-                           mode = Mode.default,
-                           allowAnon = true,
-                           ratingRange = RatingRange.default,
-                           color = Color.default)
+  val default = HookConfig(
+    variant = variantDefault,
+    timeMode = TimeMode.RealTime,
+    time = 5d,
+    increment = 8,
+    days = 2,
+    mode = Mode.default,
+    allowAnon = true,
+    ratingRange = RatingRange.default,
+    color = Color.default
+  )
 
   import reactivemongo.bson._
   import lila.db.BSON
@@ -136,7 +143,8 @@ object HookConfig extends BaseHumanConfig {
         mode = Mode orDefault (r int "m"),
         allowAnon = r bool "a",
         color = Color.Random,
-        ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
+        ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
+      )
 
     def writes(w: BSON.Writer, o: HookConfig) =
       BSONDocument("v" -> o.variant.id,

@@ -431,14 +431,16 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           mkList(testMethods.map(defaultMethodMetadata(tpe)))
 
         val getJUnitMethodRhs = {
-          mkNewInstance(TypeTree(jUnitClassMetadataType),
-                        List(
-                          mkList(liftAnnotations(clSym)),
-                          gen.mkNil,
-                          mkMethodList(jUnitMethodMetadataTypeTree)(methods),
-                          modMethods.fold(gen.mkNil)(
-                            mkMethodList(jUnitMethodMetadataTypeTree))
-                        ))
+          mkNewInstance(
+            TypeTree(jUnitClassMetadataType),
+            List(
+              mkList(liftAnnotations(clSym)),
+              gen.mkNil,
+              mkMethodList(jUnitMethodMetadataTypeTree)(methods),
+              modMethods.fold(gen.mkNil)(
+                mkMethodList(jUnitMethodMetadataTypeTree))
+            )
+          )
         }
 
         val getJUnitMetadataSym = clSym.newMethod(newTermName("metadata"))

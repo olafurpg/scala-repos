@@ -417,7 +417,8 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
           getBucketSpec,
           mode,
           extraOptions.toMap,
-          df.logicalPlan)
+          df.logicalPlan
+        )
         df.sqlContext.executePlan(cmd).toRdd
     }
   }

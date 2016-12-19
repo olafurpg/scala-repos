@@ -142,7 +142,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                                       tpAdditional.get,
                                       source.getManager),
                                   ScSubstitutor.empty
-                                ))
+                                )
+                              )
                               Some(subst)
                             case _ => None
                           }

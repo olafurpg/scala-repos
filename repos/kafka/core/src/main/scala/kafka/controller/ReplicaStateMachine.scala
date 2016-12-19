@@ -399,7 +399,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
                     partition,
                     currState,
                     targetState),
-          t)
+          t
+        )
     }
   }
 
@@ -447,8 +448,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
       fromStates.contains(replicaState(partitionAndReplica)),
       "Replica %s should be in the %s states before moving to %s state"
         .format(partitionAndReplica, fromStates.mkString(","), targetState) +
-        ". Instead it is in %s state".format(
-          replicaState(partitionAndReplica)))
+        ". Instead it is in %s state".format(replicaState(partitionAndReplica))
+    )
   }
 
   private def registerBrokerChangeListener() = {

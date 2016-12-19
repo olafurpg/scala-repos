@@ -145,7 +145,8 @@ object ScalaOIUtil {
           }
         },
         clazz.getProject,
-        if (isImplement) "Implement method" else "Override method")
+        if (isImplement) "Implement method" else "Override method"
+      )
   }
 
   def getMembersToImplement(

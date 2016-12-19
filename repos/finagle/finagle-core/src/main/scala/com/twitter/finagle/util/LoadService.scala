@@ -211,7 +211,8 @@ object loadServiceDenied
     extends GlobalFlag[Set[String]](
       Set.empty,
       "A deny list of implementations to ignore. Keys are the fully qualified class names. " +
-        "Any other implementations that are found via `LoadService.apply` are eligible to be used.")
+        "Any other implementations that are found via `LoadService.apply` are eligible to be used."
+    )
 
 /**
   * Load a singleton class in the manner of [[java.util.ServiceLoader]]. It is

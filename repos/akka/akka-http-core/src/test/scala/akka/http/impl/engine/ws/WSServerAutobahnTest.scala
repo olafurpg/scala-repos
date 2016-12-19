@@ -44,7 +44,8 @@ object WSServerAutobahnTest extends App {
               HttpResponse(404, entity = "Unknown resource!")
           },
           interface = host, // adapt to your docker host IP address if necessary
-          port = port)
+          port = port
+        )
 
     Await.result(binding, 3.second) // throws if binding fails
     println(s"Server online at http://${host}:${port}")

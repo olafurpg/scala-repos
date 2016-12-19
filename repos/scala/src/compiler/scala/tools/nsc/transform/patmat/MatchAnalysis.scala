@@ -56,7 +56,8 @@ trait TreeAndTypeAnalysis extends Debugging {
               pat.pos,
               sm"""The value matched by $pat is bound to ${binder.name}, which may be used under the
                   |unsound assumption that it has type ${pat.tpe}, whereas we can only safely
-                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503).""")
+                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503)."""
+            )
 
           pat.tpe
         }
@@ -178,8 +179,8 @@ trait TreeAndTypeAnalysis extends Debugging {
               // all of their children must be and they cannot otherwise be created.
               sym.sealedDescendants.toList sortBy (_.sealedSortName) filterNot
                 (x =>
-                   x.isSealed && x.isAbstractClass &&
-                     !isPrimitiveValueClass(x))
+                  x.isSealed && x.isAbstractClass &&
+                    !isPrimitiveValueClass(x))
             )
 
             List(
@@ -599,15 +600,20 @@ trait MatchAnalysis extends MatchApproximation {
 
         val approx = new TreeMakersToPropsIgnoreNullChecks(prevBinder)
         val symbolicCases =
-          approx.approximateMatch(cases, approx.onUnknown { tm =>
-            approx.fullRewrite.applyOrElse[TreeMaker, Prop](tm, {
-              case BodyTreeMaker(_, _) =>
-                True // irrelevant -- will be discarded by symbolCase later
-              case _ => // debug.patmat("backing off due to "+ tm)
-                backoff = true
-                False
-            })
-          }) map caseWithoutBodyToProp
+          approx.approximateMatch(
+            cases,
+            approx.onUnknown { tm =>
+              approx.fullRewrite.applyOrElse[TreeMaker, Prop](
+                tm, {
+                  case BodyTreeMaker(_, _) =>
+                    True // irrelevant -- will be discarded by symbolCase later
+                  case _ => // debug.patmat("backing off due to "+ tm)
+                    backoff = true
+                    False
+                }
+              )
+            }
+          ) map caseWithoutBodyToProp
 
         if (backoff) Nil
         else {
@@ -950,14 +956,13 @@ trait MatchAnalysis extends MatchApproximation {
         private lazy val uniqueEqualTo =
           equalTo filterNot
             (subsumed =>
-               equalTo.exists(
-                 better =>
-                   (better ne subsumed) &&
-                     instanceOfTpImplies(better.tp, subsumed.tp)))
+              equalTo.exists(better =>
+                (better ne subsumed) &&
+                  instanceOfTpImplies(better.tp, subsumed.tp)))
         private lazy val inSameDomain =
           uniqueEqualTo forall
             (const =>
-               variable.domainSyms.exists(_.exists(_.const.tp =:= const.tp)))
+              variable.domainSyms.exists(_.exists(_.const.tp =:= const.tp)))
         private lazy val prunedEqualTo =
           uniqueEqualTo filterNot
             (subsumed => variable.staticTpCheckable <:< subsumed.tp)

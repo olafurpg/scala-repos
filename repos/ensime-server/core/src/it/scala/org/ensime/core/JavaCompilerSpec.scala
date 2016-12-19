@@ -315,7 +315,8 @@ class JavaCompilerSpec
         "    System.out.println(\"bla\".index@7@Of(\"b\", 1));",
         "    System.out.println(\"bla\".index@8@Of(1));",
         "  }",
-        "}") { (sf, offset, label, cc) =>
+        "}"
+      ) { (sf, offset, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(sf, offset).get.java
         label match {
           case "0" => sig.fqn shouldBe DocFqn("", "Test1")

@@ -134,7 +134,8 @@ object MyApp extends App {
       mailbox-type = "akka.contrib.mailbox.PeekMailboxType"
       max-retries = 2
     }
-    """))
+    """)
+  )
 
   val myActor = system.actorOf(
     Props[MyActor].withDispatcher("peek-dispatcher"),

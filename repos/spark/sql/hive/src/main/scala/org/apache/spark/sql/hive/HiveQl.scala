@@ -179,19 +179,21 @@ private[hive] class HiveQl(conf: ParserConf)
                          replace: Boolean): CreateViewAsSelect = {
     val tableIdentifier = extractTableIdent(viewNameParts)
     val originalText = query.source
-    val tableDesc = CatalogTable(name = tableIdentifier,
-                                 tableType = CatalogTableType.VIRTUAL_VIEW,
-                                 schema = schema,
-                                 storage = CatalogStorageFormat(
-                                   locationUri = None,
-                                   inputFormat = None,
-                                   outputFormat = None,
-                                   serde = None,
-                                   serdeProperties = Map.empty[String, String]
-                                 ),
-                                 properties = properties,
-                                 viewOriginalText = Some(originalText),
-                                 viewText = Some(originalText))
+    val tableDesc = CatalogTable(
+      name = tableIdentifier,
+      tableType = CatalogTableType.VIRTUAL_VIEW,
+      schema = schema,
+      storage = CatalogStorageFormat(
+        locationUri = None,
+        inputFormat = None,
+        outputFormat = None,
+        serde = None,
+        serdeProperties = Map.empty[String, String]
+      ),
+      properties = properties,
+      viewOriginalText = Some(originalText),
+      viewText = Some(originalText)
+    )
 
     // We need to keep the original SQL string so that if `spark.sql.nativeView` is
     // false, we can fall back to use hive native command later.
@@ -295,15 +297,17 @@ private[hive] class HiveQl(conf: ParserConf)
           maybeProperties,
           maybeColumns,
           maybePartCols
-        ) = getClauses(Seq("TOK_TABNAME",
-                           "TOK_QUERY",
-                           "TOK_TABLECOMMENT",
-                           "TOK_ORREPLACE",
-                           "TOK_IFNOTEXISTS",
-                           "TOK_TABLEPROPERTIES",
-                           "TOK_TABCOLNAME",
-                           "TOK_VIEWPARTCOLS"),
-                       children)
+        ) = getClauses(
+          Seq("TOK_TABNAME",
+              "TOK_QUERY",
+              "TOK_TABLECOMMENT",
+              "TOK_ORREPLACE",
+              "TOK_IFNOTEXISTS",
+              "TOK_TABLEPROPERTIES",
+              "TOK_TABCOLNAME",
+              "TOK_VIEWPARTCOLS"),
+          children
+        )
 
         // If the view is partitioned, we let hive handle it.
         if (maybePartCols.isDefined) {
@@ -368,8 +372,10 @@ private[hive] class HiveQl(conf: ParserConf)
             "TOK_TABLEFILEFORMAT", // User-provided InputFormat and OutputFormat
             "TOK_STORAGEHANDLER", // Storage handler
             "TOK_TABLELOCATION",
-            "TOK_TABLEPROPERTIES"),
-          children)
+            "TOK_TABLEPROPERTIES"
+          ),
+          children
+        )
         val tableIdentifier = extractTableIdent(tableNameParts)
 
         // TODO add bucket support
@@ -387,7 +393,8 @@ private[hive] class HiveQl(conf: ParserConf)
             serde = None,
             serdeProperties = Map.empty[String, String]
           ),
-          schema = Seq.empty[CatalogColumn])
+          schema = Seq.empty[CatalogColumn]
+        )
 
         // default storage type abbreviation (e.g. RCFile, ORC, PARQUET etc.)
         val defaultStorageType =
@@ -406,7 +413,8 @@ private[hive] class HiveQl(conf: ParserConf)
             hiveSerDe.inputFormat.orElse(tableDesc.storage.inputFormat),
           outputFormat =
             hiveSerDe.outputFormat.orElse(tableDesc.storage.outputFormat),
-          serde = hiveSerDe.serde.orElse(tableDesc.storage.serde))
+          serde = hiveSerDe.serde.orElse(tableDesc.storage.serde)
+        )
 
         children.collect {
           case list @ Token("TOK_TABCOLLIST", _) =>
@@ -505,7 +513,8 @@ private[hive] class HiveQl(conf: ParserConf)
                   inputFormat = Option(
                     "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
                   outputFormat = Option(
-                    "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"))
+                    "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat")
+                )
                 if (tableDesc.storage.serde.isEmpty) {
                   tableDesc = tableDesc.withNewStorage(serde = Option(
                     "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"))
@@ -541,7 +550,8 @@ private[hive] class HiveQl(conf: ParserConf)
                   inputFormat = Option(
                     "org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat"),
                   outputFormat = Option(
-                    "org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat"))
+                    "org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat")
+                )
                 if (tableDesc.storage.serde.isEmpty) {
                   tableDesc = tableDesc.withNewStorage(
                     serde =

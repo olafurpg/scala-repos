@@ -448,24 +448,23 @@ object ScalaPsiUtil {
                     processor.isInstanceOf[MethodResolveProcessor]) {
                   val mrp = processor.asInstanceOf[MethodResolveProcessor]
                   val newProc =
-                    new MethodResolveProcessor(ref,
-                                               refName,
-                                               mrp.argumentClauses,
-                                               mrp.typeArgElements,
-                                               rr.element match {
-                                                 case fun: ScFunction
-                                                     if fun.hasTypeParameters =>
-                                                   fun.typeParameters.map(
-                                                     new TypeParameter(_))
-                                                 case _ => Seq.empty
-                                               },
-                                               kinds,
-                                               mrp.expectedOption,
-                                               mrp.isUnderscore,
-                                               mrp.isShapeResolve,
-                                               mrp.constructorResolve,
-                                               noImplicitsForArgs =
-                                                 withoutImplicitsForArgs)
+                    new MethodResolveProcessor(
+                      ref,
+                      refName,
+                      mrp.argumentClauses,
+                      mrp.typeArgElements,
+                      rr.element match {
+                        case fun: ScFunction if fun.hasTypeParameters =>
+                          fun.typeParameters.map(new TypeParameter(_))
+                        case _ => Seq.empty
+                      },
+                      kinds,
+                      mrp.expectedOption,
+                      mrp.isUnderscore,
+                      mrp.isShapeResolve,
+                      mrp.constructorResolve,
+                      noImplicitsForArgs = withoutImplicitsForArgs
+                    )
                   newProc.processType(tp, e, ResolveState.initial)
                   val candidates =
                     newProc.candidatesS.filter(_.isApplicable())
@@ -531,7 +530,8 @@ object ScalaPsiUtil {
               rr.substitutor,
               ScSubstitutor.empty,
               isFromCompanion = false, //todo: from companion parameter
-              unresolvedTypeParameters = typeParams))
+              unresolvedTypeParameters = typeParams
+            ))
         case _ => None
       }
     } else None
@@ -618,7 +618,8 @@ object ScalaPsiUtil {
       typeParams,
       isShapeResolve = isShape,
       enableTupling = true,
-      isDynamic = isDynamic)
+      isDynamic = isDynamic
+    )
     var candidates: Set[ScalaResolveResult] = Set.empty
     exprTp match {
       case ScTypePolymorphicType(internal, typeParam)

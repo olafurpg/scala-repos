@@ -538,9 +538,9 @@ object Enumerator {
     */
   def fromCallback1[E](retriever: Boolean => Future[Option[E]],
                        onComplete: () => Unit = () => (),
-                       onError: (String, Input[E]) => Unit = (_: String,
-                                                              _: Input[E]) =>
-                         ())(implicit ec: ExecutionContext) =
+                       onError: (String, Input[E]) => Unit =
+                         (_: String, _: Input[E]) => ())(
+      implicit ec: ExecutionContext) =
     new Enumerator[E] {
       private val pec = ec.prepare()
       def apply[A](it: Iteratee[E, A]): Future[Iteratee[E, A]] = {
@@ -760,10 +760,10 @@ object Enumerator {
 
   private[iteratee] def enumerateSeq2[E](s: Seq[Input[E]]): Enumerator[E] =
     checkContinue1(s)(new TreatCont1[E, Seq[Input[E]]] {
-      def apply[A](loop: (Iteratee[E, A],
-                          Seq[Input[E]]) => Future[Iteratee[E, A]],
-                   s: Seq[Input[E]],
-                   k: Input[E] => Iteratee[E, A]): Future[Iteratee[E, A]] =
+      def apply[A](
+          loop: (Iteratee[E, A], Seq[Input[E]]) => Future[Iteratee[E, A]],
+          s: Seq[Input[E]],
+          k: Input[E] => Iteratee[E, A]): Future[Iteratee[E, A]] =
         if (!s.isEmpty) loop(k(s.head), s.tail)
         else Future.successful(Cont(k))
     })

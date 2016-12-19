@@ -265,5 +265,6 @@ object Serializers {
     LocalRegisteredSerializer.fromSbtSerializer(compileResultPickler,
                                                 compileResultUnpickler),
     LocalRegisteredSerializer.fromSbtSerializer(playServerStartedPickler,
-                                                playServerStartedUnpickler))
+                                                playServerStartedUnpickler)
+  )
 }

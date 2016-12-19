@@ -91,16 +91,18 @@ object Definitions {
     val encoded =
       if (encodedName.charAt(0) == '$') encodedName.substring(1)
       else encodedName
-    val base = decompressedClasses.getOrElse(encoded, {
-      decompressedPrefixes collectFirst {
-        case (prefix, decompressed) if encoded.startsWith(prefix) =>
-          decompressed + encoded.substring(prefix.length)
-      } getOrElse {
-        assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
-               s"Cannot decode invalid encoded name '$encodedName'")
-        encoded.substring(1)
+    val base = decompressedClasses.getOrElse(
+      encoded, {
+        decompressedPrefixes collectFirst {
+          case (prefix, decompressed) if encoded.startsWith(prefix) =>
+            decompressed + encoded.substring(prefix.length)
+        } getOrElse {
+          assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
+                 s"Cannot decode invalid encoded name '$encodedName'")
+          encoded.substring(1)
+        }
       }
-    })
+    )
     base.replace("_", ".").replace("$und", "_")
   }
 

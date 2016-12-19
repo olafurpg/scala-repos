@@ -868,7 +868,8 @@ trait DAG extends Instructions {
                 case dag.Memoize(parent, priority) =>
                   for { newParent <- memoized(parent) } yield
                     dag.Memoize(newParent, priority)
-              })
+              }
+            )
           }
 
           if (graph != scope) rewritten
@@ -896,40 +897,40 @@ trait DAG extends Instructions {
         } yield inScope
 
         val rewritten = inScopeM.flatMap { inScope =>
-          editUpdate[E].edit(inScope,
-                             spec,
-                             edit,
-                             (rep: dag.BucketSpec) =>
-                               for { state <- monadState.gets(identity) } yield
-                               rep,
-                             (_: dag.BucketSpec) match {
-                               case dag.UnionBucketSpec(left, right) =>
-                                 for {
-                                   newLeft <- memoizedSpec(left)
-                                   newRight <- memoizedSpec(right)
-                                 } yield dag.UnionBucketSpec(newLeft, newRight)
+          editUpdate[E].edit(
+            inScope,
+            spec,
+            edit,
+            (rep: dag.BucketSpec) =>
+              for { state <- monadState.gets(identity) } yield rep,
+            (_: dag.BucketSpec) match {
+              case dag.UnionBucketSpec(left, right) =>
+                for {
+                  newLeft <- memoizedSpec(left)
+                  newRight <- memoizedSpec(right)
+                } yield dag.UnionBucketSpec(newLeft, newRight)
 
-                               case dag.IntersectBucketSpec(left, right) =>
-                                 for {
-                                   newLeft <- memoizedSpec(left)
-                                   newRight <- memoizedSpec(right)
-                                 } yield
-                                   dag.IntersectBucketSpec(newLeft, newRight)
+              case dag.IntersectBucketSpec(left, right) =>
+                for {
+                  newLeft <- memoizedSpec(left)
+                  newRight <- memoizedSpec(right)
+                } yield dag.IntersectBucketSpec(newLeft, newRight)
 
-                               case dag.Group(id, target, child) =>
-                                 for {
-                                   newTarget <- memoized(target)
-                                   newChild <- memoizedSpec(child)
-                                 } yield dag.Group(id, newTarget, newChild)
+              case dag.Group(id, target, child) =>
+                for {
+                  newTarget <- memoized(target)
+                  newChild <- memoizedSpec(child)
+                } yield dag.Group(id, newTarget, newChild)
 
-                               case dag.UnfixedSolution(id, target) =>
-                                 for { newTarget <- memoized(target) } yield
-                                   dag.UnfixedSolution(id, newTarget)
+              case dag.UnfixedSolution(id, target) =>
+                for { newTarget <- memoized(target) } yield
+                  dag.UnfixedSolution(id, newTarget)
 
-                               case dag.Extra(target) =>
-                                 for { newTarget <- memoized(target) } yield
-                                   dag.Extra(newTarget)
-                             })
+              case dag.Extra(target) =>
+                for { newTarget <- memoized(target) } yield
+                  dag.Extra(newTarget)
+            }
+          )
         }
 
         if (spec != scope) rewritten

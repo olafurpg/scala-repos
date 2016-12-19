@@ -179,7 +179,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
         },
         "Choose level for Extract Method",
         getTextForElement,
-        (e: PsiElement) => e.getParent)
+        (e: PsiElement) => e.getParent
+      )
     } else if (siblings.length == 1) {
       invokeDialog(project,
                    editor,
@@ -345,7 +346,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           hasReturn,
           lastReturn,
           lastExprType,
-          innerClassSettings)
+          innerClassSettings
+        )
       }
     val duplicates = DuplicatesUtil.findDuplicates(settings)
     performRefactoring(settings, editor)

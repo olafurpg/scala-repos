@@ -37,7 +37,8 @@ private[opening] final class Finisher(api: OpeningApi, openingColl: Coll) {
           openingRating = opening.perf.intRating,
           openingRatingDiff = openingPerf.intRating - opening.perf.intRating,
           userRating = user.perfs.opening.intRating,
-          userRatingDiff = userPerf.intRating - user.perfs.opening.intRating)
+          userRatingDiff = userPerf.intRating - user.perfs.opening.intRating
+        )
         ((api.attempt add a) >> {
           openingColl.update(
             BSONDocument("_id" -> opening.id),
@@ -49,7 +50,8 @@ private[opening] final class Finisher(api: OpeningApi, openingColl: Coll) {
               "$set" -> BSONDocument(
                 Opening.BSONFields.perf -> Perf.perfBSONHandler.write(
                   openingPerf)
-              ))) zip UserRepo.setPerf(user.id, "opening", userPerf)
+              ))
+          ) zip UserRepo.setPerf(user.id, "opening", userPerf)
         }) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
     }
   }

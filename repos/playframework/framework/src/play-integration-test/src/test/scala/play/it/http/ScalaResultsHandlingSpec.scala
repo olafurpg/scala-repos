@@ -220,18 +220,19 @@ trait ScalaResultsHandlingSpec
     }
 
     "allow sending trailers" in withServer(
-      Result(ResponseHeader(200,
-                            Map(TRANSFER_ENCODING -> CHUNKED,
-                                TRAILER -> "Chunks")),
-             HttpEntity.Chunked(
-               Source(
-                 List(
-                   chunk("aa"),
-                   chunk("bb"),
-                   chunk("cc"),
-                   HttpChunk.LastChunk(new Headers(Seq("Chunks" -> "3")))
-                 )),
-               None))
+      Result(
+        ResponseHeader(200,
+                       Map(TRANSFER_ENCODING -> CHUNKED, TRAILER -> "Chunks")),
+        HttpEntity.Chunked(
+          Source(
+            List(
+              chunk("aa"),
+              chunk("bb"),
+              chunk("cc"),
+              HttpChunk.LastChunk(new Headers(Seq("Chunks" -> "3")))
+            )),
+          None)
+      )
     ) { port =>
       val response = BasicHttpClient.makeRequests(port)(
         BasicRequest("GET", "/", "HTTP/1.1", Map(), "")

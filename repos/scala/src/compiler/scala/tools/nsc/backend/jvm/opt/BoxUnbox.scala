@@ -550,17 +550,20 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
     val newLocalsMap: mutable.LongMap[List[(Type, Int)]] =
       mutable.LongMap.empty
     def newLocals(index: Int) =
-      newLocalsMap.getOrElseUpdate(index, valueTypes match {
-        case List(t) if t.getSize == 1 =>
-          reTypedLocals += index -> t
-          List((t, index))
-        case _ =>
-          valueTypes.map(t => {
-            val newIndex = nextCopyOpLocal
-            nextCopyOpLocal += t.getSize
-            (t, newIndex)
-          })
-      })
+      newLocalsMap.getOrElseUpdate(
+        index,
+        valueTypes match {
+          case List(t) if t.getSize == 1 =>
+            reTypedLocals += index -> t
+            List((t, index))
+          case _ =>
+            valueTypes.map(t => {
+              val newIndex = nextCopyOpLocal
+              nextCopyOpLocal += t.getSize
+              (t, newIndex)
+            })
+        }
+      )
 
     var replaceOK = true
     val copyOps = new CopyOpsIterator(initialProds, finalCons, prodCons)

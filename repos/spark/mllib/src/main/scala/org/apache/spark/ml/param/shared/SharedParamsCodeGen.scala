@@ -52,7 +52,8 @@ private[shared] object SharedParamsCodeGen {
         "Column name for predicted class conditional" +
           " probabilities. Note: Not all models output well-calibrated probability estimates!" +
           " These probabilities should be treated as confidences, not precise probabilities",
-        Some("\"probability\"")),
+        Some("\"probability\"")
+      ),
       ParamDesc[String](
         "varianceCol",
         "Column name for the biased sample variance of prediction"),
@@ -70,7 +71,8 @@ private[shared] object SharedParamsCodeGen {
           " The class with largest value p/t is predicted, where p is the original probability" +
           " of that class and t is the class' threshold",
         isValid = "(t: Array[Double]) => t.forall(_ >= 0)",
-        finalMethods = false),
+        finalMethods = false
+      ),
       ParamDesc[String]("inputCol", "input column name"),
       ParamDesc[Array[String]]("inputCols", "input column names"),
       ParamDesc[String]("outputCol",
@@ -81,7 +83,8 @@ private[shared] object SharedParamsCodeGen {
         "set checkpoint interval (>= 1) or " +
           "disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed " +
           "every 10 iterations",
-        isValid = "(interval: Int) => interval == -1 || interval >= 1"),
+        isValid = "(interval: Int) => interval == -1 || interval >= 1"
+      ),
       ParamDesc[Boolean]("fitIntercept",
                          "whether to fit an intercept term",
                          Some("true")),
@@ -90,7 +93,8 @@ private[shared] object SharedParamsCodeGen {
         "how to handle invalid entries. Options are skip (which " +
           "will filter out rows with bad values), or error (which will throw an errror). More " +
           "options may be added later",
-        isValid = "ParamValidators.inArray(Array(\"skip\", \"error\"))"),
+        isValid = "ParamValidators.inArray(Array(\"skip\", \"error\"))"
+      ),
       ParamDesc[Boolean]("standardization",
                          "whether to standardize the training features" +
                            " before fitting the model",
@@ -102,7 +106,8 @@ private[shared] object SharedParamsCodeGen {
         "elasticNetParam",
         "the ElasticNet mixing parameter, in range [0, 1]." +
           " For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty",
-        isValid = "ParamValidators.inRange(0, 1)"),
+        isValid = "ParamValidators.inRange(0, 1)"
+      ),
       ParamDesc[Double]("tol",
                         "the convergence tolerance for iterative algorithms"),
       ParamDesc[Double](

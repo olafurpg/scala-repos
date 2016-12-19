@@ -321,7 +321,8 @@ class PatternAnnotatorTest
     checkWarning(
       "val Some(x: AnyRef{def foo(i: Int): Int}) = Some(new AnyRef())",
       "AnyRef{def foo(i: Int): Int}",
-      ScalaBundle.message("pattern.on.refinement.unchecked"))
+      ScalaBundle.message("pattern.on.refinement.unchecked")
+    )
   }
 
   def testExpectedTypeIsTupleIfThereIsOneArgumentAndMoreThanOneArgumentIsReturnedByUnapplySCL8115(
@@ -436,7 +437,8 @@ class PatternAnnotatorTest
         Error(
           "foo appliedTo2 ()",
           ScalaBundle.message("wrong.number.arguments.extractor", "2", "3"))
-      ))
+      )
+    )
     assertNoWarnings(code)
   }
 

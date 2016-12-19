@@ -56,14 +56,16 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
   private def paginator(user: User,
                         page: Int,
                         sort: BSONDocument): Fu[Paginator[TourEntry]] =
-    Paginator(adapter = new BSONAdapter[Entry](
-                  collection = coll,
-                  selector = BSONDocument("u" -> user.id),
-                  projection = BSONDocument(),
-                  sort = sort
-                ) mapFutureList withTournaments,
-              currentPage = page,
-              maxPerPage = maxPerPage)
+    Paginator(
+      adapter = new BSONAdapter[Entry](
+          collection = coll,
+          selector = BSONDocument("u" -> user.id),
+          projection = BSONDocument(),
+          sort = sort
+        ) mapFutureList withTournaments,
+      currentPage = page,
+      maxPerPage = maxPerPage
+    )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
     TournamentRepo byIds entries.map(_.tourId) map { tours =>

@@ -25,14 +25,16 @@ class FlatClassPathResolverTest {
                                     "scala",
                                     "scala.reflect",
                                     "scala.reflect.io")
-  private val classFilesToFind = List("scala.tools.util.FlatClassPathResolver",
-                                      "scala.reflect.io.AbstractFile",
-                                      "scala.collection.immutable.List",
-                                      "scala.Option",
-                                      "scala.collection.immutable.Vector",
-                                      "scala.util.hashing.MurmurHash3",
-                                      "java.lang.Object",
-                                      "java.util.Date")
+  private val classFilesToFind = List(
+    "scala.tools.util.FlatClassPathResolver",
+    "scala.reflect.io.AbstractFile",
+    "scala.collection.immutable.List",
+    "scala.Option",
+    "scala.collection.immutable.Vector",
+    "scala.util.hashing.MurmurHash3",
+    "java.lang.Object",
+    "java.util.Date"
+  )
 
   private val classesToFind =
     classFilesToFind ++ List("TestSourceInRootPackage",
@@ -105,7 +107,8 @@ class FlatClassPathResolverTest {
       assertEquals(
         s"Class and source entries with the same name obtained via list for package '$inPackage' should be merged into one containing both files",
         uniqueNamesOfClassAndSourceFiles.size,
-        classesAndSourcesFromList.length)
+        classesAndSourcesFromList.length
+      )
     }
 
     packagesToTest foreach compareEntriesInPackage

@@ -164,7 +164,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                        ColumnName("gender"),
                        NotNullable,
                        Some(22),
-                       Some("male")))
+                       Some("male"))
+    )
 
     val typeDesc = DBMacro.toDBTypeDescriptor[User]
     val columnDef = typeDesc.columnDefn
@@ -216,7 +217,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                        ColumnName("gender"),
                        NotNullable,
                        Some(22),
-                       Some("male")))
+                       Some("male"))
+    )
 
     val typeDesc = DBMacro.toDBTypeDescriptor[User2]
     val columnDef = typeDesc.columnDefn
@@ -257,7 +259,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                        ColumnName("gender"),
                        NotNullable,
                        Some(22),
-                       Some("male")))
+                       Some("male"))
+    )
 
     assert(
       DBMacro
@@ -411,7 +414,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         "forced_var_char",
         new Date(1111L),
         new Date(1112L),
-        Some(1113L)))
+        Some(1113L)
+      ))
   }
 
   "TupleConverter for Date" should {

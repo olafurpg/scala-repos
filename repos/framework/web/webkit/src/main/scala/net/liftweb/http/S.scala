@@ -1558,8 +1558,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   private[http] def unsetSnippetForClass(cls: String): Unit =
     _statefulSnip.set(_statefulSnip.is - cls)
 
-  private var _queryAnalyzer: List[(Box[Req], Long,
-                                    List[(String, Long)]) => Any] = Nil
+  private var _queryAnalyzer: List[
+    (Box[Req], Long, List[(String, Long)]) => Any] = Nil
 
   /**
     * Add a query analyzer (passed queries for analysis or logging). The analyzer
@@ -1901,7 +1901,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                 if (Props.devMode)
                   LiftRules.siteMap // materialize the sitemap very early
                 _innerInit(request, f)
-              }))
+              }
+            )
+          )
         }
       }
     }
@@ -2698,92 +2700,101 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     testFunctionMap {
       (autoCleanUp.box, _oneShot.box) match {
         case (Full(true), _) => {
-          updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-            var shot = false
+          updateFunctionMap(
+            name,
+            new S.ProxyFuncHolder(value) {
+              var shot = false
 
-            override def apply(in: List[String]): Any = {
-              synchronized {
-                if (!shot) {
-                  shot = true
-                  S.session.map(_.removeFunction(name))
-                  value.apply(in)
-                } else {
-                  js.JsCmds.Noop
+              override def apply(in: List[String]): Any = {
+                synchronized {
+                  if (!shot) {
+                    shot = true
+                    S.session.map(_.removeFunction(name))
+                    value.apply(in)
+                  } else {
+                    js.JsCmds.Noop
+                  }
+                }
+              }
+
+              override def apply(in: FileParamHolder): Any = {
+                synchronized {
+                  if (!shot) {
+                    shot = true
+                    S.session.map(_.removeFunction(name))
+                    value.apply(in)
+                  } else {
+                    js.JsCmds.Noop
+                  }
                 }
               }
             }
-
-            override def apply(in: FileParamHolder): Any = {
-              synchronized {
-                if (!shot) {
-                  shot = true
-                  S.session.map(_.removeFunction(name))
-                  value.apply(in)
-                } else {
-                  js.JsCmds.Noop
-                }
-              }
-            }
-          })
+          )
         }
 
         case (_, Full(true)) => {
-          updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-            var shot = false
-            lazy val theFuture: LAFuture[Any] = {
-              S.session.map(_.removeFunction(name))
-              val future: LAFuture[Any] = new LAFuture
+          updateFunctionMap(
+            name,
+            new S.ProxyFuncHolder(value) {
+              var shot = false
+              lazy val theFuture: LAFuture[Any] = {
+                S.session.map(_.removeFunction(name))
+                val future: LAFuture[Any] = new LAFuture
 
-              updateFunctionMap(name, new S.ProxyFuncHolder(value) {
-                override def apply(in: List[String]): Any =
-                  future.get(5000).openOrThrowException("legacy code")
+                updateFunctionMap(
+                  name,
+                  new S.ProxyFuncHolder(value) {
+                    override def apply(in: List[String]): Any =
+                      future.get(5000).openOrThrowException("legacy code")
 
-                override def apply(in: FileParamHolder): Any =
-                  future.get(5000).openOrThrowException("legacy code")
-              })
+                    override def apply(in: FileParamHolder): Any =
+                      future.get(5000).openOrThrowException("legacy code")
+                  }
+                )
 
-              future
-            }
+                future
+              }
 
-            def fixShot(): Boolean = synchronized {
-              val ret = shot
-              shot = true
-              ret
-            }
+              def fixShot(): Boolean = synchronized {
+                val ret = shot
+                shot = true
+                ret
+              }
 
-            override def apply(in: List[String]): Any = {
-              val ns = fixShot()
-              if (ns) {
-                theFuture.get(5000).openOrThrowException("legacy code")
-              } else {
-                val future = theFuture
-                try {
-                  val ret = value.apply(in)
-                  future.satisfy(ret)
-                  ret
-                } catch {
-                  case e: Exception => future.satisfy(e); throw e
+              override def apply(in: List[String]): Any = {
+                val ns = fixShot()
+                if (ns) {
+                  theFuture.get(5000).openOrThrowException("legacy code")
+                } else {
+                  val future = theFuture
+                  try {
+                    val ret = value.apply(in)
+                    future.satisfy(ret)
+                    ret
+                  } catch {
+                    case e: Exception => future.satisfy(e); throw e
+                  }
+                }
+              }
+
+              override def apply(in: FileParamHolder): Any = {
+                val ns = fixShot()
+
+                if (ns) {
+                  theFuture.get(5000).openOrThrowException("legacy code")
+                } else {
+                  val future = theFuture
+                  try {
+                    val ret = value.apply(in)
+                    future.satisfy(ret)
+                    ret
+                  } catch {
+                    case e: Exception => future.satisfy(e); throw e
+                  }
                 }
               }
             }
-
-            override def apply(in: FileParamHolder): Any = {
-              val ns = fixShot()
-
-              if (ns) {
-                theFuture.get(5000).openOrThrowException("legacy code")
-              } else {
-                val future = theFuture
-                try {
-                  val ret = value.apply(in)
-                  future.satisfy(ret)
-                  ret
-                } catch {
-                  case e: Exception => future.satisfy(e); throw e
-                }
-              }
-            }
-          })
+          )
         }
 
         case _ =>

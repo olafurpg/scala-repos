@@ -29,7 +29,8 @@ import org.apache.kafka.common.utils.Utils._
 @deprecated(
   "This object has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-  "0.10.0.0")
+  "0.10.0.0"
+)
 object SyncProducer {
   val RequestKey: Short = 0
   val randomGenerator = new Random
@@ -42,7 +43,8 @@ object SyncProducer {
 @deprecated(
   "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-  "0.10.0.0")
+  "0.10.0.0"
+)
 class SyncProducer(val config: SyncProducerConfig) extends Logging {
 
   private val lock = new Object()

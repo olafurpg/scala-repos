@@ -241,7 +241,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
             _,
             SlaveLost("Remote RPC client disassociated. Likely due to " +
               "containers exceeding thresholds, or network issues. Check driver logs for WARN " +
-              "messages.")))
+              "messages.")
+          ))
     }
 
     // Make fake resource offers on just one executor

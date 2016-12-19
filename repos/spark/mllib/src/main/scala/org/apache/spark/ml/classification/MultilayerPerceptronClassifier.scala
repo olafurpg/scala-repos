@@ -53,7 +53,8 @@ private[ml] trait MultilayerPerceptronParams
       " E.g., Array(780, 100, 10) means 780 inputs, " +
       "one hidden layer with 100 neurons and output layer of 10 neurons.",
     // TODO: how to check ALSO that all elements are greater than 0?
-    ParamValidators.arrayLengthGt(1))
+    ParamValidators.arrayLengthGt(1)
+  )
 
   /** @group getParam */
   final def getLayers: Array[Int] = $(layers)
@@ -72,7 +73,8 @@ private[ml] trait MultilayerPerceptronParams
     "Block size for stacking input data in matrices. Data is stacked within partitions." +
       " If block size is more than remaining data in a partition then " +
       "it is adjusted to the size of this data. Recommended size is between 10 and 1000",
-    ParamValidators.gt(0))
+    ParamValidators.gt(0)
+  )
 
   /** @group getParam */
   final def getBlockSize: Int = $(blockSize)

@@ -449,13 +449,16 @@ class MarathonSchedulerService @Inject()(
 
   private def startLeaderDurationMetric() = {
     metrics
-      .gauge("service.mesosphere.marathon.leaderDuration", new Gauge[Long] {
-        val startedAt = System.currentTimeMillis()
+      .gauge(
+        "service.mesosphere.marathon.leaderDuration",
+        new Gauge[Long] {
+          val startedAt = System.currentTimeMillis()
 
-        override def getValue: Long = {
-          System.currentTimeMillis() - startedAt
+          override def getValue: Long = {
+            System.currentTimeMillis() - startedAt
+          }
         }
-      })
+      )
   }
   private def stopLeaderDurationMetric() = {
     metrics.registry.remove("service.mesosphere.marathon.leaderDuration")

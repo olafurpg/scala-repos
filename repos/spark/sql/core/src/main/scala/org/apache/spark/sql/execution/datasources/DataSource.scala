@@ -183,7 +183,8 @@ case class DataSource(sqlContext: SQLContext,
                 paths = files,
                 userSpecifiedSchema = Some(dataSchema),
                 className = className,
-                options = options.filterKeys(_ != "path")).resolveRelation()))
+                options = options.filterKeys(_ != "path")).resolveRelation())
+          )
         }
 
         new FileStreamSource(sqlContext,
@@ -268,14 +269,15 @@ case class DataSource(sqlContext: SQLContext,
                 "It must be specified manually")
           }
 
-        HadoopFsRelation(sqlContext,
-                         fileCatalog,
-                         partitionSchema =
-                           fileCatalog.partitionSpec().partitionColumns,
-                         dataSchema = dataSchema.asNullable,
-                         bucketSpec = bucketSpec,
-                         format,
-                         options)
+        HadoopFsRelation(
+          sqlContext,
+          fileCatalog,
+          partitionSchema = fileCatalog.partitionSpec().partitionColumns,
+          dataSchema = dataSchema.asNullable,
+          bucketSpec = bucketSpec,
+          format,
+          options
+        )
 
       case _ =>
         throw new AnalysisException(
@@ -366,7 +368,8 @@ case class DataSource(sqlContext: SQLContext,
           () => Unit, // No existing table needs to be refreshed.
           options,
           data.logicalPlan,
-          mode)
+          mode
+        )
         sqlContext.executePlan(plan).toRdd
 
       case _ =>

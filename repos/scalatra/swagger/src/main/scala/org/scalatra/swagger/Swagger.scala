@@ -68,13 +68,15 @@ object Swagger {
                       "Duration",
                       "FiniteDuration",
                       "Chronology")
-  val excludes: Set[java.lang.reflect.Type] = Set(classOf[java.util.TimeZone],
-                                                  classOf[java.util.Date],
-                                                  classOf[DateTime],
-                                                  classOf[DateMidnight],
-                                                  classOf[ReadableInstant],
-                                                  classOf[Chronology],
-                                                  classOf[DateTimeZone])
+  val excludes: Set[java.lang.reflect.Type] = Set(
+    classOf[java.util.TimeZone],
+    classOf[java.util.Date],
+    classOf[DateTime],
+    classOf[DateMidnight],
+    classOf[ReadableInstant],
+    classOf[Chronology],
+    classOf[DateTimeZone]
+  )
   val containerTypes = Set("Array", "List", "Set")
   val SpecVersion = "1.2"
   val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
@@ -150,7 +152,8 @@ object Swagger {
       else ctorParam.map(_.argIndex).getOrElse(position.getOrElse(0)),
       required = required && !prop.returnType.isOption,
       description = description.flatMap(_.blankOption),
-      allowableValues = convertToAllowableValues(allowableValues))
+      allowableValues = convertToAllowableValues(allowableValues)
+    )
     //    if (descr.simpleName == "Pet") println("The property is: " + mp)
     prop.name -> mp
   }
@@ -280,21 +283,23 @@ class Swagger(val swaggerVersion: String,
     val endpoints: List[Endpoint] =
       s.endpoints(resourcePath) collect { case m: Endpoint => m }
     _docs +=
-      listingPath -> Api(apiVersion,
-                         swaggerVersion,
-                         resourcePath,
-                         description,
-                         (produces ::: endpoints.flatMap(
-                           _.operations.flatMap(_.produces))).distinct,
-                         (consumes ::: endpoints.flatMap(
-                           _.operations.flatMap(_.consumes))).distinct,
-                         (protocols ::: endpoints.flatMap(
-                           _.operations.flatMap(_.protocols))).distinct,
-                         endpoints,
-                         s.models.toMap,
-                         (authorizations ::: endpoints.flatMap(
-                           _.operations.flatMap(_.authorizations))).distinct,
-                         0)
+      listingPath -> Api(
+        apiVersion,
+        swaggerVersion,
+        resourcePath,
+        description,
+        (produces ::: endpoints
+          .flatMap(_.operations.flatMap(_.produces))).distinct,
+        (consumes ::: endpoints
+          .flatMap(_.operations.flatMap(_.consumes))).distinct,
+        (protocols ::: endpoints
+          .flatMap(_.operations.flatMap(_.protocols))).distinct,
+        endpoints,
+        s.models.toMap,
+        (authorizations ::: endpoints.flatMap(
+          _.operations.flatMap(_.authorizations))).distinct,
+        0
+      )
   }
 }
 

@@ -717,20 +717,22 @@ private[clustering] object LDASuite {
     val alpha = 0.01
     val eta = 0.01
     val gammaShape = 100
-    val topics = new DenseMatrix(numRows = vocabSize,
-                                 numCols = k,
-                                 values = Array(1.86738052,
-                                                1.94056535,
-                                                1.89981687,
-                                                0.0833265,
-                                                0.07405918,
-                                                0.07940597,
-                                                0.15081551,
-                                                0.08637973,
-                                                0.12428538,
-                                                1.9474897,
-                                                1.94615165,
-                                                1.95204124))
+    val topics = new DenseMatrix(
+      numRows = vocabSize,
+      numCols = k,
+      values = Array(1.86738052,
+                     1.94056535,
+                     1.89981687,
+                     0.0833265,
+                     0.07405918,
+                     0.07940597,
+                     0.15081551,
+                     0.08637973,
+                     0.12428538,
+                     1.9474897,
+                     1.94615165,
+                     1.95204124)
+    )
     val ldaModel: LocalLDAModel = new LocalLDAModel(
       topics,
       Vectors.dense(Array.fill(k)(alpha)),

@@ -219,14 +219,16 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
                   }
                 //todo: so what to return? probable PIEAE after such code invocation
                 case _ =>
-                  return safeBindToElement(qname, {
-                    case (qual, true) =>
-                      ScalaPsiElementFactory
-                        .createReferenceFromText(qual, getContext, this)
-                    case (qual, false) =>
-                      ScalaPsiElementFactory
-                        .createReferenceFromText(qual, getManager)
-                  }) {
+                  return safeBindToElement(
+                    qname, {
+                      case (qual, true) =>
+                        ScalaPsiElementFactory
+                          .createReferenceFromText(qual, getContext, this)
+                      case (qual, false) =>
+                        ScalaPsiElementFactory
+                          .createReferenceFromText(qual, getManager)
+                    }
+                  ) {
                     c match {
                       case ClassTypeToImport(clazz) =>
                         ScalaImportTypeFix

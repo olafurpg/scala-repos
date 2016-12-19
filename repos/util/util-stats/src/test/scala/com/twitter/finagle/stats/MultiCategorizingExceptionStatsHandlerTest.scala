@@ -58,18 +58,19 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             classOf[RuntimeException].getName,
             classOf[Exception].getName)) == 1)
 
-    assert(keys == Seq(
-      "clienterrors",
-      "clienterrors/interrupted",
-      "clienterrors/interrupted/java.lang.RuntimeException",
-      "clienterrors/interrupted/java.lang.RuntimeException/java.lang.Exception",
-      "clienterrors/restartable",
-      "clienterrors/restartable/java.lang.RuntimeException",
-      "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
-      "sourcedfailures/service",
-      "sourcedfailures/service/java.lang.RuntimeException",
-      "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
-    ))
+    assert(
+      keys == Seq(
+        "clienterrors",
+        "clienterrors/interrupted",
+        "clienterrors/interrupted/java.lang.RuntimeException",
+        "clienterrors/interrupted/java.lang.RuntimeException/java.lang.Exception",
+        "clienterrors/restartable",
+        "clienterrors/restartable/java.lang.RuntimeException",
+        "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
+        "sourcedfailures/service",
+        "sourcedfailures/service/java.lang.RuntimeException",
+        "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+      ))
   }
 
   test("skips flags when it's empty") {
@@ -108,14 +109,15 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             classOf[RuntimeException].getName,
             classOf[Exception].getName)) == 1)
 
-    assert(keys == Seq(
-      "clienterrors",
-      "clienterrors/java.lang.RuntimeException",
-      "clienterrors/java.lang.RuntimeException/java.lang.Exception",
-      "sourcedfailures/service",
-      "sourcedfailures/service/java.lang.RuntimeException",
-      "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
-    ))
+    assert(
+      keys == Seq(
+        "clienterrors",
+        "clienterrors/java.lang.RuntimeException",
+        "clienterrors/java.lang.RuntimeException/java.lang.Exception",
+        "sourcedfailures/service",
+        "sourcedfailures/service/java.lang.RuntimeException",
+        "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+      ))
   }
 
   test("skips unknown source and defaults to failures") {
@@ -178,14 +180,15 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             classOf[RuntimeException].getName,
             classOf[Exception].getName)) == 1)
 
-    assert(keys == Seq(
-      "clienterrors",
-      "clienterrors/interrupted",
-      "clienterrors/interrupted/java.lang.RuntimeException/java.lang.Exception",
-      "clienterrors/restartable",
-      "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
-      "sourcedfailures/service",
-      "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
-    ))
+    assert(
+      keys == Seq(
+        "clienterrors",
+        "clienterrors/interrupted",
+        "clienterrors/interrupted/java.lang.RuntimeException/java.lang.Exception",
+        "clienterrors/restartable",
+        "clienterrors/restartable/java.lang.RuntimeException/java.lang.Exception",
+        "sourcedfailures/service",
+        "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
+      ))
   }
 }

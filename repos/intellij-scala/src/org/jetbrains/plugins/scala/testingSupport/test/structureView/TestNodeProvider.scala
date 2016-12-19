@@ -473,7 +473,8 @@ object TestNodeProvider {
           children,
           if (checkSpecsPending(expr))
             TestStructureViewElement.pendingStatusId
-          else TestStructureViewElement.normalStatusId))
+          else TestStructureViewElement.normalStatusId
+        ))
     } else None
   }
 

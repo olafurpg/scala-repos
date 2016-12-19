@@ -121,7 +121,8 @@ object TreeView {
   @deprecated(
     "This method does not correctly calculate the distance from the given TreeItem to the root of the TreeView. " +
       "As of JavaFX 8.0_20, the proper way to do this is via getTreeItemLevel(TreeItem)",
-    since = "8.0_20")
+    since = "8.0_20"
+  )
   def nodeLevel(node: TreeItem[_]) = jfxsc.TreeView.getNodeLevel(node)
 
   /**

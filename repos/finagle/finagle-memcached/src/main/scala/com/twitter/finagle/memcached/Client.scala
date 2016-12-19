@@ -922,7 +922,8 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
       healthBroker,
       ejectFailedHost,
       label,
-      ClientStatsReceiver.scope("memcached_client"))
+      ClientStatsReceiver.scope("memcached_client")
+    )
 
   private[this] val failureAccrualEx = Future.exception(
     new FailureAccrualException("Endpoint is marked dead by failureAccrual") {

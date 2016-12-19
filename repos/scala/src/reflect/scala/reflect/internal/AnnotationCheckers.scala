@@ -75,7 +75,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     @deprecated(
       "Create an AnalyzerPlugin and use pluginsTypedReturn. Note: the 'tree' argument here is\n" +
         "the 'expr' of a Return tree; 'pluginsTypedReturn' takes the Return tree itself as argument",
-      "2.10.1")
+      "2.10.1"
+    )
     def adaptTypeOfReturn(tree: Tree, pt: Type, default: => Type): Type =
       default
   }

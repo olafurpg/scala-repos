@@ -368,7 +368,8 @@ class OffsetIndex(@volatile var file: File,
     require(
       entries == 0 || lastOffset > baseOffset,
       "Corrupt index found, index file (%s) has non-zero size but the last offset is %d and the base offset is %d"
-        .format(file.getAbsolutePath, lastOffset, baseOffset))
+        .format(file.getAbsolutePath, lastOffset, baseOffset)
+    )
     val len = file.length()
     require(len % 8 == 0,
             "Index file " + file.getName + " is corrupt, found " + len +

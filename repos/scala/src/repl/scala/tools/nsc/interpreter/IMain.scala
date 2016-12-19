@@ -443,8 +443,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     // enough to just redefine them together but that may not always
     // be what people want so I'm waiting until I can do it better.
     exitingTyper {
-      req.defines filterNot (s =>
-                               req.defines contains s.companionSymbol) foreach {
+      req.defines filterNot (s => req.defines contains s.companionSymbol) foreach {
         newSym =>
           val oldSym = replScope lookup newSym.name.companionName
           if (Seq(oldSym, newSym).permutations exists {
@@ -522,17 +521,17 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     repltrace(
       trees map
         (t => {
-           // [Eugene to Paul] previously it just said `t map ...`
-           // because there was an implicit conversion from Tree to a list of Trees
-           // however Martin and I have removed the conversion
-           // (it was conflicting with the new reflection API),
-           // so I had to rewrite this a bit
-           val subs = t collect { case sub => sub }
-           subs map
-             (t0 =>
-                "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                  "\n") mkString ""
-         }) mkString "\n"
+          // [Eugene to Paul] previously it just said `t map ...`
+          // because there was an implicit conversion from Tree to a list of Trees
+          // however Martin and I have removed the conversion
+          // (it was conflicting with the new reflection API),
+          // so I had to rewrite this a bit
+          val subs = t collect { case sub => sub }
+          subs map
+            (t0 =>
+              "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                "\n") mkString ""
+        }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
     // AST node position and snap the line off there.  Rewrite the code embodied

@@ -208,8 +208,8 @@ class LazyMacros(val c: whitebox.Context)
 
   def mkStrictImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
-      (tree,
-       actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
+      (tree, actualType) =>
+        q"_root_.shapeless.Strict.apply[$actualType]($tree)",
       q"null.asInstanceOf[_root_.shapeless.Strict[_root_.scala.Nothing]]"
     )
 

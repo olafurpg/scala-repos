@@ -234,23 +234,27 @@ private[stream] object ActorGraphInterpreter {
       }
     }
 
-    setHandler(out, new OutHandler {
-      override def onPull(): Unit = {
-        if (inputBufferElements > 1) push(out, dequeue())
-        else if (inputBufferElements == 1) {
-          if (upstreamCompleted) {
-            push(out, dequeue())
+    setHandler(
+      out,
+      new OutHandler {
+        override def onPull(): Unit = {
+          if (inputBufferElements > 1) push(out, dequeue())
+          else if (inputBufferElements == 1) {
+            if (upstreamCompleted) {
+              push(out, dequeue())
+              complete(out)
+            } else push(out, dequeue())
+          } else if (upstreamCompleted) {
             complete(out)
-          } else push(out, dequeue())
-        } else if (upstreamCompleted) {
-          complete(out)
+          }
         }
+
+        override def onDownstreamFinish(): Unit = cancel()
+
+        override def toString: String =
+          BatchingActorInputBoundary.this.toString
       }
-
-      override def onDownstreamFinish(): Unit = cancel()
-
-      override def toString: String = BatchingActorInputBoundary.this.toString
-    })
+    )
 
     override def toString: String =
       s"BatchingActorInputBoundary(id=$id, fill=$inputBufferElements/$size, completed=$upstreamCompleted, canceled=$downstreamCanceled)"
@@ -299,19 +303,22 @@ private[stream] object ActorGraphInterpreter {
       }
     }
 
-    setHandler(in, new InHandler {
-      override def onPush(): Unit = {
-        onNext(grab(in))
-        if (downstreamCompleted) cancel(in)
-        else if (downstreamDemand > 0) pull(in)
+    setHandler(
+      in,
+      new InHandler {
+        override def onPush(): Unit = {
+          onNext(grab(in))
+          if (downstreamCompleted) cancel(in)
+          else if (downstreamDemand > 0) pull(in)
+        }
+
+        override def onUpstreamFinish(): Unit = complete()
+
+        override def onUpstreamFailure(cause: Throwable): Unit = fail(cause)
+
+        override def toString: String = ActorOutputBoundary.this.toString
       }
-
-      override def onUpstreamFinish(): Unit = complete()
-
-      override def onUpstreamFailure(cause: Throwable): Unit = fail(cause)
-
-      override def toString: String = ActorOutputBoundary.this.toString
-    })
+    )
 
     def subscribePending(): Unit =
       exposedPublisher.takePendingSubscribers() foreach { sub ⇒
@@ -396,7 +403,8 @@ private[stream] final class GraphInterpreterShell(
       else enqueueToShortCircuit(asyncInput)
     },
     settings.fuzzingMode,
-    self)
+    self
+  )
 
   private val inputs = new Array[BatchingActorInputBoundary](shape.inlets.size)
   private val outputs = new Array[ActorOutputBoundary](shape.outlets.size)

@@ -36,7 +36,8 @@ object Rewind {
               Some(((nowMillis - game.createdAt.getMillis) / 100).toInt),
             check =
               if (rewindedSituation.check) rewindedSituation.kingPos
-              else None),
+              else None
+          ),
           binaryMoveTimes = BinaryFormat.moveTime write
               (game.moveTimes take rewindedGame.turns),
           crazyData = rewindedSituation.board.crazyData,

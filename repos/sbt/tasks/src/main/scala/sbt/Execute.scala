@@ -97,7 +97,8 @@ private[sbt] final class Execute[A[_] <: AnyRef](
           assert(
             false,
             "Internal task engine error: nothing running.  This usually indicates a cycle in tasks.\n  Calling tasks (internal task engine state):\n" +
-              dumpCalling)
+              dumpCalling
+          )
         }
       }
 

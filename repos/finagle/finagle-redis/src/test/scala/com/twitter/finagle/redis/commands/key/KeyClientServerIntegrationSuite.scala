@@ -333,7 +333,8 @@ final class KeyClientServerIntegrationSuite
     "RENAMENX should return an IntegerReply of 0 to verify a key rename did not occur when the" +
       " the new key name already exists",
     ClientServerTest,
-    RedisTest) {
+    RedisTest
+  ) {
     withRedisClient { client =>
       val rename1 = string2ChanBuf("rename1")
       assert(Await.result(client(Set(rename1, bar))) == OKStatusReply)

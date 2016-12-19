@@ -271,16 +271,20 @@ sealed abstract class Future[+A] {
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
-      scheduler.schedule(new Runnable {
-        def run() {
-          if (done.compareAndSet(false, true)) {
-            cancel.set(true)
-            cb(
-              -\/(new TimeoutException(
-                s"Timed out after $timeoutInMillis milliseconds")))
+      scheduler.schedule(
+        new Runnable {
+          def run() {
+            if (done.compareAndSet(false, true)) {
+              cancel.set(true)
+              cb(
+                -\/(new TimeoutException(
+                  s"Timed out after $timeoutInMillis milliseconds")))
+            }
           }
-        }
-      }, timeoutInMillis, TimeUnit.MILLISECONDS)
+        },
+        timeoutInMillis,
+        TimeUnit.MILLISECONDS
+      )
 
       unsafePerformAsyncInterruptibly(
         a => if (done.compareAndSet(false, true)) cb(\/-(a)),
@@ -417,8 +421,9 @@ object Future {
 
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
-                    cb(results.toList.foldLeft(R.zero)((a, b) =>
-                      R.append(a, b)))
+                    cb(
+                      results.toList.foldLeft(R.zero)(
+                        (a, b) => R.append(a, b)))
                   else Trampoline.done(())
                 }
               }

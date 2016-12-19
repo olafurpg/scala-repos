@@ -25,7 +25,8 @@ class ReceiverSpec extends TypedSpec {
     Setup("afterGetOneLater", afterGetOneLater, 1, 2),
     Setup("afterGetOneTimeout", afterGetOneTimeout, 1, 2),
     Setup("afterGetAll", afterGetAll, 1, 1),
-    Setup("afterGetAllTimeout", afterGetAllTimeout, 1, 1))
+    Setup("afterGetAllTimeout", afterGetAllTimeout, 1, 1)
+  )
 
   private def afterGetOneFirst(
       ctx: ActorContext[Command[Msg]]): Behavior[Command[Msg]] =
@@ -66,7 +67,8 @@ class ReceiverSpec extends TypedSpec {
 
   private def setup(name: String,
                     behv: Behavior[Command[Msg]] = behavior[Msg])(
-      proc: (EffectfulActorContext[Command[Msg]], EffectfulActorContext[Msg],
+      proc: (EffectfulActorContext[Command[Msg]],
+             EffectfulActorContext[Msg],
              Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
     for (Setup(description, behv, messages, effects) ← startingPoints) {
       val ctx = new EffectfulActorContext("ctx",

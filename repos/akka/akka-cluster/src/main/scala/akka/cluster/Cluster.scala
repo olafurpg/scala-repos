@@ -119,7 +119,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
         "Using a dedicated scheduler for cluster. Default scheduler can be used if configured " +
           "with 'akka.scheduler.tick-duration' [{} ms] <=  'akka.cluster.scheduler.tick-duration' [{} ms].",
         (1000 / system.scheduler.maxFrequency).toInt,
-        SchedulerTickDuration.toMillis)
+        SchedulerTickDuration.toMillis
+      )
 
       val cfg = ConfigFactory
         .parseString(
@@ -250,7 +251,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
             "at least one `ClusterDomainEvent` class is required")
     require(
       to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
-      s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
+      s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]"
+    )
     clusterCore ! InternalClusterAction
       .Subscribe(subscriber, initialStateMode, to.toSet)
   }

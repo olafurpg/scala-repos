@@ -121,7 +121,8 @@ sealed trait BoxTrait {
     java.lang.Float.TYPE -> classOf[java.lang.Float],
     java.lang.Integer.TYPE -> classOf[java.lang.Integer],
     java.lang.Long.TYPE -> classOf[java.lang.Long],
-    java.lang.Short.TYPE -> classOf[java.lang.Short])
+    java.lang.Short.TYPE -> classOf[java.lang.Short]
+  )
 
   @deprecated("Use the correctly-spelled primitiveMap instead.", "3.0")
   val primativeMap = primitiveMap

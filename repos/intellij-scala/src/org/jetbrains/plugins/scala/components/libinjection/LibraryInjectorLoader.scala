@@ -440,43 +440,46 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     runWithHelperModule { module =>
       ProgressManager
         .getInstance()
-        .runProcess(toRunnable {
-          for ((manifest, injectors) <- data) {
-            for (injectorDescriptor <- injectors) {
-              try {
-                compileInjectorFromLibrary(
-                  extractInjectorSources(new File(manifest.jarPath),
-                                         injectorDescriptor),
-                  getInjectorCacheDir(manifest)(injectorDescriptor),
-                  module
-                )
-                numSuccessful += 1
-                loadInjector(manifest, injectorDescriptor)
-                jarCache.cache.put(manifest.jarPath, manifest)
-              } catch {
-                case e: InjectorCompileException =>
-                  LOG.error("Failed to compile injector", e)
-                  numFailed += 1
+        .runProcess(
+          toRunnable {
+            for ((manifest, injectors) <- data) {
+              for (injectorDescriptor <- injectors) {
+                try {
+                  compileInjectorFromLibrary(
+                    extractInjectorSources(new File(manifest.jarPath),
+                                           injectorDescriptor),
+                    getInjectorCacheDir(manifest)(injectorDescriptor),
+                    module
+                  )
+                  numSuccessful += 1
+                  loadInjector(manifest, injectorDescriptor)
+                  jarCache.cache.put(manifest.jarPath, manifest)
+                } catch {
+                  case e: InjectorCompileException =>
+                    LOG.error("Failed to compile injector", e)
+                    numFailed += 1
+                }
               }
             }
-          }
-          val msg =
-            if (numFailed == 0)
-              s"Compiled $numSuccessful injector(s) in ${(System
-                .currentTimeMillis() - startTime) / 1000} seconds"
-            else
-              s"Failed to compile $numFailed injectors out of ${numSuccessful + numFailed}, see Event Log for details"
-          val notificationDisplayType =
-            if (numFailed == 0) NotificationType.INFORMATION
-            else NotificationType.ERROR
-          GROUP
-            .createNotification("IDEA Extensions",
-                                msg,
-                                notificationDisplayType,
-                                null)
-            .notify(project)
-          LOG.trace(msg)
-        }, indicator)
+            val msg =
+              if (numFailed == 0)
+                s"Compiled $numSuccessful injector(s) in ${(System
+                  .currentTimeMillis() - startTime) / 1000} seconds"
+              else
+                s"Failed to compile $numFailed injectors out of ${numSuccessful + numFailed}, see Event Log for details"
+            val notificationDisplayType =
+              if (numFailed == 0) NotificationType.INFORMATION
+              else NotificationType.ERROR
+            GROUP
+              .createNotification("IDEA Extensions",
+                                  msg,
+                                  notificationDisplayType,
+                                  null)
+              .notify(project)
+            LOG.trace(msg)
+          },
+          indicator
+        )
     }
   }
 

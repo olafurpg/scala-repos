@@ -23,7 +23,8 @@ object ContravariantCoyonedaUsage extends App {
     Vector("東京", "1868", "13,185,502"),
     Vector("Brisbane", "1824-09-13", "2,189,878"),
     Vector("München", "1158", "1,388,308"),
-    Vector("Boston", "1630-09-07", "636,479"))
+    Vector("Boston", "1630-09-07", "636,479")
+  )
 
   // Or, really, maybe it has some structure.  That’s not important.
   // What matters is, I want to sort the data according to various
@@ -115,7 +116,8 @@ object ContravariantCoyonedaUsage extends App {
   val byDirectSorts: List[List[Vector[String]]] = List(
     schwartzian(unstructuredData)(v => caseInsensitively(v(0))),
     schwartzian(unstructuredData)(v => parseDate(v(1))),
-    schwartzian(unstructuredData)(v => parseCommaNum(v(2))))
+    schwartzian(unstructuredData)(v => parseCommaNum(v(2)))
+  )
 
   // Something interesting happens when you try to abstract over the
   // sort key function, though:

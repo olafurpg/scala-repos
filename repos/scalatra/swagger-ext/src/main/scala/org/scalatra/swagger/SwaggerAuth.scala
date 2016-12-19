@@ -49,7 +49,8 @@ class SwaggerWithAuth(val swaggerVersion: String,
         s.models.toMap,
         (authorizations ::: endpoints.flatMap(
           _.operations.flatMap(_.authorizations))).distinct,
-        0)
+        0
+      )
   }
 }
 
@@ -414,7 +415,8 @@ trait SwaggerAuthSupport[TypeForUser <: AnyRef]
           (errors ::: swaggerDefaultMessages ::: swaggerDefaultErrors).distinct,
         produces = produces,
         consumes = consumes,
-        allows = allows)
+        allows = allows
+      )
     }
   }
 }

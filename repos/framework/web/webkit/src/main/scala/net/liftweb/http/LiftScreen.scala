@@ -398,11 +398,19 @@ trait AbstractScreen extends Factory with Loggable {
                            default: => T,
                            stuff: FilterOrValidate[T]*)(
       implicit man: Manifest[T]): FieldBuilder[T] = {
-    new FieldBuilder[T](name, default, man, Empty, stuff.toList.collect {
-      case AVal(v: Function1[_, _]) => v.asInstanceOf[T => List[FieldError]]
-    }, stuff.toList.collect {
-      case AFilter(v) => v.asInstanceOf[T => T]
-    }, stuff)
+    new FieldBuilder[T](
+      name,
+      default,
+      man,
+      Empty,
+      stuff.toList.collect {
+        case AVal(v: Function1[_, _]) => v.asInstanceOf[T => List[FieldError]]
+      },
+      stuff.toList.collect {
+        case AFilter(v) => v.asInstanceOf[T => T]
+      },
+      stuff
+    )
   }
 
   protected object FilterOrValidate {
@@ -723,14 +731,22 @@ trait AbstractScreen extends Factory with Loggable {
                          default: => T,
                          stuff: FilterOrValidate[T]*)(
       implicit man: Manifest[T]): Field { type ValueType = T } =
-    new FieldBuilder[T](name, default, man, Empty, stuff.toList.flatMap {
-      case AVal(v: Function1[_, _]) =>
-        List(v.asInstanceOf[T => List[FieldError]])
-      case _ => Nil
-    }, stuff.toList.flatMap {
-      case AFilter(v) => List(v.asInstanceOf[T => T])
-      case _ => Nil
-    }, stuff).make
+    new FieldBuilder[T](
+      name,
+      default,
+      man,
+      Empty,
+      stuff.toList.flatMap {
+        case AVal(v: Function1[_, _]) =>
+          List(v.asInstanceOf[T => List[FieldError]])
+        case _ => Nil
+      },
+      stuff.toList.flatMap {
+        case AFilter(v) => List(v.asInstanceOf[T => T])
+        case _ => Nil
+      },
+      stuff
+    ).make
 
   protected def removeRegExChars(regEx: String): String => String =
     s =>
@@ -848,9 +864,9 @@ trait AbstractScreen extends Factory with Loggable {
   protected def makeField[T, OV](theName: => String,
                                  defaultValue: => T,
                                  theToForm: (Field {
-                                               type OtherValueType = OV
-                                               type ValueType = T
-                                             } => Box[NodeSeq]),
+                                   type OtherValueType = OV
+                                   type ValueType = T
+                                 } => Box[NodeSeq]),
                                  otherValue: OtherValueInitializer[OV],
                                  stuff: FilterOrValidate[T]*)
     : Field { type ValueType = T; type OtherValueType = OV } = {
@@ -1164,7 +1180,8 @@ trait AbstractScreen extends Factory with Loggable {
             .radio(field.otherValue, Full(field.is), field.set _, eAttr: _*)
             .toForm),
       OtherValueInitializerImpl[Seq[String]](() => choices),
-      stuff: _*)
+      stuff: _*
+    )
   }
 }
 
@@ -1257,18 +1274,23 @@ trait ScreenWizardRendered extends Loggable {
       S.getAllNotices
 
     def fieldsWithStyle(style: BindingStyle, includeMissing: Boolean) =
-      logger.trace("Looking for fields with style %s, includeMissing = %s"
-                     .format(style, includeMissing),
-                   fields filter
-                     (field =>
-                        field.binding map (_.bindingStyle == style) openOr
-                          (includeMissing)))
+      logger.trace(
+        "Looking for fields with style %s, includeMissing = %s"
+          .format(style, includeMissing),
+        fields filter
+          (field =>
+            field.binding map (_.bindingStyle == style) openOr
+              (includeMissing))
+      )
 
     def bindingInfoWithFields(style: BindingStyle) =
-      logger.trace("Looking for fields with style %s".format(style), (for {
-        field <- fields;
-        bindingInfo <- field.binding if bindingInfo.bindingStyle == style
-      } yield (bindingInfo, field)).toList)
+      logger.trace(
+        "Looking for fields with style %s".format(style),
+        (for {
+          field <- fields;
+          bindingInfo <- field.binding if bindingInfo.bindingStyle == style
+        } yield (bindingInfo, field)).toList
+      )
 
     def templateFields: List[CssBindFunc] =
       List(
@@ -1289,7 +1311,8 @@ trait ScreenWizardRendered extends Loggable {
             "Binding default field %s to %s"
               .format(bindingInfo.selector(formName), defaultFieldNodeSeq),
             bindingInfo.selector(formName) #> bindField(field)(
-              defaultFieldNodeSeq))
+              defaultFieldNodeSeq)
+          )
 
     def customFields: List[CssBindFunc] =
       for {
@@ -1302,7 +1325,8 @@ trait ScreenWizardRendered extends Loggable {
         traceInline(
           "Binding custom field %s to %s"
             .format(bindingInfo.selector(formName), custom.template),
-          bindingInfo.selector(formName) #> bindField(field)(custom.template))
+          bindingInfo.selector(formName) #> bindField(field)(custom.template)
+        )
 
     def dynamicFields: List[CssBindFunc] =
       for {
@@ -1941,8 +1965,8 @@ trait LiftScreen
       Empty,
       cancelId ->
         (() => {
-           redirectBack()
-         }), //cancelId: (String, () => Unit),
+          redirectBack()
+        }), //cancelId: (String, () => Unit),
       theScreen,
       ajaxForms_?
     )

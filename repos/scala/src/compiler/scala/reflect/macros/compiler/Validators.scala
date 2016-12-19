@@ -115,8 +115,8 @@ trait Validators { self: DefaultMacroCompiler =>
       private def paramss_s =
         paramss map
           (ps =>
-             ps.map(s => s"${s.name}: ${s.tpe_*}")
-               .mkString("(", ", ", ")")) mkString ""
+            ps.map(s => s"${s.name}: ${s.tpe_*}")
+              .mkString("(", ", ", ")")) mkString ""
       override def toString =
         "MacroImplSig(" + tparams_s + paramss_s + ret + ")"
     }
@@ -225,14 +225,16 @@ trait Validators { self: DefaultMacroCompiler =>
         def makeParam(name: Name, pos: Position, tpe: Type, flags: Long) =
           macroDef.newValueParameter(name.toTermName, pos, flags) setInfo tpe
         def param(tree: Tree): Symbol = (
-          cache.getOrElseUpdate(tree.symbol, {
-            val sym = tree.symbol
-            assert(sym.isTerm, s"sym = $sym, tree = $tree")
-            makeParam(sym.name,
-                      sym.pos,
-                      sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
-                      sym.flags)
-          })
+          cache.getOrElseUpdate(
+            tree.symbol, {
+              val sym = tree.symbol
+              assert(sym.isTerm, s"sym = $sym, tree = $tree")
+              makeParam(sym.name,
+                        sym.pos,
+                        sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
+                        sym.flags)
+            }
+          )
         )
       }
 

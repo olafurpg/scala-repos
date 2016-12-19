@@ -60,7 +60,8 @@ class VectorIndexerSuite
       Vectors.sparse(3, Array(0, 1), Array(1.0, 2.0)),
       Vectors.sparse(3, Array(1, 2), Array(1.0, 2.0)),
       Vectors.sparse(3, Array(2), Array(-1.0)),
-      Vectors.sparse(3, Array(0, 1, 2), Array(1.0, 3.0, 2.0)))
+      Vectors.sparse(3, Array(0, 1, 2), Array(1.0, 3.0, 2.0))
+    )
     point1maxes = Array(1.0, 3.0, 2.0)
 
     val densePoints2Seq = Seq(Vectors.dense(1.0, 1.0, 0.0, 1.0),
@@ -69,7 +70,8 @@ class VectorIndexerSuite
     val sparsePoints2Seq = Seq(
       Vectors.sparse(4, Array(0, 1, 3), Array(1.0, 1.0, 1.0)),
       Vectors.sparse(4, Array(1, 2, 3), Array(1.0, 1.0, 1.0)),
-      Vectors.sparse(4, Array(0, 1, 2), Array(-1.0, 1.0, 2.0)))
+      Vectors.sparse(4, Array(0, 1, 2), Array(-1.0, 1.0, 2.0))
+    )
 
     val badPointsSeq = Seq(Vectors.sparse(2, Array(0, 1), Array(1.0, 1.0)),
                            Vectors.sparse(3, Array(2), Array(-1.0)))

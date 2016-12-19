@@ -33,4 +33,5 @@ class SdkTableModel
 
         override def valueOf(item: SdkChoice): Boolean =
           item.sdk.docFiles.nonEmpty
-      })
+      }
+    )

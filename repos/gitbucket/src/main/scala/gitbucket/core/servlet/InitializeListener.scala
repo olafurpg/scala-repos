@@ -63,7 +63,8 @@ class InitializeListener
         |    }
         |  }
         |}
-      """.stripMargin))
+      """.stripMargin)
+    )
 
     val scheduler = QuartzSchedulerExtension(system)
 

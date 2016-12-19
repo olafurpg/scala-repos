@@ -126,16 +126,18 @@ trait ProdConsAnalyzerImpl {
                          producedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, producedSlot)
-        _initialProducersCache.getOrElseUpdate(key, {
-          // prevent infinite recursion if an instruction is its own producer or consumer
-          // see cyclicProdCons in ProdConsAnalyzerTest
-          _initialProducersCache(key) = Set.empty
-          val (sourceValue, sourceValueSlot) =
-            copyOperationSourceValue(insn, producedSlot)
-          sourceValue.insns.iterator.asScala
-            .flatMap(initialProducers(_, sourceValueSlot))
-            .toSet
-        })
+        _initialProducersCache.getOrElseUpdate(
+          key, {
+            // prevent infinite recursion if an instruction is its own producer or consumer
+            // see cyclicProdCons in ProdConsAnalyzerTest
+            _initialProducersCache(key) = Set.empty
+            val (sourceValue, sourceValueSlot) =
+              copyOperationSourceValue(insn, producedSlot)
+            sourceValue.insns.iterator.asScala
+              .flatMap(initialProducers(_, sourceValueSlot))
+              .toSet
+          }
+        )
       } else {
         Set(insn)
       }
@@ -153,16 +155,19 @@ trait ProdConsAnalyzerImpl {
                           consumedSlot: Int): Set[AbstractInsnNode] = {
       if (isCopyOperation(insn)) {
         val key = (insn, consumedSlot)
-        _ultimateConsumersCache.getOrElseUpdate(key, {
-          // prevent infinite recursion if an instruction is its own producer or consumer
-          // see cyclicProdCons in ProdConsAnalyzerTest
-          _ultimateConsumersCache(key) = Set.empty
-          for {
-            producedSlot <- copyOperationProducedValueSlots(insn, consumedSlot)
-            consumer <- consumersOfValueAt(insn.getNext, producedSlot)
-            ultimateConsumer <- ultimateConsumers(consumer, producedSlot)
-          } yield ultimateConsumer
-        })
+        _ultimateConsumersCache.getOrElseUpdate(
+          key, {
+            // prevent infinite recursion if an instruction is its own producer or consumer
+            // see cyclicProdCons in ProdConsAnalyzerTest
+            _ultimateConsumersCache(key) = Set.empty
+            for {
+              producedSlot <- copyOperationProducedValueSlots(insn,
+                                                              consumedSlot)
+              consumer <- consumersOfValueAt(insn.getNext, producedSlot)
+              ultimateConsumer <- ultimateConsumers(consumer, producedSlot)
+            } yield ultimateConsumer
+          }
+        )
       } else {
         Set(insn)
       }

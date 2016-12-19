@@ -62,7 +62,8 @@ object RatingFest {
               s"perfs.$name" -> BSONBoolean(true)
             }
           )),
-        multi = true)
+        multi = true
+      )
       _ = log("Gathering cheater IDs")
       engineIds <- UserRepo.engineIds
       _ = log(s"Found ${engineIds.size} cheaters")

@@ -246,16 +246,19 @@ class GoToImplicitConversionAction
       GoToImplicitConversionAction.getList.repaint()
     }
 
-    hintAlarm.addRequest(new Runnable {
-      def run() {
-        hint = new LightBulbHint(element.getEditor,
-                                 project,
-                                 element.getOldExpression)
-        hint.createHint(element.getFirstPart, element.getSecondPart)
-        GoToImplicitConversionAction.getList.add(hint, 20, 0)
-        hint.setBulbLayout()
-      }
-    }, 500)
+    hintAlarm.addRequest(
+      new Runnable {
+        def run() {
+          hint = new LightBulbHint(element.getEditor,
+                                   project,
+                                   element.getOldExpression)
+          hint.createHint(element.getFirstPart, element.getSecondPart)
+          GoToImplicitConversionAction.getList.add(hint, 20, 0)
+          hint.setBulbLayout()
+        }
+      },
+      500
+    )
   }
 
   class LightBulbHint(editor: Editor, project: Project, expr: ScExpression)

@@ -85,7 +85,8 @@ class Analyzer(catalog: Catalog,
     Batch(
       "Resolution",
       fixedPoint,
-      ResolveRelations :: ResolveReferences :: ResolveGroupingAnalytics :: ResolvePivot :: ResolveUpCast :: ResolveSortReferences :: ResolveGenerate :: ResolveFunctions :: ResolveAliases :: ResolveSubquery :: ResolveWindowOrder :: ResolveWindowFrame :: ResolveNaturalAndUsingJoin :: ExtractWindowExpressions :: GlobalAggregates :: ResolveAggregateFunctions :: HiveTypeCoercion.typeCoercionRules ++ extendedResolutionRules: _*),
+      ResolveRelations :: ResolveReferences :: ResolveGroupingAnalytics :: ResolvePivot :: ResolveUpCast :: ResolveSortReferences :: ResolveGenerate :: ResolveFunctions :: ResolveAliases :: ResolveSubquery :: ResolveWindowOrder :: ResolveWindowFrame :: ResolveNaturalAndUsingJoin :: ExtractWindowExpressions :: GlobalAggregates :: ResolveAggregateFunctions :: HiveTypeCoercion.typeCoercionRules ++ extendedResolutionRules: _*
+    ),
     Batch("Nondeterministic", Once, PullOutNondeterministic),
     Batch("UDF", Once, HandleNullInputsForUDF),
     Batch("Cleanup", fixedPoint, CleanupAliases)
@@ -515,33 +516,36 @@ class Analyzer(catalog: Catalog,
 
       // If the projection list contains Stars, expand it.
       case p @ Project(projectList, child) if containsStar(projectList) =>
-        Project(projectList.flatMap {
-          case s: Star => s.expand(child, resolver)
-          case UnresolvedAlias(f @ UnresolvedFunction(_, args, _), _)
-              if containsStar(args) =>
-            val newChildren = expandStarExpressions(args, child)
-            UnresolvedAlias(child = f.copy(children = newChildren)) :: Nil
-          case a @ Alias(f @ UnresolvedFunction(_, args, _), name)
-              if containsStar(args) =>
-            val newChildren = expandStarExpressions(args, child)
-            Alias(child = f.copy(children = newChildren), name)(
-              isGenerated = a.isGenerated) :: Nil
-          case UnresolvedAlias(c @ CreateArray(args), _)
-              if containsStar(args) =>
-            val expandedArgs = args.flatMap {
-              case s: Star => s.expand(child, resolver)
-              case o => o :: Nil
-            }
-            UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
-          case UnresolvedAlias(c @ CreateStruct(args), _)
-              if containsStar(args) =>
-            val expandedArgs = args.flatMap {
-              case s: Star => s.expand(child, resolver)
-              case o => o :: Nil
-            }
-            UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
-          case o => o :: Nil
-        }, child)
+        Project(
+          projectList.flatMap {
+            case s: Star => s.expand(child, resolver)
+            case UnresolvedAlias(f @ UnresolvedFunction(_, args, _), _)
+                if containsStar(args) =>
+              val newChildren = expandStarExpressions(args, child)
+              UnresolvedAlias(child = f.copy(children = newChildren)) :: Nil
+            case a @ Alias(f @ UnresolvedFunction(_, args, _), name)
+                if containsStar(args) =>
+              val newChildren = expandStarExpressions(args, child)
+              Alias(child = f.copy(children = newChildren), name)(
+                isGenerated = a.isGenerated) :: Nil
+            case UnresolvedAlias(c @ CreateArray(args), _)
+                if containsStar(args) =>
+              val expandedArgs = args.flatMap {
+                case s: Star => s.expand(child, resolver)
+                case o => o :: Nil
+              }
+              UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
+            case UnresolvedAlias(c @ CreateStruct(args), _)
+                if containsStar(args) =>
+              val expandedArgs = args.flatMap {
+                case s: Star => s.expand(child, resolver)
+                case o => o :: Nil
+              }
+              UnresolvedAlias(c.copy(children = expandedArgs)) :: Nil
+            case o => o :: Nil
+          },
+          child
+        )
 
       case t: ScriptTransformation if containsStar(t.input) =>
         t.copy(
@@ -1051,7 +1055,8 @@ class Analyzer(catalog: Catalog,
               outer = false,
               qualifier = None,
               generatorOutput = makeGeneratorOutput(generator, names),
-              child)
+              child
+            )
 
             resolvedGenerator.generatorOutput
           case other => other :: Nil

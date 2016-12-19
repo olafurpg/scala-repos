@@ -71,6 +71,7 @@ object ParserUtil {
                 Completions.strict(
                   xs.map(x => Completion.tokenDisplay(x.stripPrefix(seen), x))
                     .toSet)
-          })).filter(!_.startsWith("-"), x => x)
+          })
+    ).filter(!_.startsWith("-"), x => x)
   }
 }

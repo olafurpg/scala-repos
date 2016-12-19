@@ -61,14 +61,16 @@ trait ServiceSpecBase {
       userName: String,
       repositoryName: String,
       loginUser: String = "root")(implicit s: Session): Int = {
-    dummyService.createIssue(owner = userName,
-                             repository = repositoryName,
-                             loginUser = loginUser,
-                             title = "issue title",
-                             content = None,
-                             assignedUserName = None,
-                             milestoneId = None,
-                             isPullRequest = true)
+    dummyService.createIssue(
+      owner = userName,
+      repository = repositoryName,
+      loginUser = loginUser,
+      title = "issue title",
+      content = None,
+      assignedUserName = None,
+      milestoneId = None,
+      isPullRequest = true
+    )
   }
 
   def generateNewPullRequest(
@@ -82,16 +84,17 @@ trait ServiceSpecBase {
       baseUserName,
       baseRepositoryName,
       Option(loginUser).getOrElse(requestUserName))
-    dummyService.createPullRequest(originUserName = baseUserName,
-                                   originRepositoryName = baseRepositoryName,
-                                   issueId = issueId,
-                                   originBranch = baesBranch,
-                                   requestUserName = requestUserName,
-                                   requestRepositoryName =
-                                     requestRepositoryName,
-                                   requestBranch = requestBranch,
-                                   commitIdFrom = baesBranch,
-                                   commitIdTo = requestBranch)
+    dummyService.createPullRequest(
+      originUserName = baseUserName,
+      originRepositoryName = baseRepositoryName,
+      issueId = issueId,
+      originBranch = baesBranch,
+      requestUserName = requestUserName,
+      requestRepositoryName = requestRepositoryName,
+      requestBranch = requestBranch,
+      commitIdFrom = baesBranch,
+      commitIdTo = requestBranch
+    )
     dummyService.getPullRequest(baseUserName, baseRepositoryName, issueId).get
   }
 }

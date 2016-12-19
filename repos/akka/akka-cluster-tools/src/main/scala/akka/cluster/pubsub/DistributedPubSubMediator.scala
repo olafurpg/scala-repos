@@ -58,7 +58,8 @@ object DistributedPubSubSettings {
         config.getDuration("gossip-interval", MILLISECONDS).millis,
       removedTimeToLive =
         config.getDuration("removed-time-to-live", MILLISECONDS).millis,
-      maxDeltaElements = config.getInt("max-delta-elements"))
+      maxDeltaElements = config.getInt("max-delta-elements")
+    )
 
   /**
     * Java API: Create settings from the default configuration

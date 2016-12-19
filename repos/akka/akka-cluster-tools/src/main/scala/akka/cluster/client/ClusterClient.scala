@@ -532,7 +532,8 @@ object ClusterReceptionistSettings {
       numberOfContacts = config.getInt("number-of-contacts"),
       responseTunnelReceiveTimeout = config
         .getDuration("response-tunnel-receive-timeout", MILLISECONDS)
-        .millis)
+        .millis
+    )
 
   /**
     * Java API: Create settings from the default configuration

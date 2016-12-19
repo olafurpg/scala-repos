@@ -335,7 +335,8 @@ class LowPriorityDerivationTests {
     validateTC[Tree0.Leaf.type]("Generic[HNil]")
     validateTC[Tree0](
       "Generic[Generic[HNil] :+: Generic[Generic[Generic[HNil] :+: Generic[Generic[Generic[…] :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Generic[HNil] :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
 
     // Orphan
     validateTC[Tree.Leaf.type]("Leaf")
@@ -343,7 +344,8 @@ class LowPriorityDerivationTests {
     // Fails with the current Orphan
     validateTC[Tree](
       "Generic[Leaf :+: Generic[Generic[Leaf :+: Generic[Generic[Leaf :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Leaf :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
   }
 
   @Test
@@ -382,7 +384,8 @@ class LowPriorityDerivationTests {
     validateTC[Tree0.Leaf.type]("Generic[HNil]")
     validateTC[Tree0](
       "Generic[Generic[HNil] :+: Generic[Generic[Generic[HNil] :+: Generic[Generic[Generic[…] :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Generic[HNil] :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
 
     // Orphan
     validateTC[Tree.Leaf.type]("Leaf")
@@ -390,7 +393,8 @@ class LowPriorityDerivationTests {
     // Fails with the current Orphan
     validateTC[Tree](
       "Generic[Leaf :+: Generic[Generic[Leaf :+: Generic[Generic[Leaf :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Leaf :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
   }
 
   @Test
@@ -415,10 +419,12 @@ class LowPriorityDerivationTests {
     validateTC0[CC4]("Generic[default :: HNil]")
     validateTC0[CC5](
       "Generic[Generic[Generic[default :: Generic[Generic[default :: Generic[…] :: HNil] :+: Generic[HNil] :+: CNil] :: HNil] :+: Generic[HNil] :+: CNil] :: HNil]",
-      12)
+      12
+    )
     validateTC0[CC6](
       "Generic[default :: Generic[Generic[default :: Generic[Generic[default :: … :: …] :+: Generic[HNil] :+: CNil] :: HNil] :+: Generic[HNil] :+: CNil] :: HNil]",
-      12)
+      12
+    )
     validateTC0[Either[Int, CC1]](
       "Generic[Generic[Int :: HNil] :+: Generic[CC1 :: HNil] :+: CNil]")
     // Fails with the current Orphan
@@ -436,7 +442,8 @@ class LowPriorityDerivationTests {
     validateTC0[Tree0.Leaf.type]("Generic[HNil]")
     validateTC0[Tree0](
       "Generic[Generic[HNil] :+: Generic[Generic[Generic[HNil] :+: Generic[Generic[Generic[…] :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Generic[HNil] :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
 
     // Orphan
     validateTC0[Tree.Leaf.type]("Leaf")
@@ -444,6 +451,7 @@ class LowPriorityDerivationTests {
     // Fails with the current Orphan
     validateTC0[Tree](
       "Generic[Leaf :+: Generic[Generic[Leaf :+: Generic[Generic[Leaf :+: … :+: …] :: Generic[… :+: …] :: Int :: HNil] :+: CNil] :: Generic[Leaf :+: Generic[Generic[… :+: …] :: Generic[…] :: … :: …] :+: CNil] :: Int :: HNil] :+: CNil]",
-      12)
+      12
+    )
   }
 }

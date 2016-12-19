@@ -75,7 +75,8 @@ class ScalaFileNameInspection extends LocalInspectionTool {
           Array[LocalQuickFix](
             new ScalaRenameClassQuickFix(scalaClass, name),
             new ScalaRenameFileQuickFix(scalaFile, clazz.name + ".scala")),
-          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+        )
       }
     }
     res.toArray

@@ -42,7 +42,8 @@ private[simul] final class SimulApi(system: ActorSystem,
                          hostExtraTime = setup.clockExtra * 60),
       variants = setup.variants.flatMap { chess.variant.Variant(_) },
       host = me,
-      color = setup.color)
+      color = setup.color
+    )
     repo.createdByHostId(me.id) foreach {
       _.filter(_.isNotBrandNew).map(_.id).foreach(abort)
     }
@@ -175,7 +176,8 @@ private[simul] final class SimulApi(system: ActorSystem,
         mode = chess.Mode.Casual,
         variant = pairing.player.variant,
         source = lila.game.Source.Simul,
-        pgnImport = None)
+        pgnImport = None
+      )
       game2 = game1
         .updatePlayer(chess.White,
                       _.withUser(whiteUser.id,
@@ -213,15 +215,18 @@ private[simul] final class SimulApi(system: ActorSystem,
 
   private object publish {
     private val siteMessage = SendToFlag("simul", Json.obj("t" -> "reload"))
-    private val debouncer = system.actorOf(Props(new Debouncer(2 seconds, {
-      (_: Debouncer.Nothing) =>
-        site ! siteMessage
-        repo.allCreated foreach { simuls =>
-          renderer ? actorApi.SimulTable(simuls) map {
-            case view: play.twirl.api.Html => ReloadSimuls(view.body)
-          } pipeToSelection lobby
-        }
-    })))
+    private val debouncer = system.actorOf(
+      Props(
+        new Debouncer(
+          2 seconds, { (_: Debouncer.Nothing) =>
+            site ! siteMessage
+            repo.allCreated foreach { simuls =>
+              renderer ? actorApi.SimulTable(simuls) map {
+                case view: play.twirl.api.Html => ReloadSimuls(view.body)
+              } pipeToSelection lobby
+            }
+          }
+        )))
     def apply() { debouncer ! Debouncer.Nothing }
   }
 

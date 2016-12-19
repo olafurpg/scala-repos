@@ -51,17 +51,19 @@ final class Cached(nbTtl: FiniteDuration,
       racingKings <- top10Perf(PerfType.RacingKings.id)
       crazyhouse <- top10Perf(PerfType.Crazyhouse.id)
     } yield
-      Perfs.Leaderboards(bullet = bullet,
-                         blitz = blitz,
-                         classical = classical,
-                         crazyhouse = crazyhouse,
-                         chess960 = chess960,
-                         kingOfTheHill = kingOfTheHill,
-                         threeCheck = threeCheck,
-                         antichess = antichess,
-                         atomic = atomic,
-                         horde = horde,
-                         racingKings = racingKings)
+      Perfs.Leaderboards(
+        bullet = bullet,
+        blitz = blitz,
+        classical = classical,
+        crazyhouse = crazyhouse,
+        chess960 = chess960,
+        kingOfTheHill = kingOfTheHill,
+        threeCheck = threeCheck,
+        antichess = antichess,
+        atomic = atomic,
+        horde = horde,
+        racingKings = racingKings
+      )
 
   val top10Perf = mongoCache[Perf.ID, List[LightPerf]](
     prefix = "user:top10:perf",

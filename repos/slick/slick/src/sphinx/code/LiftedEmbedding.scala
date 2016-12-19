@@ -445,9 +445,9 @@ object LiftedEmbedding extends App {
 
       {
         //#compiled2
-        val userPaged = Compiled(
-          (d: ConstColumn[Long], t: ConstColumn[Long]) =>
-            users.drop(d).take(t))
+        val userPaged = Compiled((d: ConstColumn[Long],
+                                  t: ConstColumn[Long]) =>
+          users.drop(d).take(t))
 
         val usersAction1 = userPaged(2, 1).result
         val usersAction2 = userPaged(1, 3).result
@@ -499,17 +499,19 @@ object LiftedEmbedding extends App {
 
       assert {
         Await
-          .result(db.run(
-                    salesPerDay.schema.create >>
-                      (salesPerDay += ((new Date(999999999), 999))) >> {
-                      //#simpleliteral
-                      val current_date =
-                        SimpleLiteral[java.sql.Date]("CURRENT_DATE")
-                      salesPerDay.map(_ => current_date)
-                      //#simpleliteral
-                    }.result.head
-                  ),
-                  Duration.Inf)
+          .result(
+            db.run(
+              salesPerDay.schema.create >>
+                (salesPerDay += ((new Date(999999999), 999))) >> {
+                //#simpleliteral
+                val current_date =
+                  SimpleLiteral[java.sql.Date]("CURRENT_DATE")
+                salesPerDay.map(_ => current_date)
+                //#simpleliteral
+              }.result.head
+            ),
+            Duration.Inf
+          )
           .isInstanceOf[java.sql.Date]
       }
     }

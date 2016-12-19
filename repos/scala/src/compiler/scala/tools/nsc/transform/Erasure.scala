@@ -813,11 +813,13 @@ abstract class Erasure
           if (exitingRefchecks(lowType matches highType)) ""
           else " after erasure: " + exitingPostErasure(highType)
 
-        reporter.error(pos,
-                       s"""|$what:
+        reporter.error(
+          pos,
+          s"""|$what:
               |${exitingRefchecks(highString)} and
               |${exitingRefchecks(lowString)}
-              |have same type$when""".trim.stripMargin)
+              |have same type$when""".trim.stripMargin
+        )
       }
       low setInfo ErrorType
     }
@@ -909,8 +911,7 @@ abstract class Erasure
         val (bridges, toBeRemoved) = bridgeDefs(base)
         if (bridges.isEmpty) stats
         else
-          (stats filterNot (stat =>
-                              toBeRemoved contains stat.symbol)) ::: bridges
+          (stats filterNot (stat => toBeRemoved contains stat.symbol)) ::: bridges
       }
 
     /**  Transform tree at phase erasure before retyping it.

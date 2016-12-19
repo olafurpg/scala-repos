@@ -320,18 +320,26 @@ class EventServiceActor(val eventClient: LEvents,
             authenticate(withAccessKey) { authData =>
               val appId = authData.appId
               val channelId = authData.channelId
-              parameters('startTime.as[Option[String]],
-                         'untilTime.as[Option[String]],
-                         'entityType.as[Option[String]],
-                         'entityId.as[Option[String]],
-                         'event.as[Option[String]],
-                         'targetEntityType.as[Option[String]],
-                         'targetEntityId.as[Option[String]],
-                         'limit.as[Option[Int]],
-                         'reversed.as[Option[Boolean]]) {
-                (startTimeStr, untilTimeStr, entityType, entityId,
+              parameters(
+                'startTime.as[Option[String]],
+                'untilTime.as[Option[String]],
+                'entityType.as[Option[String]],
+                'entityId.as[Option[String]],
+                'event.as[Option[String]],
+                'targetEntityType.as[Option[String]],
+                'targetEntityId.as[Option[String]],
+                'limit.as[Option[Int]],
+                'reversed.as[Option[Boolean]]
+              ) {
+                (startTimeStr,
+                 untilTimeStr,
+                 entityType,
+                 entityId,
                  eventName, // only support one event name
-                 targetEntityType, targetEntityId, limit, reversed) =>
+                 targetEntityType,
+                 targetEntityId,
+                 limit,
+                 reversed) =>
                   respondWithMediaType(MediaTypes.`application/json`) {
                     complete {
                       logger.debug(
@@ -340,10 +348,12 @@ class EventServiceActor(val eventClient: LEvents,
                           s"et=${entityType} eid=${entityId} " +
                           s"li=${limit} rev=${reversed} ")
 
-                      require(!((reversed == Some(true)) &&
-                                (entityType.isEmpty || entityId.isEmpty)),
-                              "the parameter reversed can only be used with" +
-                                " both entityType and entityId specified.")
+                      require(
+                        !((reversed == Some(true)) &&
+                          (entityType.isEmpty || entityId.isEmpty)),
+                        "the parameter reversed can only be used with" +
+                          " both entityType and entityId specified."
+                      )
 
                       val parseTime = Future {
                         val startTime =
@@ -357,19 +367,20 @@ class EventServiceActor(val eventClient: LEvents,
                         .flatMap {
                           case (startTime, untilTime) =>
                             val data = eventClient
-                              .futureFind(appId = appId,
-                                          channelId = channelId,
-                                          startTime = startTime,
-                                          untilTime = untilTime,
-                                          entityType = entityType,
-                                          entityId = entityId,
-                                          eventNames = eventName.map(List(_)),
-                                          targetEntityType =
-                                            targetEntityType.map(Some(_)),
-                                          targetEntityId =
-                                            targetEntityId.map(Some(_)),
-                                          limit = limit.orElse(Some(20)),
-                                          reversed = reversed)
+                              .futureFind(
+                                appId = appId,
+                                channelId = channelId,
+                                startTime = startTime,
+                                untilTime = untilTime,
+                                entityType = entityType,
+                                entityId = entityId,
+                                eventNames = eventName.map(List(_)),
+                                targetEntityType =
+                                  targetEntityType.map(Some(_)),
+                                targetEntityId = targetEntityId.map(Some(_)),
+                                limit = limit.orElse(Some(20)),
+                                reversed = reversed
+                              )
                               .map { eventIter =>
                                 if (eventIter.hasNext) {
                                   (StatusCodes.OK, eventIter.toArray)

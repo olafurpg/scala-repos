@@ -196,7 +196,8 @@ private[ml] object WeightedLeastSquares {
       require(
         k <= MAX_NUM_FEATURES,
         "In order to take the normal equation approach efficiently, " +
-          s"we set the max number of features to $MAX_NUM_FEATURES but got $k.")
+          s"we set the max number of features to $MAX_NUM_FEATURES but got $k."
+      )
       this.k = k
       triK = k * (k + 1) / 2
       count = 0L

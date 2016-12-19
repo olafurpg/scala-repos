@@ -185,7 +185,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                                                           metadata =
                                                             "metadata three"),
         TopicAndPartition(topic2, 1) -> OffsetAndMetadata(offset = 45L)
-      ))
+      )
+    )
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
     assertEquals(
       Errors.NONE.code,
@@ -210,7 +211,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         TopicAndPartition(topic3, 1), // An unknown partition
         TopicAndPartition(topic4, 0), // An unused topic
         TopicAndPartition(topic5, 0) // An unknown topic
-      ))
+      )
+    )
     val fetchResponse = simpleConsumer.fetchOffsets(fetchRequest)
 
     assertEquals(

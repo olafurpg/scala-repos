@@ -141,7 +141,8 @@ abstract class ScalaRenameTestBase
                        newName: String): String = {
     val element = TargetElementUtil.findTargetElement(
       InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(editor, file),
-      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
+      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED
+    )
     assert(element != null, "Reference is not specified.")
     val searchInComments =
       element.getText != null && element.getText.contains("Comments")

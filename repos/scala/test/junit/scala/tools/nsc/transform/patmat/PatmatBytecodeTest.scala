@@ -131,29 +131,33 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val c = compileClasses(optCompiler)(code).head
-    assertSameSummary(getSingleMethod(c, "a"),
-                      List(NEW,
-                           DUP,
-                           ICONST_1,
-                           "boxToInteger",
-                           LDC,
-                           "<init>",
-                           ASTORE /*1*/,
-                           ALOAD /*1*/,
-                           "y",
-                           ASTORE /*2*/,
-                           ALOAD /*1*/,
-                           "x",
-                           INSTANCEOF,
-                           IFNE /*R*/,
-                           NEW,
-                           DUP,
-                           ALOAD /*1*/,
-                           "<init>",
-                           ATHROW,
-                           /*R*/ -1,
-                           ALOAD /*2*/,
-                           ARETURN))
+    assertSameSummary(
+      getSingleMethod(c, "a"),
+      List(
+        NEW,
+        DUP,
+        ICONST_1,
+        "boxToInteger",
+        LDC,
+        "<init>",
+        ASTORE /*1*/,
+        ALOAD /*1*/,
+        "y",
+        ASTORE /*2*/,
+        ALOAD /*1*/,
+        "x",
+        INSTANCEOF,
+        IFNE /*R*/,
+        NEW,
+        DUP,
+        ALOAD /*1*/,
+        "<init>",
+        ATHROW,
+        /*R*/ -1,
+        ALOAD /*2*/,
+        ARETURN
+      )
+    )
   }
 
   @Test
@@ -171,24 +175,26 @@ class PatmatBytecodeTest extends ClearAfterClass {
       code,
       allowMessage = _.msg.contains("may not be exhaustive")).head
 
-    val expected = List(ALOAD /*1*/,
-                        INSTANCEOF /*::*/,
-                        IFEQ /*A*/,
-                        ALOAD,
-                        CHECKCAST /*::*/,
-                        "head",
-                        "unboxToInt",
-                        ISTORE,
-                        GOTO /*B*/,
-                        -1 /*A*/,
-                        NEW /*MatchError*/,
-                        DUP,
-                        ALOAD /*1*/,
-                        "<init>",
-                        ATHROW,
-                        -1 /*B*/,
-                        ILOAD,
-                        IRETURN)
+    val expected = List(
+      ALOAD /*1*/,
+      INSTANCEOF /*::*/,
+      IFEQ /*A*/,
+      ALOAD,
+      CHECKCAST /*::*/,
+      "head",
+      "unboxToInt",
+      ISTORE,
+      GOTO /*B*/,
+      -1 /*A*/,
+      NEW /*MatchError*/,
+      DUP,
+      ALOAD /*1*/,
+      "<init>",
+      ATHROW,
+      -1 /*B*/,
+      ILOAD,
+      IRETURN
+    )
 
     assertSameSummary(getSingleMethod(c, "a"), expected)
     assertSameSummary(getSingleMethod(c, "b"), expected)

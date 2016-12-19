@@ -35,11 +35,13 @@ class IndexScript(universe: doc.Universe) extends Page {
             .sortBy(_.toLowerCase)
             .map(key => {
               val pairs = merged(key).flatMap { t: DocTemplateEntity =>
-                Seq(kindToString(t) -> relativeLinkTo(t),
-                    "kind" -> kindToString(t),
-                    "members" -> membersToJSON(
-                      t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
-                    "shortDescription" -> shortDesc(t))
+                Seq(
+                  kindToString(t) -> relativeLinkTo(t),
+                  "kind" -> kindToString(t),
+                  "members" -> membersToJSON(
+                    t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
+                  "shortDescription" -> shortDesc(t)
+                )
               }
 
               JSONObject(Map(pairs: _*) + ("name" -> key))
@@ -127,12 +129,14 @@ class IndexScript(universe: doc.Universe) extends Page {
       */
     def jsonObject(m: MemberEntity): JSONObject =
       JSONObject(
-        Map("label" -> m.definitionName.replaceAll(".*#", ""), // member name
-            "member" -> m.definitionName
-              .replaceFirst("#", "."), // full member name
-            "tail" -> memberTail(m),
-            "kind" -> memberKindToString(m), // modifiers i.e. "abstract def"
-            "link" -> memberToUrl(m))) // permalink to the member
+        Map(
+          "label" -> m.definitionName.replaceAll(".*#", ""), // member name
+          "member" -> m.definitionName
+            .replaceFirst("#", "."), // full member name
+          "tail" -> memberTail(m),
+          "kind" -> memberKindToString(m), // modifiers i.e. "abstract def"
+          "link" -> memberToUrl(m)
+        )) // permalink to the member
 
     mbr match {
       case d: Def => jsonObject(d)

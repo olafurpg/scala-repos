@@ -28,6 +28,7 @@ trait FreeSpecPathSingleTestTest extends FreeSpecPathGenerator {
           checkResultTreeDoesNotHaveNodes(
             root,
             "should not run tests that are not selected"),
-      debug = true)
+      debug = true
+    )
   }
 }

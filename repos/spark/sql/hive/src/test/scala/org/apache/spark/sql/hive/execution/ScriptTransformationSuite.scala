@@ -53,46 +53,52 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
 
   test("cat without SerDe") {
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
-    checkAnswer(rowsDf,
-                (child: SparkPlan) =>
-                  new ScriptTransformation(
-                    input = Seq(rowsDf.col("a").expr),
-                    script = "cat",
-                    output = Seq(AttributeReference("a", StringType)()),
-                    child = child,
-                    ioschema = noSerdeIOSchema
-                  )(hiveContext),
-                rowsDf.collect())
+    checkAnswer(
+      rowsDf,
+      (child: SparkPlan) =>
+        new ScriptTransformation(
+          input = Seq(rowsDf.col("a").expr),
+          script = "cat",
+          output = Seq(AttributeReference("a", StringType)()),
+          child = child,
+          ioschema = noSerdeIOSchema
+        )(hiveContext),
+      rowsDf.collect()
+    )
   }
 
   test("cat with LazySimpleSerDe") {
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
-    checkAnswer(rowsDf,
-                (child: SparkPlan) =>
-                  new ScriptTransformation(
-                    input = Seq(rowsDf.col("a").expr),
-                    script = "cat",
-                    output = Seq(AttributeReference("a", StringType)()),
-                    child = child,
-                    ioschema = serdeIOSchema
-                  )(hiveContext),
-                rowsDf.collect())
+    checkAnswer(
+      rowsDf,
+      (child: SparkPlan) =>
+        new ScriptTransformation(
+          input = Seq(rowsDf.col("a").expr),
+          script = "cat",
+          output = Seq(AttributeReference("a", StringType)()),
+          child = child,
+          ioschema = serdeIOSchema
+        )(hiveContext),
+      rowsDf.collect()
+    )
   }
 
   test(
     "script transformation should not swallow errors from upstream operators (no serde)") {
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
     val e = intercept[TestFailedException] {
-      checkAnswer(rowsDf,
-                  (child: SparkPlan) =>
-                    new ScriptTransformation(
-                      input = Seq(rowsDf.col("a").expr),
-                      script = "cat",
-                      output = Seq(AttributeReference("a", StringType)()),
-                      child = ExceptionInjectingOperator(child),
-                      ioschema = noSerdeIOSchema
-                    )(hiveContext),
-                  rowsDf.collect())
+      checkAnswer(
+        rowsDf,
+        (child: SparkPlan) =>
+          new ScriptTransformation(
+            input = Seq(rowsDf.col("a").expr),
+            script = "cat",
+            output = Seq(AttributeReference("a", StringType)()),
+            child = ExceptionInjectingOperator(child),
+            ioschema = noSerdeIOSchema
+          )(hiveContext),
+        rowsDf.collect()
+      )
     }
     assert(e.getMessage().contains("intentional exception"))
   }
@@ -101,16 +107,18 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
     "script transformation should not swallow errors from upstream operators (with serde)") {
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
     val e = intercept[TestFailedException] {
-      checkAnswer(rowsDf,
-                  (child: SparkPlan) =>
-                    new ScriptTransformation(
-                      input = Seq(rowsDf.col("a").expr),
-                      script = "cat",
-                      output = Seq(AttributeReference("a", StringType)()),
-                      child = ExceptionInjectingOperator(child),
-                      ioschema = serdeIOSchema
-                    )(hiveContext),
-                  rowsDf.collect())
+      checkAnswer(
+        rowsDf,
+        (child: SparkPlan) =>
+          new ScriptTransformation(
+            input = Seq(rowsDf.col("a").expr),
+            script = "cat",
+            output = Seq(AttributeReference("a", StringType)()),
+            child = ExceptionInjectingOperator(child),
+            ioschema = serdeIOSchema
+          )(hiveContext),
+        rowsDf.collect()
+      )
     }
     assert(e.getMessage().contains("intentional exception"))
   }

@@ -713,15 +713,16 @@ private[python] class PythonMLLibAPI extends Serializable {
     val algo = Algo.fromString(algoStr)
     val impurity = Impurities.fromString(impurityStr)
 
-    val strategy = new Strategy(algo = algo,
-                                impurity = impurity,
-                                maxDepth = maxDepth,
-                                numClasses = numClasses,
-                                maxBins = maxBins,
-                                categoricalFeaturesInfo =
-                                  categoricalFeaturesInfo.asScala.toMap,
-                                minInstancesPerNode = minInstancesPerNode,
-                                minInfoGain = minInfoGain)
+    val strategy = new Strategy(
+      algo = algo,
+      impurity = impurity,
+      maxDepth = maxDepth,
+      numClasses = numClasses,
+      maxBins = maxBins,
+      categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap,
+      minInstancesPerNode = minInstancesPerNode,
+      minInfoGain = minInfoGain
+    )
     try {
       DecisionTree
         .train(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), strategy)

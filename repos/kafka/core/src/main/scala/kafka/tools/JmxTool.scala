@@ -38,7 +38,8 @@ object JmxTool extends Logging {
         "object-name",
         "A JMX object name to use as a query. This can contain wild cards, and this option " +
           "can be given multiple times to specify more than one query. If no objects are specified " +
-          "all objects will be queried.")
+          "all objects will be queried."
+      )
       .withRequiredArg
       .describedAs("name")
       .ofType(classOf[String])

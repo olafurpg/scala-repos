@@ -331,7 +331,8 @@ class Dataset[T] private[sql] (
       "The number of columns doesn't match.\n" +
         s"Old column names (${schema.size}): " +
         schema.fields.map(_.name).mkString(", ") + "\n" +
-        s"New column names (${colNames.size}): " + colNames.mkString(", "))
+        s"New column names (${colNames.size}): " + colNames.mkString(", ")
+    )
 
     val newCols = logicalPlan.output.zip(colNames).map {
       case (oldAttribute, newName) =>
@@ -1836,7 +1837,8 @@ class Dataset[T] private[sql] (
       "stddev" ->
         ((child: Expression) => StddevSamp(child).toAggregateExpression()),
       "min" -> ((child: Expression) => Min(child).toAggregateExpression()),
-      "max" -> ((child: Expression) => Max(child).toAggregateExpression()))
+      "max" -> ((child: Expression) => Max(child).toAggregateExpression())
+    )
 
     val outputCols =
       (if (cols.isEmpty) numericColumns.map(usePrettyExpression(_).sql)

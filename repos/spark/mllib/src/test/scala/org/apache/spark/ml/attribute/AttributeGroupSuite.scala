@@ -23,18 +23,20 @@ class AttributeGroupSuite extends SparkFunSuite {
 
   test("attribute group") {
     val attrs =
-      Array(NumericAttribute.defaultAttr,
-            NominalAttribute.defaultAttr,
-            BinaryAttribute.defaultAttr.withIndex(0),
-            NumericAttribute.defaultAttr.withName("age").withSparsity(0.8),
-            NominalAttribute.defaultAttr
-              .withName("size")
-              .withValues("small", "medium", "large"),
-            BinaryAttribute.defaultAttr
-              .withName("clicked")
-              .withValues("no", "yes"),
-            NumericAttribute.defaultAttr,
-            NumericAttribute.defaultAttr)
+      Array(
+        NumericAttribute.defaultAttr,
+        NominalAttribute.defaultAttr,
+        BinaryAttribute.defaultAttr.withIndex(0),
+        NumericAttribute.defaultAttr.withName("age").withSparsity(0.8),
+        NominalAttribute.defaultAttr
+          .withName("size")
+          .withValues("small", "medium", "large"),
+        BinaryAttribute.defaultAttr
+          .withName("clicked")
+          .withValues("no", "yes"),
+        NumericAttribute.defaultAttr,
+        NumericAttribute.defaultAttr
+      )
     val group = new AttributeGroup("user", attrs)
     assert(group.size === 8)
     assert(group.name === "user")

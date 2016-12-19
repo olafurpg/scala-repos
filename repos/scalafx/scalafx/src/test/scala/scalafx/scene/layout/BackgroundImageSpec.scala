@@ -53,5 +53,6 @@ class BackgroundImageSpec
       BackgroundRepeat.NoRepeat,
       BackgroundRepeat.NoRepeat,
       BackgroundPosition.Center,
-      BackgroundSize.Default)
+      BackgroundSize.Default
+    )
 }

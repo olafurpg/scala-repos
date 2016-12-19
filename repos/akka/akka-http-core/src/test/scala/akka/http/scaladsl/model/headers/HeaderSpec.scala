@@ -15,11 +15,13 @@ class HeaderSpec extends FreeSpec with Matchers {
       "successful parse run" in {
         headers.`Cache-Control`.parseFromValueString(
           "private, no-cache, no-cache=Set-Cookie, proxy-revalidate, s-maxage=1000") shouldEqual Right(
-          headers.`Cache-Control`(CacheDirectives.`private`(),
-                                  CacheDirectives.`no-cache`,
-                                  CacheDirectives.`no-cache`("Set-Cookie"),
-                                  CacheDirectives.`proxy-revalidate`,
-                                  CacheDirectives.`s-maxage`(1000)))
+          headers.`Cache-Control`(
+            CacheDirectives.`private`(),
+            CacheDirectives.`no-cache`,
+            CacheDirectives.`no-cache`("Set-Cookie"),
+            CacheDirectives.`proxy-revalidate`,
+            CacheDirectives.`s-maxage`(1000)
+          ))
       }
       "failing parse run" in {
         val Left(List(ErrorInfo(summary, detail))) =

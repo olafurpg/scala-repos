@@ -213,9 +213,9 @@ private[sql] object ParquetFilters {
    */
   }
 
-  private val makeInSet: PartialFunction[DataType,
-                                         (String,
-                                          Set[Any]) => FilterPredicate] = {
+  private val makeInSet: PartialFunction[
+    DataType,
+    (String, Set[Any]) => FilterPredicate] = {
     case IntegerType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(

@@ -94,15 +94,17 @@ abstract class UnaryLogExpression(f: Double => Double, name: String)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    c => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      c => s"""
         if ($c <= $yAsymptote) {
           ${ev.isNull} = true;
         } else {
           ${ev.value} = java.lang.Math.${funcName}($c);
         }
-      """)
+      """
+    )
   }
 }
 
@@ -234,14 +236,16 @@ case class Conv(numExpr: Expression,
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val numconv = NumberConverter.getClass.getName.stripSuffix("$")
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (num, from, to) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (num, from, to) => s"""
        ${ev.value} = $numconv.convert($num.getBytes(), $from, $to);
        if (${ev.value} == null) {
          ${ev.isNull} = true;
        }
-       """)
+       """
+    )
   }
 }
 
@@ -331,8 +335,11 @@ case class Factorial(child: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, eval => {
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      eval => {
+        s"""
         if ($eval > 20 || $eval < 0) {
           ${ev.isNull} = true;
         } else {
@@ -340,7 +347,8 @@ case class Factorial(child: Expression)
             org.apache.spark.sql.catalyst.expressions.Factorial.factorial($eval);
         }
       """
-    })
+      }
+    )
   }
 }
 
@@ -350,15 +358,17 @@ case class Log2(child: Expression)
     extends UnaryLogExpression((x: Double) => math.log(x) / math.log(2),
                                "LOG2") {
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    c => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      c => s"""
         if ($c <= $yAsymptote) {
           ${ev.isNull} = true;
         } else {
           ${ev.value} = java.lang.Math.log($c) / java.lang.Math.log(2);
         }
-      """)
+      """
+    )
   }
 }
 
@@ -528,14 +538,18 @@ case class Hex(child: Expression)
   }
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (c) => {
-      val hex = Hex.getClass.getName.stripSuffix("$")
-      s"${ev.value} = " +
-        (child.dataType match {
-          case StringType => s"""$hex.hex($c.getBytes());"""
-          case _ => s"""$hex.hex($c);"""
-        })
-    })
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (c) => {
+        val hex = Hex.getClass.getName.stripSuffix("$")
+        s"${ev.value} = " +
+          (child.dataType match {
+            case StringType => s"""$hex.hex($c.getBytes());"""
+            case _ => s"""$hex.hex($c);"""
+          })
+      }
+    )
   }
 }
 
@@ -556,13 +570,17 @@ case class Unhex(child: Expression)
     Hex.unhex(num.asInstanceOf[UTF8String].getBytes)
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (c) => {
-      val hex = Hex.getClass.getName.stripSuffix("$")
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (c) => {
+        val hex = Hex.getClass.getName.stripSuffix("$")
+        s"""
         ${ev.value} = $hex.unhex($c.getBytes());
         ${ev.isNull} = ${ev.value} == null;
        """
-    })
+      }
+    )
   }
 }
 
@@ -704,25 +722,29 @@ case class Logarithm(left: Expression, right: Expression)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     if (left.isInstanceOf[EulerNumber]) {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (c1, c2) => s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"""
           if ($c2 <= 0.0) {
             ${ev.isNull} = true;
           } else {
             ${ev.value} = java.lang.Math.log($c2);
           }
-        """)
+        """
+      )
     } else {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (c1, c2) => s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"""
           if ($c1 <= 0.0 || $c2 <= 0.0) {
             ${ev.isNull} = true;
           } else {
             ${ev.value} = java.lang.Math.log($c2) / java.lang.Math.log($c1);
           }
-        """)
+        """
+      )
     }
   }
 }

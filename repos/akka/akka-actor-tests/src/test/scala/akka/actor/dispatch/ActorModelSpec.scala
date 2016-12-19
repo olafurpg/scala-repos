@@ -264,13 +264,15 @@ object ActorModelSpec {
     } catch {
       case e: Throwable ⇒
         system.eventStream.publish(
-          Error(e,
-                Option(dispatcher).toString,
-                (Option(dispatcher) getOrElse this).getClass,
-                "actual: " + stats + ", required: InterceptorStats(susp=" +
-                  suspensions + ",res=" + resumes + ",reg=" + registers +
-                  ",unreg=" + unregisters + ",recv=" + msgsReceived +
-                  ",proc=" + msgsProcessed + ",restart=" + restarts))
+          Error(
+            e,
+            Option(dispatcher).toString,
+            (Option(dispatcher) getOrElse this).getClass,
+            "actual: " + stats + ", required: InterceptorStats(susp=" +
+              suspensions + ",res=" + resumes + ",reg=" + registers +
+              ",unreg=" + unregisters + ",recv=" + msgsReceived +
+              ",proc=" + msgsProcessed + ",restart=" + restarts
+          ))
         throw e
     }
   }
@@ -637,8 +639,8 @@ object DispatcherModelSpec {
       config.getInt("throughput"),
       config.getNanosDuration("throughput-deadline-time"),
       configureExecutor(),
-      config.getMillisDuration("shutdown-timeout"))
-    with MessageDispatcherInterceptor
+      config.getMillisDuration("shutdown-timeout")
+    ) with MessageDispatcherInterceptor
 
     override def dispatcher(): MessageDispatcher = instance
   }
@@ -732,8 +734,8 @@ object BalancingDispatcherModelSpec {
         mailboxType,
         configureExecutor(),
         config.getMillisDuration("shutdown-timeout"),
-        config.getBoolean("attempt-teamwork"))
-      with MessageDispatcherInterceptor
+        config.getBoolean("attempt-teamwork")
+      ) with MessageDispatcherInterceptor
   }
 }
 

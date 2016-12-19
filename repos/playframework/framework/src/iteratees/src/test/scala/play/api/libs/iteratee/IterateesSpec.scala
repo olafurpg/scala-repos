@@ -199,7 +199,8 @@ object IterateesSpec
               implicitly[scala.collection.generic.CanBuildFrom[List[Int],
                                                                Int,
                                                                List[Int]]],
-              flatMapEC)
+              flatMapEC
+            )
             .unflatten) must equalTo(Step.Done(4, Input.El(List(1, 2, 3, 4))))
       }
     }

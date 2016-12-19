@@ -26,8 +26,9 @@ object Supervision {
   case class SupervisorConfig(
       restartStrategy: FaultHandlingStrategy,
       worker: List[Server],
-      maxRestartsHandler: (ActorRef,
-                           MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
+      maxRestartsHandler: (
+          ActorRef,
+          MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
         (aRef, max) =>
           ()
       })
@@ -100,9 +101,11 @@ object Supervision {
     def this(trapExit: java.util.List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange)
+      )
   }
 
   object OneForOneStrategy {
@@ -137,9 +140,11 @@ object Supervision {
     def this(trapExit: java.util.List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange)
+      )
   }
 
   case object NoFaultHandlingStrategy extends FaultHandlingStrategy(Nil)

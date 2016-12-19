@@ -26,6 +26,7 @@ trait FlatSpecSingleTestTest extends FlatSpecGenerator {
       root =>
         checkResultTreeHasExactNamedPath(root, flatSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
-      debug = true)
+      debug = true
+    )
   }
 }

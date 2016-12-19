@@ -57,26 +57,28 @@ private[pref] final class DataForm {
                       captured: Int) {
 
     def apply(pref: Pref) =
-      pref.copy(autoQueen = autoQueen,
-                autoThreefold = autoThreefold,
-                takeback = takeback,
-                clockTenths = clockTenths,
-                clockBar = clockBar == 1,
-                clockSound = clockSound == 1,
-                follow = follow == 1,
-                highlight = highlight == 1,
-                destination = destination == 1,
-                coords = coords,
-                replay = replay,
-                blindfold = blindfold,
-                challenge = challenge,
-                message = message,
-                premove = premove == 1,
-                animation = animation,
-                submitMove = submitMove,
-                insightShare = insightShare,
-                confirmResign = confirmResign,
-                captured = captured == 1)
+      pref.copy(
+        autoQueen = autoQueen,
+        autoThreefold = autoThreefold,
+        takeback = takeback,
+        clockTenths = clockTenths,
+        clockBar = clockBar == 1,
+        clockSound = clockSound == 1,
+        follow = follow == 1,
+        highlight = highlight == 1,
+        destination = destination == 1,
+        coords = coords,
+        replay = replay,
+        blindfold = blindfold,
+        challenge = challenge,
+        message = message,
+        premove = premove == 1,
+        animation = animation,
+        submitMove = submitMove,
+        insightShare = insightShare,
+        confirmResign = confirmResign,
+        captured = captured == 1
+      )
   }
 
   object PrefData {

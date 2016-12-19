@@ -190,31 +190,29 @@ trait StatsLibSpecs[M[+ _]]
           case (ids, SArray(d)) if ids.length == 1 => d
         }
 
-      result2 must_== Set(Vector(SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(1)),
-                          Vector(SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(1),
-                                 SDecimal(0)),
-                          Vector(SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(1),
-                                 SDecimal(0),
-                                 SDecimal(0)),
-                          Vector(SDecimal(0),
-                                 SDecimal(1),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0)),
-                          Vector(SDecimal(1),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0),
-                                 SDecimal(0)))
+      result2 must_== Set(
+        Vector(SDecimal(0),
+               SDecimal(0),
+               SDecimal(0),
+               SDecimal(0),
+               SDecimal(1)),
+        Vector(SDecimal(0),
+               SDecimal(0),
+               SDecimal(0),
+               SDecimal(1),
+               SDecimal(0)),
+        Vector(SDecimal(0),
+               SDecimal(0),
+               SDecimal(1),
+               SDecimal(0),
+               SDecimal(0)),
+        Vector(SDecimal(0),
+               SDecimal(1),
+               SDecimal(0),
+               SDecimal(0),
+               SDecimal(0)),
+        Vector(SDecimal(1), SDecimal(0), SDecimal(0), SDecimal(0), SDecimal(0))
+      )
     }
 
     "assign dummy variables to loaded dataset across slices" >> {
@@ -583,7 +581,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(DenseRank,
                         dag.AbsoluteLoad(
                           Const(CString("/hom/numbers6"))(line))(line))(line),
-             Const(CLong(3))(line))(line))(line)
+             Const(CLong(3))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -625,15 +624,17 @@ trait StatsLibSpecs[M[+ _]]
       val heightWeight =
         dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line)
 
-      val input = dag.Morph2(LinearCorrelation,
-                             Join(DerefObject,
-                                  Cross(None),
-                                  heightWeight,
-                                  Const(CString("height"))(line))(line),
-                             Join(DerefObject,
-                                  Cross(None),
-                                  heightWeight,
-                                  Const(CString("weight"))(line))(line))(line)
+      val input = dag.Morph2(
+        LinearCorrelation,
+        Join(DerefObject,
+             Cross(None),
+             heightWeight,
+             Const(CString("height"))(line))(line),
+        Join(DerefObject,
+             Cross(None),
+             heightWeight,
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -660,7 +661,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -686,7 +688,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -718,7 +721,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -903,7 +907,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(Rank,
                         dag.AbsoluteLoad(
                           Const(CString("/het/numbers6"))(line))(line))(line),
-             Const(CLong(13))(line))(line))(line)
+             Const(CLong(13))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -928,7 +933,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(Rank,
                         dag.AbsoluteLoad(
                           Const(CString("/het/numbers6"))(line))(line))(line),
-             Const(CLong(5))(line))(line))(line)
+             Const(CLong(5))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -953,7 +959,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(Rank,
                         dag.AbsoluteLoad(
                           Const(CString("/het/numbers6"))(line))(line))(line),
-             Const(CLong(10))(line))(line))(line)
+             Const(CLong(10))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1020,7 +1027,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(DenseRank,
                         dag.AbsoluteLoad(
                           Const(CString("/het/numbers6"))(line))(line))(line),
-             Const(CLong(10))(line))(line))(line)
+             Const(CLong(10))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1045,7 +1053,8 @@ trait StatsLibSpecs[M[+ _]]
              dag.Morph1(DenseRank,
                         dag.AbsoluteLoad(
                           Const(CString("/het/numbers6"))(line))(line))(line),
-             Const(CLong(9))(line))(line))(line)
+             Const(CLong(9))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1094,7 +1103,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("het/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1121,7 +1131,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("het/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1147,7 +1158,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("het/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1179,7 +1191,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("het/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1213,7 +1226,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1240,7 +1254,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1266,7 +1281,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1298,7 +1314,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1332,7 +1349,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("height"))(line))(line))(line)
+             Const(CString("height"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1358,7 +1376,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("height"))(line))(line))(line)
+             Const(CString("height"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1384,7 +1403,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("height"))(line))(line))(line)
+             Const(CString("height"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1416,7 +1436,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefObject,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
-             Const(CString("height"))(line))(line))(line)
+             Const(CString("height"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1443,13 +1464,15 @@ trait StatsLibSpecs[M[+ _]]
         val line = Line(1, 1, "")
 
         val input =
-          dag.Morph2(LinearCorrelation,
-                     Join(DerefObject,
-                          Cross(None),
-                          dag.AbsoluteLoad(
-                            Const(CString("hom/heightWeight"))(line))(line),
-                          Const(CString("height"))(line))(line),
-                     Const(CLong(5))(line))(line)
+          dag.Morph2(
+            LinearCorrelation,
+            Join(
+              DerefObject,
+              Cross(None),
+              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
+              Const(CString("height"))(line))(line),
+            Const(CLong(5))(line)
+          )(line)
 
         val result = testEval(input)
 
@@ -1460,13 +1483,15 @@ trait StatsLibSpecs[M[+ _]]
         val line = Line(1, 1, "")
 
         val input =
-          dag.Morph2(LinearCorrelation,
-                     Const(CLong(5))(line),
-                     Join(DerefObject,
-                          Cross(None),
-                          dag.AbsoluteLoad(
-                            Const(CString("hom/heightWeight"))(line))(line),
-                          Const(CString("height"))(line))(line))(line)
+          dag.Morph2(
+            LinearCorrelation,
+            Const(CLong(5))(line),
+            Join(
+              DerefObject,
+              Cross(None),
+              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
+              Const(CString("height"))(line))(line)
+          )(line)
 
         val result = testEval(input)
 
@@ -1483,7 +1508,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
              Const(CString("height"))(line))(line),
-        Const(CLong(5))(line))(line)
+        Const(CLong(5))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1506,7 +1532,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
              Const(CString("height"))(line))(line),
-        Const(CLong(5))(line))(line)
+        Const(CLong(5))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1531,13 +1558,15 @@ trait StatsLibSpecs[M[+ _]]
         val line = Line(1, 1, "")
 
         val input =
-          dag.Morph2(LogarithmicRegression,
-                     Join(DerefObject,
-                          Cross(None),
-                          dag.AbsoluteLoad(
-                            Const(CString("hom/heightWeight"))(line))(line),
-                          Const(CString("height"))(line))(line),
-                     Const(CLong(5))(line))(line)
+          dag.Morph2(
+            LogarithmicRegression,
+            Join(
+              DerefObject,
+              Cross(None),
+              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
+              Const(CString("height"))(line))(line),
+            Const(CLong(5))(line)
+          )(line)
 
         val result = testEval(input)
 
@@ -1561,13 +1590,15 @@ trait StatsLibSpecs[M[+ _]]
         val line = Line(1, 1, "")
 
         val input =
-          dag.Morph2(LogarithmicRegression,
-                     Operate(Neg, Const(CLong(5))(line))(line),
-                     Join(DerefObject,
-                          Cross(None),
-                          dag.AbsoluteLoad(
-                            Const(CString("hom/heightWeight"))(line))(line),
-                          Const(CString("height"))(line))(line))(line)
+          dag.Morph2(
+            LogarithmicRegression,
+            Operate(Neg, Const(CLong(5))(line))(line),
+            Join(
+              DerefObject,
+              Cross(None),
+              dag.AbsoluteLoad(Const(CString("hom/heightWeight"))(line))(line),
+              Const(CString("height"))(line))(line)
+          )(line)
 
         val result = testEval(input)
 
@@ -1595,7 +1626,8 @@ trait StatsLibSpecs[M[+ _]]
                  Cross(None),
                  dag.AbsoluteLoad(
                    Const(CString("hom/heightWeight_neg"))(line))(line),
-                 Const(CString("weight"))(line))(line))(line)
+                 Const(CString("weight"))(line))(line)
+          )(line)
 
         val result = testEval(input)
 
@@ -1885,16 +1917,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/hom/numbersAcrossSlices"))(line))(line),
-               Join(Eq,
-                    Cross(None),
-                    dag.Morph1(DenseRank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/hom/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(3))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/hom/numbersAcrossSlices"))(line))(
+            line),
+          Join(Eq,
+               Cross(None),
+               dag.Morph1(DenseRank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/hom/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(3))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -1946,7 +1980,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("hom/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -1974,7 +2009,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("hom/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2003,7 +2039,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("hom/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2037,7 +2074,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("hom/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2063,22 +2101,19 @@ trait StatsLibSpecs[M[+ _]]
         Const(CString("hom/heightWeightAcrossSlices"))(line))(line)
       def const[A: CValueType](a: A): Const = Const(CValueType[A](a))(line)
 
-      val left = Join(JoinObject,
-                      IdentitySort,
-                      Join(WrapObject,
-                           Cross(None),
-                           const("smooth"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("weight"))(line))(line),
-                      Join(WrapObject,
-                           Cross(None),
-                           const("by"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("height"))(line))(line))(line)
+      val left = Join(
+        JoinObject,
+        IdentitySort,
+        Join(
+          WrapObject,
+          Cross(None),
+          const("smooth"),
+          Join(DerefObject, Cross(None), data, const("weight"))(line))(line),
+        Join(WrapObject,
+             Cross(None),
+             const("by"),
+             Join(DerefObject, Cross(None), data, const("height"))(line))(line)
+      )(line)
       val right = const(BigDecimal(0.5))
       val input = dag.Morph2(SimpleExponentialSmoothing, left, right)(line)
 
@@ -2101,32 +2136,27 @@ trait StatsLibSpecs[M[+ _]]
         Const(CString("hom/heightWeightAcrossSlices"))(line))(line)
       def const[A: CValueType](a: A): Const = Const(CValueType[A](a))(line)
 
-      val left = Join(JoinObject,
-                      IdentitySort,
-                      Join(WrapObject,
-                           Cross(None),
-                           const("smooth"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("weight"))(line))(line),
-                      Join(WrapObject,
-                           Cross(None),
-                           const("by"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("height"))(line))(line))(line)
-      val right = Join(JoinObject,
-                       Cross(None),
-                       Join(WrapObject,
-                            Cross(None),
-                            const("alpha"),
-                            const(BigDecimal(0.7)))(line),
-                       Join(WrapObject,
-                            Cross(None),
-                            const("beta"),
-                            const(BigDecimal(0.5)))(line))(line)
+      val left = Join(
+        JoinObject,
+        IdentitySort,
+        Join(
+          WrapObject,
+          Cross(None),
+          const("smooth"),
+          Join(DerefObject, Cross(None), data, const("weight"))(line))(line),
+        Join(WrapObject,
+             Cross(None),
+             const("by"),
+             Join(DerefObject, Cross(None), data, const("height"))(line))(line)
+      )(line)
+      val right = Join(
+        JoinObject,
+        Cross(None),
+        Join(WrapObject, Cross(None), const("alpha"), const(BigDecimal(0.7)))(
+          line),
+        Join(WrapObject, Cross(None), const("beta"), const(BigDecimal(0.5)))(
+          line)
+      )(line)
       val input = dag.Morph2(DoubleExponentialSmoothing, left, right)(line)
 
       val result = testEval(input)
@@ -2245,16 +2275,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/het/numbersAcrossSlices"))(line))(line),
-               Join(Eq,
-                    Cross(None),
-                    dag.Morph1(Rank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/het/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(17))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/het/numbersAcrossSlices"))(line))(
+            line),
+          Join(Eq,
+               Cross(None),
+               dag.Morph1(Rank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/het/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(17))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -2272,16 +2304,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/het/numbersAcrossSlices"))(line))(line),
-               Join(Eq,
-                    Cross(None),
-                    dag.Morph1(Rank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/het/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(9))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/het/numbersAcrossSlices"))(line))(
+            line),
+          Join(Eq,
+               Cross(None),
+               dag.Morph1(Rank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/het/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(9))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -2299,16 +2333,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/het/numbersAcrossSlices"))(line))(line),
-               Join(LtEq,
-                    Cross(None),
-                    dag.Morph1(Rank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/het/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(10))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/het/numbersAcrossSlices"))(line))(
+            line),
+          Join(LtEq,
+               Cross(None),
+               dag.Morph1(Rank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/het/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(10))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -2404,16 +2440,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/het/numbersAcrossSlices"))(line))(line),
-               Join(Eq,
-                    Cross(None),
-                    dag.Morph1(DenseRank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/het/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(13))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/het/numbersAcrossSlices"))(line))(
+            line),
+          Join(Eq,
+               Cross(None),
+               dag.Morph1(DenseRank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/het/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(13))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -2431,16 +2469,18 @@ trait StatsLibSpecs[M[+ _]]
       val line = Line(1, 1, "")
 
       val input =
-        Filter(IdentitySort,
-               dag.AbsoluteLoad(
-                 Const(CString("/het/numbersAcrossSlices"))(line))(line),
-               Join(LtEq,
-                    Cross(None),
-                    dag.Morph1(DenseRank,
-                               dag.AbsoluteLoad(
-                                 Const(CString("/het/numbersAcrossSlices"))(
-                                   line))(line))(line),
-                    Const(CLong(10))(line))(line))(line)
+        Filter(
+          IdentitySort,
+          dag.AbsoluteLoad(Const(CString("/het/numbersAcrossSlices"))(line))(
+            line),
+          Join(LtEq,
+               Cross(None),
+               dag.Morph1(DenseRank,
+                          dag.AbsoluteLoad(
+                            Const(CString("/het/numbersAcrossSlices"))(line))(
+                            line))(line),
+               Const(CLong(10))(line))(line)
+        )(line)
 
       val result = testEval(input)
 
@@ -2509,7 +2549,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("het/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2536,7 +2577,8 @@ trait StatsLibSpecs[M[+ _]]
         Join(DerefArray,
              Cross(None),
              dag.AbsoluteLoad(Const(CString("uncorrelated"))(line))(line),
-             Const(CLong(1))(line))(line))(line)
+             Const(CLong(1))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2561,7 +2603,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("het/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2590,7 +2633,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("het/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2624,7 +2668,8 @@ trait StatsLibSpecs[M[+ _]]
              Cross(None),
              dag.AbsoluteLoad(
                Const(CString("het/heightWeightAcrossSlices"))(line))(line),
-             Const(CString("weight"))(line))(line))(line)
+             Const(CString("weight"))(line))(line)
+      )(line)
 
       val result = testEval(input)
 
@@ -2650,22 +2695,19 @@ trait StatsLibSpecs[M[+ _]]
         Const(CString("het/heightWeightAcrossSlices"))(line))(line)
       def const[A: CValueType](a: A): Const = Const(CValueType[A](a))(line)
 
-      val left = Join(JoinObject,
-                      IdentitySort,
-                      Join(WrapObject,
-                           Cross(None),
-                           const("smooth"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("weight"))(line))(line),
-                      Join(WrapObject,
-                           Cross(None),
-                           const("by"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("height"))(line))(line))(line)
+      val left = Join(
+        JoinObject,
+        IdentitySort,
+        Join(
+          WrapObject,
+          Cross(None),
+          const("smooth"),
+          Join(DerefObject, Cross(None), data, const("weight"))(line))(line),
+        Join(WrapObject,
+             Cross(None),
+             const("by"),
+             Join(DerefObject, Cross(None), data, const("height"))(line))(line)
+      )(line)
       val right = const(BigDecimal(0.7))
       val input = dag.Morph2(SimpleExponentialSmoothing, left, right)(line)
 
@@ -2690,32 +2732,27 @@ trait StatsLibSpecs[M[+ _]]
         Const(CString("het/heightWeightAcrossSlices"))(line))(line)
       def const[A: CValueType](a: A): Const = Const(CValueType[A](a))(line)
 
-      val left = Join(JoinObject,
-                      IdentitySort,
-                      Join(WrapObject,
-                           Cross(None),
-                           const("smooth"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("weight"))(line))(line),
-                      Join(WrapObject,
-                           Cross(None),
-                           const("by"),
-                           Join(DerefObject,
-                                Cross(None),
-                                data,
-                                const("height"))(line))(line))(line)
-      val right = Join(JoinObject,
-                       Cross(None),
-                       Join(WrapObject,
-                            Cross(None),
-                            const("alpha"),
-                            const(BigDecimal(0.7)))(line),
-                       Join(WrapObject,
-                            Cross(None),
-                            const("beta"),
-                            const(BigDecimal(0.5)))(line))(line)
+      val left = Join(
+        JoinObject,
+        IdentitySort,
+        Join(
+          WrapObject,
+          Cross(None),
+          const("smooth"),
+          Join(DerefObject, Cross(None), data, const("weight"))(line))(line),
+        Join(WrapObject,
+             Cross(None),
+             const("by"),
+             Join(DerefObject, Cross(None), data, const("height"))(line))(line)
+      )(line)
+      val right = Join(
+        JoinObject,
+        Cross(None),
+        Join(WrapObject, Cross(None), const("alpha"), const(BigDecimal(0.7)))(
+          line),
+        Join(WrapObject, Cross(None), const("beta"), const(BigDecimal(0.5)))(
+          line)
+      )(line)
       val input = dag.Morph2(DoubleExponentialSmoothing, left, right)(line)
 
       val result = testEval(input)

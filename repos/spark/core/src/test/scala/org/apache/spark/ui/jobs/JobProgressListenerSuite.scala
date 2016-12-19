@@ -322,13 +322,15 @@ class JobProgressListenerSuite
 
     // Go through all the failure cases to make sure we are counting them as failures.
     val taskFailedReasons =
-      Seq(Resubmitted,
-          new FetchFailed(null, 0, 0, 0, "ignored"),
-          ExceptionFailure("Exception", "description", null, null, None),
-          TaskResultLost,
-          TaskKilled,
-          ExecutorLostFailure("0", true, Some("Induced failure")),
-          UnknownReason)
+      Seq(
+        Resubmitted,
+        new FetchFailed(null, 0, 0, 0, "ignored"),
+        ExceptionFailure("Exception", "description", null, null, None),
+        TaskResultLost,
+        TaskKilled,
+        ExecutorLostFailure("0", true, Some("Induced failure")),
+        UnknownReason
+      )
     var failCount = 0
     for (reason <- taskFailedReasons) {
       listener.onTaskEnd(
@@ -408,9 +410,12 @@ class JobProgressListenerSuite
     listener.onExecutorMetricsUpdate(
       SparkListenerExecutorMetricsUpdate(
         execId,
-        Array((1234L, 0, 0, makeTaskMetrics(0).accumulatorUpdates()),
-              (1235L, 0, 0, makeTaskMetrics(100).accumulatorUpdates()),
-              (1236L, 1, 0, makeTaskMetrics(200).accumulatorUpdates()))))
+        Array(
+          (1234L, 0, 0, makeTaskMetrics(0).accumulatorUpdates()),
+          (1235L, 0, 0, makeTaskMetrics(100).accumulatorUpdates()),
+          (1236L, 1, 0, makeTaskMetrics(200).accumulatorUpdates())
+        )
+      ))
 
     var stage0Data = listener.stageIdToData.get((0, 0)).get
     var stage1Data = listener.stageIdToData.get((1, 0)).get

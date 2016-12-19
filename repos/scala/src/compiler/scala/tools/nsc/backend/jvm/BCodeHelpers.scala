@@ -968,7 +968,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                  |signature: %s
                  |if this is reproducible, please report bug at https://issues.scala-lang.org/
               """.trim.stripMargin
-              .format(sym, sym.owner.skipPackageObject.fullName, sig))
+              .format(sym, sym.owner.skipPackageObject.fullName, sig)
+          )
           return null
         }
       }
@@ -991,7 +992,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                                           sig,
                                           memberTpe,
                                           normalizedTpe,
-                                          bytecodeTpe))
+                                          bytecodeTpe)
+          )
           return null
         }
       }

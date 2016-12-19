@@ -44,7 +44,8 @@ object DumpLogSegments {
     val indexSanityOpt = parser.accepts(
       "index-sanity-check",
       "if set, just checks the index sanity without printing its content. " +
-        "This is the same check that is executed on broker startup to determine if an index needs rebuilding or not.")
+        "This is the same check that is executed on broker startup to determine if an index needs rebuilding or not."
+    )
     val filesOpt = parser
       .accepts(
         "files",
@@ -64,14 +65,16 @@ object DumpLogSegments {
     val valueDecoderOpt = parser
       .accepts(
         "value-decoder-class",
-        "if set, used to deserialize the messages. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
+        "if set, used to deserialize the messages. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory."
+      )
       .withOptionalArg()
       .ofType(classOf[java.lang.String])
       .defaultsTo("kafka.serializer.StringDecoder")
     val keyDecoderOpt = parser
       .accepts(
         "key-decoder-class",
-        "if set, used to deserialize the keys. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory.")
+        "if set, used to deserialize the keys. This class should implement kafka.serializer.Decoder trait. Custom jar should be available in kafka/libs directory."
+      )
       .withOptionalArg()
       .ofType(classOf[java.lang.String])
       .defaultsTo("kafka.serializer.StringDecoder")

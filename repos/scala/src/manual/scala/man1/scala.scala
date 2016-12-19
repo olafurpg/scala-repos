@@ -24,45 +24,41 @@ object scala extends Command {
             CmdLine(" [ " & Argument("option") & " ]... " & "[ " & Argument(
               "torun") & " " & Argument("argument") & "... ]"))
 
-  val parameters = Section("PARAMETERS",
-                           DefinitionList(
-                             Definition(Mono(Argument("compiler-option")),
-                                        "Any scalac option.  See " & Link(
-                                          Bold("scalac") & "(1)",
-                                          "scalac.html") & "."),
-                             Definition(
-                               CmdOptionBound("howtorun:", Argument("how")),
-                               "How to execute " & Argument("torun") & ", if it is present. " & "Options for " & Argument(
-                                 "how") & " are " & Mono("guess") & " (the default), " & Mono(
-                                 "script") & ", " & Mono("jar") & ", and " & Mono(
-                                 "object") & "."),
-                             Definition(
-                               CmdOption("i", Argument("file")),
-                               "Requests that a file be pre-loaded.  It is only " & "meaningful for interactive shells."),
-                             Definition(
-                               CmdOption("e", Argument("string")),
-                               "Requests that its argument be executed as Scala code."),
-                             Definition(
-                               CmdOption("savecompiled"),
-                               "Save this compiled version of scripts in order to speed up " & "later executions of the same script.  When running a script, " & "save the compiled version in a file with the same name as the " & "script but with an extension of " & Mono(
-                                 ".jar") & ".  On subsequent " & "runs of the same script, the pre-compiled " & Mono(
-                                 ".jar") & " file " & "will be used if it is newer than the script file."),
-                             Definition(
-                               CmdOption("nocompdaemon"),
-                               "Do not use the " & MBold("fsc") & " offline compiler."),
-                             Definition(
-                               CmdOption("nc"),
-                               "Same as " & Mono("-nocompdaemon") & "."),
-                             Definition(
-                               CmdOptionBound("D", "property=value"),
-                               "Set a Java system property.  If no value is specified, " & "then the property is set to the empty string."),
-                             Definition(
-                               Mono(Argument("torun")),
-                               "A top-level object or a script file to run."),
-                             Definition(Mono(Argument("argument")),
-                                        "An arguments to pass to " & Argument(
-                                          "torun") & ".")
-                           ))
+  val parameters = Section(
+    "PARAMETERS",
+    DefinitionList(
+      Definition(Mono(Argument("compiler-option")),
+                 "Any scalac option.  See " & Link(Bold("scalac") & "(1)",
+                                                   "scalac.html") & "."),
+      Definition(
+        CmdOptionBound("howtorun:", Argument("how")),
+        "How to execute " & Argument("torun") & ", if it is present. " & "Options for " & Argument(
+          "how") & " are " & Mono("guess") & " (the default), " & Mono(
+          "script") & ", " & Mono("jar") & ", and " & Mono("object") & "."
+      ),
+      Definition(
+        CmdOption("i", Argument("file")),
+        "Requests that a file be pre-loaded.  It is only " & "meaningful for interactive shells."),
+      Definition(CmdOption("e", Argument("string")),
+                 "Requests that its argument be executed as Scala code."),
+      Definition(
+        CmdOption("savecompiled"),
+        "Save this compiled version of scripts in order to speed up " & "later executions of the same script.  When running a script, " & "save the compiled version in a file with the same name as the " & "script but with an extension of " & Mono(
+          ".jar") & ".  On subsequent " & "runs of the same script, the pre-compiled " & Mono(
+          ".jar") & " file " & "will be used if it is newer than the script file."
+      ),
+      Definition(CmdOption("nocompdaemon"),
+                 "Do not use the " & MBold("fsc") & " offline compiler."),
+      Definition(CmdOption("nc"), "Same as " & Mono("-nocompdaemon") & "."),
+      Definition(
+        CmdOptionBound("D", "property=value"),
+        "Set a Java system property.  If no value is specified, " & "then the property is set to the empty string."),
+      Definition(Mono(Argument("torun")),
+                 "A top-level object or a script file to run."),
+      Definition(Mono(Argument("argument")),
+                 "An arguments to pass to " & Argument("torun") & ".")
+    )
+  )
 
   val description =
     Section(
@@ -103,18 +99,21 @@ object scala extends Command {
     "OPTIONS",
     "If any compiler options are specified, they must be first in the " & "command line and must be followed by a bare hypen (" & Quote(
       "-") & ") character. " & "If no arguments are specified after the optional compiler arguments, " & "then an interactive Scala shell is started.  Otherwise, either a " & "script file is run, or a pre-compiled Scala object is run.  It " & "is possible to distinguish the last two cases by using an explicit " & Mono(
-      "-object") & " or " & Mono("-script") & " flag, but usually the " & "program can guess correctly.")
+      "-object") & " or " & Mono("-script") & " flag, but usually the " & "program can guess correctly."
+  )
 
   val environment = Section(
     "ENVIRONMENT",
     DefinitionList(
       Definition(
         MBold("JAVACMD"),
-        "Specify the " & MBold("java") & " command to be used " & "for running the Scala code.  Arguments may be specified " & "as part of the environment variable; spaces, quotation marks, " & "etc., will be passed directly to the shell for expansion."),
+        "Specify the " & MBold("java") & " command to be used " & "for running the Scala code.  Arguments may be specified " & "as part of the environment variable; spaces, quotation marks, " & "etc., will be passed directly to the shell for expansion."
+      ),
       Definition(
         MBold("JAVA_HOME"),
         "Specify JDK/JRE home directory. This directory is used to locate " & "the " & MBold(
-          "java") & " command unless " & MBold("JAVACMD") & " variable set."),
+          "java") & " command unless " & MBold("JAVACMD") & " variable set."
+      ),
       Definition(
         MBold("JAVA_OPTS"),
         SeqPara(
@@ -122,7 +121,10 @@ object scala extends Command {
             "JAVACMD") & ".",
           "With Java 1.5 (or newer) one may for example configure the " & "memory usage of the JVM as follows: " & Mono(
             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\"")
-        ))))
+        )
+      )
+    )
+  )
 
   val examples = Section(
     "EXAMPLES",
@@ -134,15 +136,18 @@ object scala extends Command {
         "Execute a Scala program generated in a user-defined " & "directory " & Bold(
           "classes"),
         CmdLine(CmdOption("classpath", "classes") & "hello.HelloWorld")),
-      Definition("Execute a Scala program using a user-defined " & MBold(
-                   "java") & " " & "command",
-                 MBold("env JAVACMD") & Mono("=/usr/local/bin/cacao ") & CmdLine(
-                   CmdOption("classpath", "classes") & "hello.HelloWorld")),
+      Definition(
+        "Execute a Scala program using a user-defined " & MBold("java") & " " & "command",
+        MBold("env JAVACMD") & Mono("=/usr/local/bin/cacao ") & CmdLine(
+          CmdOption("classpath", "classes") & "hello.HelloWorld")
+      ),
       Definition(
         "Execute a Scala program using JVM options",
         MBold("env JAVACMD") & Mono("=java ") & MBold("JAVA_OPTS") & Mono(
           "=\"-Dmsg=hello -enableassertions\" ") & CmdLine(
-          CmdOption("classpath", "classes") & "hello.HelloWorld"))),
+          CmdOption("classpath", "classes") & "hello.HelloWorld")
+      )
+    ),
     "Here is a complete Scala script for Unix: ",
     CodeSample(
       "#!/bin/sh\n" + "exec scala \"$0\" \"$@\"\n" + "!#\n" +
@@ -165,16 +170,17 @@ object scala extends Command {
   val exitStatus = Section(
     "EXIT STATUS",
     "The " & MBold(command) & " command " & "returns a zero exit status if it succeeds. " & "Non zero is returned in case of any error.  If a script or " & "top-level object is executed and returns a value, then that " & "return value is passed on to " & MBold(
-      command) & ".")
+      command) & "."
+  )
 
   val seeAlso =
-    Section("SEE ALSO",
-            Link(Bold("fsc") & "(1)", "fsc.html") & ", " & Link(
-              Bold("scalac") & "(1)",
-              "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)",
-                                           "scaladoc.html") & ", " & Link(
-              Bold("scalap") & "(1)",
-              "scalap.html"))
+    Section(
+      "SEE ALSO",
+      Link(Bold("fsc") & "(1)", "fsc.html") & ", " & Link(Bold("scalac") & "(1)",
+                                                          "scalac.html") & ", " & Link(
+        Bold("scaladoc") & "(1)",
+        "scaladoc.html") & ", " & Link(Bold("scalap") & "(1)", "scalap.html")
+    )
 
   def manpage = new Document {
     title = command

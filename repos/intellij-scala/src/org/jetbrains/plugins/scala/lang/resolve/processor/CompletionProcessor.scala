@@ -188,7 +188,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                 isNamedParameter = isNamedParameter,
                 fromType = fromType,
                 importsUsed = importsUsed,
-                prefixCompletion = prefixCompletion)
+                prefixCompletion = prefixCompletion
+              )
               _addResult(result)
             case bindingPattern: ScBindingPattern =>
               val result = new ScalaResolveResult(
@@ -199,7 +200,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                 isNamedParameter = isNamedParameter,
                 fromType = fromType,
                 importsUsed = importsUsed,
-                prefixCompletion = prefixCompletion)
+                prefixCompletion = prefixCompletion
+              )
               _addResult(result)
             case _ =>
               val result = new ScalaResolveResult(
@@ -210,7 +212,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                 isNamedParameter = isNamedParameter,
                 fromType = fromType,
                 importsUsed = importsUsed,
-                prefixCompletion = prefixCompletion)
+                prefixCompletion = prefixCompletion
+              )
               _addResult(result)
           }
         }

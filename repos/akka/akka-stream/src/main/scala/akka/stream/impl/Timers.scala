@@ -233,35 +233,41 @@ private[stream] object Timers {
         // Prefetching to ensure priority of actual upstream elements
         override def preStart(): Unit = pull(in)
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            nextDeadline = Deadline.now + timeout
-            cancelTimer(IdleTimer)
-            if (isAvailable(out)) {
-              push(out, grab(in))
-              pull(in)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              nextDeadline = Deadline.now + timeout
+              cancelTimer(IdleTimer)
+              if (isAvailable(out)) {
+                push(out, grab(in))
+                pull(in)
+              }
+            }
+
+            override def onUpstreamFinish(): Unit = {
+              if (!isAvailable(in)) completeStage()
             }
           }
+        )
 
-          override def onUpstreamFinish(): Unit = {
-            if (!isAvailable(in)) completeStage()
-          }
-        })
-
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
-            if (isAvailable(in)) {
-              push(out, grab(in))
-              if (isClosed(in)) completeStage()
-              else pull(in)
-            } else {
-              if (nextDeadline.isOverdue()) {
-                nextDeadline = Deadline.now + timeout
-                push(out, inject())
-              } else scheduleOnce(IdleTimer, nextDeadline.timeLeft)
+        setHandler(
+          out,
+          new OutHandler {
+            override def onPull(): Unit = {
+              if (isAvailable(in)) {
+                push(out, grab(in))
+                if (isClosed(in)) completeStage()
+                else pull(in)
+              } else {
+                if (nextDeadline.isOverdue()) {
+                  nextDeadline = Deadline.now + timeout
+                  push(out, inject())
+                } else scheduleOnce(IdleTimer, nextDeadline.timeLeft)
+              }
             }
           }
-        })
+        )
 
         override protected def onTimer(timerKey: Any): Unit = {
           if (nextDeadline.isOverdue() && isAvailable(out)) {

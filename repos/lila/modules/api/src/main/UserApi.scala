@@ -56,17 +56,19 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                   makeUrl(s"${g.gameId}/${g.color.name}")),
                 "nbFollowing" -> following,
                 "nbFollowers" -> followers,
-                "count" -> Json.obj("all" -> u.count.game,
-                                    "rated" -> u.count.rated,
-                                    "ai" -> u.count.ai,
-                                    "draw" -> u.count.draw,
-                                    "drawH" -> u.count.drawH,
-                                    "loss" -> u.count.loss,
-                                    "lossH" -> u.count.lossH,
-                                    "win" -> u.count.win,
-                                    "winH" -> u.count.winH,
-                                    "bookmark" -> bookmarkApi.countByUser(u),
-                                    "me" -> nbGamesWithMe)
+                "count" -> Json.obj(
+                  "all" -> u.count.game,
+                  "rated" -> u.count.rated,
+                  "ai" -> u.count.ai,
+                  "draw" -> u.count.draw,
+                  "drawH" -> u.count.drawH,
+                  "loss" -> u.count.loss,
+                  "lossH" -> u.count.lossH,
+                  "win" -> u.count.win,
+                  "winH" -> u.count.winH,
+                  "bookmark" -> bookmarkApi.countByUser(u),
+                  "me" -> nbGamesWithMe
+                )
               ) ++ ctx.isAuth.??(
                 Json.obj(
                   "followable" -> followable,

@@ -106,12 +106,14 @@ class ReplSuite extends SparkFunSuite {
 
   test("simple foreach with accumulator") {
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
         |val accum = sc.accumulator(0)
         |sc.parallelize(1 to 10).foreach(x => accum += x)
         |accum.value
-      """.stripMargin)
+      """.stripMargin
+      )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res1: Int = 55", output)
@@ -125,7 +127,8 @@ class ReplSuite extends SparkFunSuite {
         |sc.parallelize(1 to 10).map(x => v).collect().reduceLeft(_+_)
         |v = 10
         |sc.parallelize(1 to 10).map(x => v).collect().reduceLeft(_+_)
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 70", output)
@@ -140,7 +143,8 @@ class ReplSuite extends SparkFunSuite {
         |def foo = 5
         |}
         |sc.parallelize(1 to 10).map(x => (new C).foo).collect().reduceLeft(_+_)
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 50", output)
@@ -167,7 +171,8 @@ class ReplSuite extends SparkFunSuite {
         |sc.parallelize(1 to 10).map(x => getV()).collect().reduceLeft(_+_)
         |v = 10
         |sc.parallelize(1 to 10).map(x => getV()).collect().reduceLeft(_+_)
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 70", output)
@@ -186,7 +191,8 @@ class ReplSuite extends SparkFunSuite {
         |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
         |array(0) = 5
         |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Array[Int] = Array(0, 0, 0, 0, 0)", output)
@@ -201,15 +207,17 @@ class ReplSuite extends SparkFunSuite {
     out.write("Goodbye\n")
     out.close()
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
         |var file = sc.textFile("%s").cache()
         |file.count()
         |file.count()
         |file.count()
       """.stripMargin.format(
-                       StringEscapeUtils.escapeJava(
-                         tempDir.getAbsolutePath + File.separator + "input")))
+          StringEscapeUtils.escapeJava(
+            tempDir.getAbsolutePath + File.separator + "input"))
+      )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Long = 3", output)
@@ -232,7 +240,8 @@ class ReplSuite extends SparkFunSuite {
         |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
         |array(0) = 5
         |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 70", output)
@@ -249,7 +258,8 @@ class ReplSuite extends SparkFunSuite {
         |val a = Sum("A", "B")
         |def b(a: Sum): String = a match { case Sum(_, _) => "Found Sum" }
         |b(a)
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
   }
@@ -276,19 +286,22 @@ class ReplSuite extends SparkFunSuite {
         |
         |// Test Dataset Serialization in the REPL
         |Seq(TestCaseClass(1)).toDS().collect()
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
   }
 
   test("SPARK-8461 SQL with codegen") {
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
       |val sqlContext = new org.apache.spark.sql.SQLContext(sc)
       |sqlContext.setConf("spark.sql.codegen", "true")
       |sqlContext.range(0, 100).filter('id > 50).count()
-    """.stripMargin)
+    """.stripMargin
+      )
     assertContains("Long = 49", output)
     assertDoesNotContain("java.lang.ClassNotFoundException", output)
   }
@@ -310,7 +323,8 @@ class ReplSuite extends SparkFunSuite {
         |
         |val ds = Seq(1, 2, 3, 4).toDS()
         |ds.select(simpleSum).collect
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
   }
@@ -325,7 +339,8 @@ class ReplSuite extends SparkFunSuite {
       |import t.testMethod
       |case class TestCaseClass(value: Int)
       |sc.parallelize(1 to 10).map(x => TestCaseClass(x)).collect()
-    """.stripMargin)
+    """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
   }
@@ -345,7 +360,8 @@ class ReplSuite extends SparkFunSuite {
           |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
           |array(0) = 5
           |sc.parallelize(0 to 4).map(x => broadcastArray.value(x)).collect()
-        """.stripMargin)
+        """.stripMargin
+      )
       assertDoesNotContain("error:", output)
       assertDoesNotContain("Exception", output)
       assertContains("res0: Int = 70", output)
@@ -375,7 +391,8 @@ class ReplSuite extends SparkFunSuite {
         |def sum[I, N : Numeric : Encoder](f: I => N): TypedColumn[I, N] = new SumOf(f).toColumn
         |val ds = Seq((1, 1, 2L), (1, 2, 3L), (1, 3, 4L), (2, 1, 5L)).toDS()
         |ds.groupBy(_._1).agg(sum(_._2), sum(_._3)).collect()
-      """.stripMargin)
+      """.stripMargin
+    )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
   }
@@ -394,12 +411,14 @@ class ReplSuite extends SparkFunSuite {
 
   test("collecting objects of class defined in repl - shuffling") {
     val output =
-      runInterpreter("local-cluster[1,1,1024]",
-                     """
+      runInterpreter(
+        "local-cluster[1,1,1024]",
+        """
         |case class Foo(i: Int)
         |val list = List((1, Foo(1)), (1, Foo(2)))
         |val ret = sc.parallelize(list).groupByKey().collect()
-      """.stripMargin)
+      """.stripMargin
+      )
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("ret: Array[(Int, Iterable[Foo])] = Array((1,", output)

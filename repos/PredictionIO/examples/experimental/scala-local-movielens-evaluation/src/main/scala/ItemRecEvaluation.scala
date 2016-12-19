@@ -47,7 +47,8 @@ object ItemRecEvaluation1 {
       nearestN = 10,
       unseenOnly = false,
       freshness = 0,
-      freshnessTimeUnit = 86400)
+      freshnessTimeUnit = 86400
+    )
 
     val engineParams = new EngineParams(
       dataSourceParams = dsp,

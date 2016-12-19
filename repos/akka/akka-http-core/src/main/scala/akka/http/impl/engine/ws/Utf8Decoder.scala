@@ -409,7 +409,8 @@ private[http] object Utf8Decoder extends StreamingCharsetDecoder {
     12,
     12,
     12,
-    12)
+    12
+  )
 
   def create(): StreamingCharsetDecoderInstance =
     new StreamingCharsetDecoderInstance {

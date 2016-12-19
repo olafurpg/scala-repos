@@ -707,8 +707,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         enabled partition (_.requires forall isEnabled)
       unhappy foreach
         (u =>
-           globalError(
-             s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
+          globalError(
+            s"Phase '${u.phaseName}' requires: ${u.requires filterNot isEnabled}"))
       satisfied // they're happy now, but they may need an unhappy phase that was booted
     }
     computeInternalPhases() // Global.scala
@@ -1669,7 +1669,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         val maxId = math.max(globalPhase.id, typerPhase.id)
         firstPhase.iterator takeWhile (_.id < maxId) foreach
           (ph =>
-             enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
+            enteringPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
         refreshProgress()
       }
     }
@@ -1714,9 +1714,9 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(currentRun.symSource.keys map
-          (sym =>
-             findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
+        phased(
+          currentRun.symSource.keys map
+            (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)
     }

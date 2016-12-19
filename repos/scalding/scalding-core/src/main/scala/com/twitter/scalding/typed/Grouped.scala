@@ -620,7 +620,8 @@ case class ValueSortedReduce[K, V1, V2](
                                        Grouped.valueConverter(optVOrdering),
                                        reduceFn,
                                        Grouped.valueField),
-          Fields.REPLACE))
+          Fields.REPLACE
+        ))
         .reducers(reducers.getOrElse(-1))
         .setDescriptions(descriptions)
     }
@@ -672,7 +673,8 @@ case class IteratorMappedReduce[K, V1, V2](
                           TupleConverter.singleConverter[V1],
                           reduceFn,
                           Grouped.valueField),
-        Fields.REPLACE))
+        Fields.REPLACE
+      ))
       .reducers(reducers.getOrElse(-1))
       .setDescriptions(descriptions)
   }

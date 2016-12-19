@@ -148,17 +148,19 @@ class ParamsSuite extends SparkFunSuite {
     {
       // DoubleArrayParam
       val param = new DoubleArrayParam(dummy, "name", "doc")
-      val values: Seq[Array[Double]] = Seq(Array(),
-                                           Array(1.0),
-                                           Array(Double.NaN,
-                                                 Double.NegativeInfinity,
-                                                 Double.MinValue,
-                                                 -1.0,
-                                                 0.0,
-                                                 Double.MinPositiveValue,
-                                                 1.0,
-                                                 Double.MaxValue,
-                                                 Double.PositiveInfinity))
+      val values: Seq[Array[Double]] = Seq(
+        Array(),
+        Array(1.0),
+        Array(Double.NaN,
+              Double.NegativeInfinity,
+              Double.MinValue,
+              -1.0,
+              0.0,
+              Double.MinPositiveValue,
+              1.0,
+              Double.MaxValue,
+              Double.PositiveInfinity)
+      )
       for (value <- values) {
         val json = param.jsonEncode(value)
         val decoded = param.jsonDecode(json)

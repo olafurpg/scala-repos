@@ -1002,7 +1002,8 @@ private[spark] class Client(val args: ClientArguments,
         "--properties-file",
         buildPath(YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
                   LOCALIZED_CONF_DIR,
-                  SPARK_CONF_FILE))
+                  SPARK_CONF_FILE)
+      )
 
     // Command for the ApplicationMaster
     val commands =

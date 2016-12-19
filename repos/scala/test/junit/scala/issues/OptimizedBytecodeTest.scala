@@ -295,20 +295,23 @@ class OptimizedBytecodeTest extends ClearAfterClass {
     val c = cls.find(_.name == "C").get
     assertSameSummary(
       getSingleMethod(c, "t"),
-      List(GETSTATIC,
-           IFNONNULL,
-           ACONST_NULL,
-           ATHROW, // module load and null checks not yet eliminated
-           -1,
-           ICONST_1,
-           GETSTATIC,
-           IFNONNULL,
-           ACONST_NULL,
-           ATHROW,
-           -1,
-           ICONST_2,
-           IADD,
-           IRETURN))
+      List(
+        GETSTATIC,
+        IFNONNULL,
+        ACONST_NULL,
+        ATHROW, // module load and null checks not yet eliminated
+        -1,
+        ICONST_1,
+        GETSTATIC,
+        IFNONNULL,
+        ACONST_NULL,
+        ATHROW,
+        -1,
+        ICONST_2,
+        IADD,
+        IRETURN
+      )
+    )
   }
 
   @Test

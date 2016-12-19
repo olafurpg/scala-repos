@@ -310,9 +310,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     def unaryEvalForBoxes(operatorName: String, boxesName: String): Evaluator = {
       unaryEval(operatorName, unaryEvaluator(_, boxesName))
     }
-    def binaryEval(operatorName: String,
-                   function: (Evaluator,
-                              Evaluator) => Evaluator): Evaluator = {
+    def binaryEval(
+        operatorName: String,
+        function: (Evaluator, Evaluator) => Evaluator): Evaluator = {
       if (argEvaluators.length == 1) {
         val eval = qualOpt match {
           case None => new ScalaThisEvaluator()
@@ -338,23 +338,26 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
                                             boxed(l, r)))
     }
     def isInstanceOfEval: Evaluator = {
-      unaryEval("isInstanceOf", eval => {
-        import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-        val tp = ref.getParent match {
-          case gen: ScGenericCall =>
-            gen.typeArgs match {
-              case Some(args) =>
-                args.typeArgs match {
-                  case Seq(arg) => arg.calcType
-                  case _ => Nothing
-                }
-              case None => Nothing
-            }
-          case _ => Nothing
+      unaryEval(
+        "isInstanceOf",
+        eval => {
+          import org.jetbrains.plugins.scala.lang.psi.types.Nothing
+          val tp = ref.getParent match {
+            case gen: ScGenericCall =>
+              gen.typeArgs match {
+                case Some(args) =>
+                  args.typeArgs match {
+                    case Seq(arg) => arg.calcType
+                    case _ => Nothing
+                  }
+                case None => Nothing
+              }
+            case _ => Nothing
+          }
+          val jvmName: JVMName = DebuggerUtil.getJVMQualifiedName(tp)
+          new ScalaInstanceofEvaluator(eval, new TypeEvaluator(jvmName))
         }
-        val jvmName: JVMName = DebuggerUtil.getJVMQualifiedName(tp)
-        new ScalaInstanceofEvaluator(eval, new TypeEvaluator(jvmName))
-      })
+      )
     }
 
     def trueEval = expressionFromTextEvaluator("true", ref)
@@ -2006,13 +2009,15 @@ object ScalaEvaluatorBuilderUtil {
   }
 
   def localFunctionIndex(named: PsiNamedElement): Int = {
-    elementsWithSameNameIndex(named, {
-      case f: ScFunction if f.isLocal && f.name == named.name => true
-      case Both(ScalaPsiUtil.inNameContext(LazyVal(_)), lzy: ScBindingPattern)
-          if lzy.name == named.name =>
-        true
-      case _ => false
-    })
+    elementsWithSameNameIndex(
+      named, {
+        case f: ScFunction if f.isLocal && f.name == named.name => true
+        case Both(ScalaPsiUtil.inNameContext(LazyVal(_)),
+                  lzy: ScBindingPattern) if lzy.name == named.name =>
+          true
+        case _ => false
+      }
+    )
   }
 
   def lazyValIndex(named: PsiNamedElement): Int = {

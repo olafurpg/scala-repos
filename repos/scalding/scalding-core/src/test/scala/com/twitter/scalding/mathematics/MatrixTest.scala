@@ -481,25 +481,29 @@ class MatrixTest extends WordSpec with Matchers {
   "A MatrixBlockProd job" should {
     TUtil.printStack {
       JobTest(new MatrixBlockProd(_))
-        .source(Tsv("mat1", ('x1, 'y1, 'v1)),
-                List(("alpha1", 1, 1.0),
-                     ("alpha1", 2, 2.0),
-                     ("beta1", 1, 5.0),
-                     ("beta1", 2, 6.0),
-                     ("alpha2", 1, 3.0),
-                     ("alpha2", 2, 4.0),
-                     ("beta2", 1, 7.0),
-                     ("beta2", 2, 8.0)))
+        .source(
+          Tsv("mat1", ('x1, 'y1, 'v1)),
+          List(("alpha1", 1, 1.0),
+               ("alpha1", 2, 2.0),
+               ("beta1", 1, 5.0),
+               ("beta1", 2, 6.0),
+               ("alpha2", 1, 3.0),
+               ("alpha2", 2, 4.0),
+               ("beta2", 1, 7.0),
+               ("beta2", 2, 8.0))
+        )
         .sink[(String, String, Double)](Tsv("product")) { ob =>
           "correctly compute block products" in {
-            toSparseMat(ob) shouldBe Map(("alpha1", "alpha1") -> 5.0,
-                                         ("alpha1", "alpha2") -> 11.0,
-                                         ("alpha2", "alpha1") -> 11.0,
-                                         ("alpha2", "alpha2") -> 25.0,
-                                         ("beta1", "beta1") -> 61.0,
-                                         ("beta1", "beta2") -> 83.0,
-                                         ("beta2", "beta1") -> 83.0,
-                                         ("beta2", "beta2") -> 113.0)
+            toSparseMat(ob) shouldBe Map(
+              ("alpha1", "alpha1") -> 5.0,
+              ("alpha1", "alpha2") -> 11.0,
+              ("alpha2", "alpha1") -> 11.0,
+              ("alpha2", "alpha2") -> 25.0,
+              ("beta1", "beta1") -> 61.0,
+              ("beta1", "beta2") -> 83.0,
+              ("beta2", "beta1") -> 83.0,
+              ("beta2", "beta2") -> 113.0
+            )
           }
         }
         .run

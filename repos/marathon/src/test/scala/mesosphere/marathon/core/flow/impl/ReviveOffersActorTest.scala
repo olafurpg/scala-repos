@@ -323,7 +323,8 @@ class ReviveOffersActorTest
           "revive_offers_repetitions",
           descr =
             "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
-          default = Some(repetitions))
+          default = Some(repetitions)
+        )
       }
       conf.afterInit()
       conf

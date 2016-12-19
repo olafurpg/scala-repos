@@ -81,7 +81,8 @@ object Test extends ScaladocModelTest {
         extractCommentText(dtpl.groupDescription(grp).get).contains(grpDesc),
         "Group description for " + grp + " in " + dtpl.qualifiedName +
           " does not contain \"" + grpDesc + "\": \"" +
-          extractCommentText(dtpl.groupDescription(grp).get) + "\"")
+          extractCommentText(dtpl.groupDescription(grp).get) + "\""
+      )
     }
 
     def checkGroupName(dtpl: DocTemplateEntity, grp: String, grpName: String) =

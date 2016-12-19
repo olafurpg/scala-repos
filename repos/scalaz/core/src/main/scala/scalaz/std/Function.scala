@@ -30,8 +30,8 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   // `function1Covariant[=> Any]`. In 2.11.0-M6 and above, they would infer this value.
   // Those places have been change to explicitly use this instance so that we don't see different
   // behaviour based on Scala version.
-  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[
-    (=> T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
+  implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[(
+      => T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[
     (=> T) => ?] =
     new Monad[(=> T) => ?] with BindRec[(=> T) => ?] with Zip[(=> T) => ?]
     with Unzip[(=> T) => ?] with Distributive[(=> T) => ?] {
@@ -223,8 +223,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def point[A](a: => A) =
         (_, _, _, _) => a
 
-      def bind[A, B](fa: (T1, T2, T3, T4) => A)(f: (A) => (T1, T2, T3,
-                                                           T4) => B) =
+      def bind[A, B](fa: (T1, T2, T3, T4) => A)(
+          f: (A) => (T1, T2, T3, T4) => B) =
         (t1, t2, t3, t4) => f(fa(t1, t2, t3, t4))(t1, t2, t3, t4)
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4) => A \/ B)(
@@ -247,8 +247,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def point[A](a: => A) =
         (_, _, _, _, _) => a
 
-      def bind[A, B](fa: (T1, T2, T3, T4, T5) => A)(f: (A) => (T1, T2, T3, T4,
-                                                               T5) => B) =
+      def bind[A, B](fa: (T1, T2, T3, T4, T5) => A)(
+          f: (A) => (T1, T2, T3, T4, T5) => B) =
         (t1, t2, t3, t4, t5) => f(fa(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5) => A \/ B)(
@@ -265,8 +265,8 @@ trait FunctionInstances extends FunctionInstances0 {
     }
 
   implicit def function6Instance[T1, T2, T3, T4, T5, T6]
-    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5,
-                                                         T6) => ?] =
+    : Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[
+      (T1, T2, T3, T4, T5, T6) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6) => ?]
     with BindRec[(T1, T2, T3, T4, T5, T6) => ?] {
       def point[A](a: => A) =

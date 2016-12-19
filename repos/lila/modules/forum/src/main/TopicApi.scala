@@ -50,16 +50,18 @@ private[forum] final class TopicApi(
                                name = data.name,
                                troll = ctx.troll,
                                featured = true)
-        val post = Post.make(topicId = topic.id,
-                             author = data.post.author,
-                             userId = ctx.me map (_.id),
-                             ip = ctx.isAnon option ctx.req.remoteAddress,
-                             troll = ctx.troll,
-                             hidden = topic.hidden,
-                             text = lila.security.Spam.replace(data.post.text),
-                             lang = lang map (_.language),
-                             number = 1,
-                             categId = categ.id)
+        val post = Post.make(
+          topicId = topic.id,
+          author = data.post.author,
+          userId = ctx.me map (_.id),
+          ip = ctx.isAnon option ctx.req.remoteAddress,
+          troll = ctx.troll,
+          hidden = topic.hidden,
+          text = lila.security.Spam.replace(data.post.text),
+          lang = lang map (_.language),
+          number = 1,
+          categId = categ.id
+        )
         $insert(post) >> $insert(topic withPost post) >> $update(
           categ withTopic post) >>- (indexer ! InsertPost(post)) >> env.recent.invalidate >>- ctx.userId
           .?? { userId =>
@@ -91,7 +93,8 @@ private[forum] final class TopicApi(
         }
       },
       currentPage = page,
-      maxPerPage = maxPerPage)
+      maxPerPage = maxPerPage
+    )
 
   def delete(categ: Categ, topic: Topic): Funit =
     PostRepo.idsByTopicId(topic.id) flatMap { postIds =>

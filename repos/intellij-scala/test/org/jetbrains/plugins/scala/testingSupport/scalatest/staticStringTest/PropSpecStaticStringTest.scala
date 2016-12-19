@@ -11,8 +11,9 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
   val propSpecFileName = propSpecClassName + ".scala"
 
   def addPropSpec() = {
-    addFileToProject(propSpecFileName,
-                     """
+    addFileToProject(
+      propSpecFileName,
+      """
         |import org.scalatest._
         |
         |class PropSpecStringTest extends PropSpec {
@@ -29,7 +30,8 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
         |  property("time: " + System.currentTimeMillis()) {
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testPropSpecSum() = {

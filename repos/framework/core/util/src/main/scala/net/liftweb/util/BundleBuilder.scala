@@ -61,15 +61,16 @@ object BundleBuilder {
           case e: Elem => {
             e.attribute("name")
               .toList
-              .map(
-                attr =>
-                  EntryInfo(attr.text,
-                            e.attribute("lang").map(_.text),
-                            e.attribute("country").map(_.text),
-                            e.attribute("default")
-                              .map(_.text)
-                              .flatMap(Helpers.asBoolean) getOrElse false) ->
-                    (e.child: NodeSeq))
+              .map(attr =>
+                EntryInfo(
+                  attr.text,
+                  e.attribute("lang").map(_.text),
+                  e.attribute("country").map(_.text),
+                  e.attribute("default")
+                    .map(_.text)
+                    .flatMap(Helpers.asBoolean) getOrElse false
+                ) ->
+                  (e.child: NodeSeq))
           }
 
           case _ => Nil

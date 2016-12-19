@@ -188,18 +188,21 @@ object LiftSession {
       // We're using ConcurrentHashMap, so no `getOrElseUpdate` here (and
       // `getOrElseUpdate` isn't atomic anyway).
       if (!snippetClassMap.contains(name)) {
-        snippetClassMap.putIfAbsent(name, {
-          // Name might contain some relative packages, so split them out and put them in the proper argument of findClass
-          val (packageSuffix, terminal) = name.lastIndexOf('.') match {
-            case -1 => ("", name)
-            case i => ("." + name.substring(0, i), name.substring(i + 1))
+        snippetClassMap.putIfAbsent(
+          name, {
+            // Name might contain some relative packages, so split them out and put them in the proper argument of findClass
+            val (packageSuffix, terminal) = name.lastIndexOf('.') match {
+              case -1 => ("", name)
+              case i => ("." + name.substring(0, i), name.substring(i + 1))
+            }
+            findClass(
+              terminal,
+              LiftRules.buildPackage("snippet").map(_ + packageSuffix) :::
+                (("lift.app.snippet" + packageSuffix) ::
+                  ("net.liftweb.builtin.snippet" + packageSuffix) :: Nil)
+            )
           }
-          findClass(
-            terminal,
-            LiftRules.buildPackage("snippet").map(_ + packageSuffix) :::
-              (("lift.app.snippet" + packageSuffix) ::
-                ("net.liftweb.builtin.snippet" + packageSuffix) :: Nil))
-        })
+        )
       }
 
       // We don't test for null because we never remove an item from the
@@ -420,8 +423,8 @@ class LiftSession(private[http] val _contextPath: String,
   private var ajaxRequests =
     scala.collection.mutable.Map[String, List[AjaxRequestInfo]]()
 
-  private[http] def withAjaxRequests[T](
-      fn: (scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
+  private[http] def withAjaxRequests[T](fn: (
+      scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
     ajaxRequests.synchronized { fn(ajaxRequests) }
   }
 
@@ -1889,7 +1892,8 @@ class LiftSession(private[http] val _contextPath: String,
                                   {method}
                                   (in: NodeSeq): NodeSeq</pre>
                               </div>,
-                            wholeTag)
+                            wholeTag
+                          )
                       }
                     }
                   }
@@ -2236,21 +2240,26 @@ class LiftSession(private[http] val _contextPath: String,
     */
   def clientActorFor(in: LiftActor, xlate: JsonAST.JValue => Box[Any]): JsExp = {
     testStatefulFeature {
-      AnonFunc("x",
-               SHtml
-                 .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
-                   in.!(xlate(p) match {
-                     case Full(v) => v
-                     case Empty =>
-                       logger.error("Failed to deserialize JSON message " + p);
-                       p
-                     case Failure(msg, _, _) =>
-                       logger.error("Failed to deserialize JSON message " +
-                         p + ". Error " + msg); p
-                   })
-                   JsCmds.Noop
-                 })
-                 .cmd)
+      AnonFunc(
+        "x",
+        SHtml
+          .jsonCall(
+            JsRaw("x"),
+            (p: JsonAST.JValue) => {
+              in.!(xlate(p) match {
+                case Full(v) => v
+                case Empty =>
+                  logger.error("Failed to deserialize JSON message " + p);
+                  p
+                case Failure(msg, _, _) =>
+                  logger.error("Failed to deserialize JSON message " +
+                    p + ". Error " + msg); p
+              })
+              JsCmds.Noop
+            }
+          )
+          .cmd
+      )
     }
   }
 
@@ -2973,7 +2982,8 @@ class LiftSession(private[http] val _contextPath: String,
                             ca ! ItemMsg(guid, value)
                           }
                         }
-                      })
+                      }
+                    )
                 } catch {
                   case e: Exception => ca ! FailMsg(guid, e.getMessage)
                 }
@@ -3220,8 +3230,7 @@ final case class StreamRoundTrip[T](name: String, func: T => Stream[Any])(
 final case class SimpleRoundTrip[T](name: String, func: T => Any)(
     implicit val manifest: Manifest[T])
     extends RoundTripInfo
-final case class HandledRoundTrip[T](
-    name: String,
-    func: (T,
-           RoundTripHandlerFunc) => Unit)(implicit val manifest: Manifest[T])
+final case class HandledRoundTrip[T](name: String,
+                                     func: (T, RoundTripHandlerFunc) => Unit)(
+    implicit val manifest: Manifest[T])
     extends RoundTripInfo

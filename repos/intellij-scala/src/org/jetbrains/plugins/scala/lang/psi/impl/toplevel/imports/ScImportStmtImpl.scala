@@ -238,7 +238,8 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                 },
                 newState,
                 this,
-                place)
+                place
+              )
             case _ =>
           }
           val subst = state

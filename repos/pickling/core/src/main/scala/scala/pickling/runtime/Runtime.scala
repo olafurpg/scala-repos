@@ -124,19 +124,22 @@ class InterpretedPicklerRuntime(classLoader: ClassLoader, preclazz: Class[_])(
                     .genPickler(classLoader, fldClass, fldTag)
                     .asInstanceOf[Pickler[Any]]
 
-                builder.putField(fir.name, b => {
-                  if (isEffFinal) {
-                    b.hintElidedType(fldTag)
-                    pickleInto(fir.tpe, fldValue, b, fldPickler)
-                  } else {
-                    val subPicklee = fldValue
-                    if (subPicklee == null ||
-                        subPicklee.getClass == mirror.runtimeClass(
-                          fir.tpe.erasure)) b.hintElidedType(fldTag)
-                    else ()
-                    pickleInto(fir.tpe, subPicklee, b, fldPickler)
+                builder.putField(
+                  fir.name,
+                  b => {
+                    if (isEffFinal) {
+                      b.hintElidedType(fldTag)
+                      pickleInto(fir.tpe, fldValue, b, fldPickler)
+                    } else {
+                      val subPicklee = fldValue
+                      if (subPicklee == null ||
+                          subPicklee.getClass == mirror.runtimeClass(
+                            fir.tpe.erasure)) b.hintElidedType(fldTag)
+                      else ()
+                      pickleInto(fir.tpe, subPicklee, b, fldPickler)
+                    }
                   }
-                })
+                )
 
               // builder.putField(fir.name, b => {
               //   val fstaticTpe = fir.tpe.erasure

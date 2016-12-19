@@ -101,9 +101,9 @@ trait VariColumnTabulator extends Tabulator {
       // format to column width
       sss map
         (ss =>
-           ss.zipWithIndex map {
-             case (s, i) => s"%-${columnWidths(i)}s" format s
-           })
+          ss.zipWithIndex map {
+            case (s, i) => s"%-${columnWidths(i)}s" format s
+          })
     }
   }
 }

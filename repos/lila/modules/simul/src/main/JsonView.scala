@@ -64,11 +64,13 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     Json.obj("player" -> playerJson(app.player), "accepted" -> app.accepted)
 
   private def gameJson(hostId: String)(g: Game) =
-    Json.obj("id" -> g.id,
-             "status" -> g.status.id,
-             "fen" -> (chess.format.Forsyth exportBoard g.toChess.board),
-             "lastMove" -> ~g.castleLastMoveTime.lastMoveString,
-             "orient" -> g.playerByUserId(hostId).map(_.color))
+    Json.obj(
+      "id" -> g.id,
+      "status" -> g.status.id,
+      "fen" -> (chess.format.Forsyth exportBoard g.toChess.board),
+      "lastMove" -> ~g.castleLastMoveTime.lastMoveString,
+      "orient" -> g.playerByUserId(hostId).map(_.color)
+    )
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing) =
     Json.obj(

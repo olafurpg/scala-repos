@@ -101,10 +101,12 @@ object JSDependency {
       extends JSONDeserializer[JSDependency] {
     def deserialize(x: JSON): JSDependency = {
       val obj = new JSONObjExtractor(x)
-      new JSDependency(obj.fld[String]("resourceName"),
-                       obj.opt[List[String]]("dependencies").getOrElse(Nil),
-                       obj.opt[String]("commonJSName"),
-                       obj.opt[String]("minifiedResourceName"))
+      new JSDependency(
+        obj.fld[String]("resourceName"),
+        obj.opt[List[String]]("dependencies").getOrElse(Nil),
+        obj.opt[String]("commonJSName"),
+        obj.opt[String]("minifiedResourceName")
+      )
     }
   }
 }

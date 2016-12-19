@@ -152,8 +152,8 @@ class BinaryClassificationMetrics @Since("1.3.0")(
         createCombiner =
           (label: Double) => new BinaryLabelCounter(0L, 0L) += label,
         mergeValue = (c: BinaryLabelCounter, label: Double) => c += label,
-        mergeCombiners = (c1: BinaryLabelCounter,
-                          c2: BinaryLabelCounter) => c1 += c2
+        mergeCombiners =
+          (c1: BinaryLabelCounter, c2: BinaryLabelCounter) => c1 += c2
       )
       .sortByKey(ascending = false)
 
@@ -209,7 +209,8 @@ class BinaryClassificationMetrics @Since("1.3.0")(
             (score, cumCount.clone())
         }
       },
-      preservesPartitioning = true)
+      preservesPartitioning = true
+    )
     cumulativeCounts.persist()
     val confusions = cumulativeCounts.map {
       case (score, cumCount) =>

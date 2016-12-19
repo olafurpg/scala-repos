@@ -86,28 +86,28 @@ object LEventAggregator {
   /** Event names that control aggregation: \$set, \$unset, and \$delete */
   val eventNames = List("$set", "$unset", "$delete")
 
-  private def dataMapAggregator: ((Option[DataMap],
-                                   Event) => Option[DataMap]) = { (p, e) =>
-    {
-      e.event match {
-        case "$set" => {
-          if (p == None) {
-            Some(e.properties)
-          } else {
-            p.map(_ ++ e.properties)
+  private def dataMapAggregator: ((Option[DataMap], Event) => Option[DataMap]) = {
+    (p, e) =>
+      {
+        e.event match {
+          case "$set" => {
+            if (p == None) {
+              Some(e.properties)
+            } else {
+              p.map(_ ++ e.properties)
+            }
           }
-        }
-        case "$unset" => {
-          if (p == None) {
-            None
-          } else {
-            p.map(_ -- e.properties.keySet)
+          case "$unset" => {
+            if (p == None) {
+              None
+            } else {
+              p.map(_ -- e.properties.keySet)
+            }
           }
+          case "$delete" => None
+          case _ => p // do nothing for others
         }
-        case "$delete" => None
-        case _ => p // do nothing for others
       }
-    }
   }
 
   private def propAggregator: ((Prop, Event) => Prop) = { (p, e) =>

@@ -78,21 +78,23 @@ class ScalaLanguageCodeStyleSettingsProvider
 
     //blank lines
     if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
-      buffer ++= Seq("KEEP_BLANK_LINES_IN_CODE",
-                     "BLANK_LINES_AFTER_CLASS_HEADER",
-                     "KEEP_BLANK_LINES_BEFORE_RBRACE",
-                     "KEEP_BLANK_LINES_IN_DECLARATIONS",
-                     "BLANK_LINES_BEFORE_PACKAGE",
-                     "BLANK_LINES_AFTER_PACKAGE",
-                     "BLANK_LINES_BEFORE_IMPORTS",
-                     "BLANK_LINES_AFTER_IMPORTS",
-                     "BLANK_LINES_AROUND_CLASS",
-                     "BLANK_LINES_AFTER_ANONYMOUS_CLASS_HEADER",
-                     "BLANK_LINES_AROUND_FIELD_IN_INTERFACE",
-                     "BLANK_LINES_AROUND_FIELD",
-                     "BLANK_LINES_AROUND_METHOD_IN_INTERFACE",
-                     "BLANK_LINES_AROUND_METHOD",
-                     "BLANK_LINES_BEFORE_METHOD_BODY")
+      buffer ++= Seq(
+        "KEEP_BLANK_LINES_IN_CODE",
+        "BLANK_LINES_AFTER_CLASS_HEADER",
+        "KEEP_BLANK_LINES_BEFORE_RBRACE",
+        "KEEP_BLANK_LINES_IN_DECLARATIONS",
+        "BLANK_LINES_BEFORE_PACKAGE",
+        "BLANK_LINES_AFTER_PACKAGE",
+        "BLANK_LINES_BEFORE_IMPORTS",
+        "BLANK_LINES_AFTER_IMPORTS",
+        "BLANK_LINES_AROUND_CLASS",
+        "BLANK_LINES_AFTER_ANONYMOUS_CLASS_HEADER",
+        "BLANK_LINES_AROUND_FIELD_IN_INTERFACE",
+        "BLANK_LINES_AROUND_FIELD",
+        "BLANK_LINES_AROUND_METHOD_IN_INTERFACE",
+        "BLANK_LINES_AROUND_METHOD",
+        "BLANK_LINES_BEFORE_METHOD_BODY"
+      )
     }
 
     if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
@@ -104,18 +106,22 @@ class ScalaLanguageCodeStyleSettingsProvider
         "'match' or 'switch' statements")
 
       //Binary expression section
-      buffer ++= Seq("BINARY_OPERATION_WRAP",
-                     "ALIGN_MULTILINE_BINARY_OPERATION",
-                     "ALIGN_MULTILINE_PARENTHESIZED_EXPRESSION",
-                     "PARENTHESES_EXPRESSION_LPAREN_WRAP",
-                     "PARENTHESES_EXPRESSION_RPAREN_WRAP")
+      buffer ++= Seq(
+        "BINARY_OPERATION_WRAP",
+        "ALIGN_MULTILINE_BINARY_OPERATION",
+        "ALIGN_MULTILINE_PARENTHESIZED_EXPRESSION",
+        "PARENTHESES_EXPRESSION_LPAREN_WRAP",
+        "PARENTHESES_EXPRESSION_RPAREN_WRAP"
+      )
 
       //Method calls section
-      buffer ++= Seq("CALL_PARAMETERS_WRAP",
-                     "ALIGN_MULTILINE_PARAMETERS_IN_CALLS",
-                     "PREFER_PARAMETERS_WRAP",
-                     "CALL_PARAMETERS_LPAREN_ON_NEXT_LINE",
-                     "CALL_PARAMETERS_RPAREN_ON_NEXT_LINE")
+      buffer ++= Seq(
+        "CALL_PARAMETERS_WRAP",
+        "ALIGN_MULTILINE_PARAMETERS_IN_CALLS",
+        "PREFER_PARAMETERS_WRAP",
+        "CALL_PARAMETERS_LPAREN_ON_NEXT_LINE",
+        "CALL_PARAMETERS_RPAREN_ON_NEXT_LINE"
+      )
 
       //align call parameters
       buffer ++= Seq("ALIGN_MULTILINE_METHOD_BRACKETS")
@@ -144,17 +150,19 @@ class ScalaLanguageCodeStyleSettingsProvider
         Seq("IF_BRACE_FORCE", "ELSE_ON_NEW_LINE", "SPECIAL_ELSE_IF_TREATMENT")
 
       //brace forces
-      buffer ++= Seq("FOR_BRACE_FORCE",
-                     "WHILE_BRACE_FORCE",
-                     "DOWHILE_BRACE_FORCE",
-                     "WHILE_ON_NEW_LINE",
-                     "INDENT_CASE_FROM_SWITCH",
-                     "CATCH_ON_NEW_LINE",
-                     "FINALLY_ON_NEW_LINE",
-                     "FOR_STATEMENT_WRAP",
-                     "ALIGN_MULTILINE_FOR",
-                     "FOR_STATEMENT_LPAREN_ON_NEXT_LINE",
-                     "FOR_STATEMENT_RPAREN_ON_NEXT_LINE")
+      buffer ++= Seq(
+        "FOR_BRACE_FORCE",
+        "WHILE_BRACE_FORCE",
+        "DOWHILE_BRACE_FORCE",
+        "WHILE_ON_NEW_LINE",
+        "INDENT_CASE_FROM_SWITCH",
+        "CATCH_ON_NEW_LINE",
+        "FINALLY_ON_NEW_LINE",
+        "FOR_STATEMENT_WRAP",
+        "ALIGN_MULTILINE_FOR",
+        "FOR_STATEMENT_LPAREN_ON_NEXT_LINE",
+        "FOR_STATEMENT_RPAREN_ON_NEXT_LINE"
+      )
 
       //modifier list wrap
       buffer ++= Seq("MODIFIER_LIST_WRAP")
@@ -192,26 +200,32 @@ class ScalaLanguageCodeStyleSettingsProvider
                        METHOD_DEFINITION,
                        CodeStyleSettingsCustomizable.BRACE_OPTIONS,
                        CodeStyleSettingsCustomizable.BRACE_VALUES)
-      showCustomOption("TRY_BRACE_FORCE",
-                       "Force 'try' braces",
-                       CodeStyleSettingsCustomizable.WRAPPING_TRY_STATEMENT,
-                       CodeStyleSettingsCustomizable.BRACE_OPTIONS,
-                       CodeStyleSettingsCustomizable.BRACE_VALUES)
-      showCustomOption("FINALLY_BRACE_FORCE",
-                       "Force 'finally' braces",
-                       CodeStyleSettingsCustomizable.WRAPPING_TRY_STATEMENT,
-                       CodeStyleSettingsCustomizable.BRACE_OPTIONS,
-                       CodeStyleSettingsCustomizable.BRACE_VALUES)
+      showCustomOption(
+        "TRY_BRACE_FORCE",
+        "Force 'try' braces",
+        CodeStyleSettingsCustomizable.WRAPPING_TRY_STATEMENT,
+        CodeStyleSettingsCustomizable.BRACE_OPTIONS,
+        CodeStyleSettingsCustomizable.BRACE_VALUES
+      )
+      showCustomOption(
+        "FINALLY_BRACE_FORCE",
+        "Force 'finally' braces",
+        CodeStyleSettingsCustomizable.WRAPPING_TRY_STATEMENT,
+        CodeStyleSettingsCustomizable.BRACE_OPTIONS,
+        CodeStyleSettingsCustomizable.BRACE_VALUES
+      )
       showCustomOption("CLOSURE_BRACE_FORCE",
                        "Force braces",
                        ANONYMOUS_METHOD,
                        CodeStyleSettingsCustomizable.BRACE_OPTIONS,
                        CodeStyleSettingsCustomizable.BRACE_VALUES)
-      showCustomOption("CASE_CLAUSE_BRACE_FORCE",
-                       "Force 'case' branch braces",
-                       CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT,
-                       CodeStyleSettingsCustomizable.BRACE_OPTIONS,
-                       CodeStyleSettingsCustomizable.BRACE_VALUES)
+      showCustomOption(
+        "CASE_CLAUSE_BRACE_FORCE",
+        "Force 'case' branch braces",
+        CodeStyleSettingsCustomizable.WRAPPING_SWITCH_STATEMENT,
+        CodeStyleSettingsCustomizable.BRACE_OPTIONS,
+        CodeStyleSettingsCustomizable.BRACE_VALUES
+      )
       showCustomOption("PLACE_CLOSURE_PARAMETERS_ON_NEW_LINE",
                        "Parameters on new line",
                        ANONYMOUS_METHOD)
@@ -309,7 +323,8 @@ class ScalaLanguageCodeStyleSettingsProvider
       showCustomOption(
         "SD_BLANK_LINE_AFTER_PARAMETERS_COMMENTS",
         ApplicationBundle.message("checkbox.after.parameter.descriptions"),
-        ScalaDocFormattingPanel.BLANK_LINES_GROUP)
+        ScalaDocFormattingPanel.BLANK_LINES_GROUP
+      )
       showCustomOption("SD_BLANK_LINE_AFTER_RETURN_COMMENTS",
                        ApplicationBundle.message("checkbox.after.return.tag"),
                        ScalaDocFormattingPanel.BLANK_LINES_GROUP)

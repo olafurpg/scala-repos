@@ -259,7 +259,8 @@ trait WikiService {
                 pageName match {
                   case Some(x) => s"Revert ${from} ... ${to} on ${x}"
                   case None => s"Revert ${from} ... ${to}"
-                })
+                }
+              )
             }
         }
       }
@@ -339,7 +340,8 @@ trait WikiService {
                 }
               } else {
                 message
-              })
+              }
+            )
 
             Some(newHeadId.getName)
           } else None

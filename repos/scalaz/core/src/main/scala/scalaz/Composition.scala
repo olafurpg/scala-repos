@@ -97,10 +97,10 @@ private trait CompositionFoldable1[F[_], G[_]]
       f: (A, => B) => B) =
     F.foldMapRight1(fa)(G.foldMapRight1(_)(z)(f))(G.foldRight(_, _)(f))
 
-  override final def foldMapLeft1[A, B](fa: F[G[A]])(z: A => B)(f: (B,
-                                                                    A) => B) =
-    F.foldMapLeft1(fa)(G.foldMapLeft1(_)(z)(f))((b, ga) =>
-      G.foldLeft(ga, b)(f))
+  override final def foldMapLeft1[A, B](fa: F[G[A]])(z: A => B)(
+      f: (B, A) => B) =
+    F.foldMapLeft1(fa)(G.foldMapLeft1(_)(z)(f))(
+      (b, ga) => G.foldLeft(ga, b)(f))
 }
 
 private trait CompositionTraverse1[F[_], G[_]]

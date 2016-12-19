@@ -91,7 +91,8 @@ object Dimension {
         Game,
         _.name,
         Html(
-          "Rating of your opponent compared to yours. Much weaker:-200, Weaker:-100, Stronger:+100, Much stronger:+200."))
+          "Rating of your opponent compared to yours. Much weaker:-200, Weaker:-100, Stronger:+100, Much stronger:+200.")
+      )
 
   case object PieceRole
       extends Dimension[Role]("piece",
@@ -129,7 +130,8 @@ object Dimension {
         Game,
         _.name,
         Html(
-          "The side your opponent castled on during the game: kingside, queenside, or none."))
+          "The side your opponent castled on during the game: kingside, queenside, or none.")
+      )
 
   case object QueenTrade
       extends Dimension[QueenTrade](
@@ -148,7 +150,8 @@ object Dimension {
         Move,
         _.name,
         Html(
-          "Value of your pieces compared to your opponent's. Pawn=1, Bishop/Knight=3, Rook=5, Queen=9."))
+          "Value of your pieces compared to your opponent's. Pawn=1, Bishop/Knight=3, Rook=5, Queen=9.")
+      )
 
   val all = List(Perf,
                  Phase,

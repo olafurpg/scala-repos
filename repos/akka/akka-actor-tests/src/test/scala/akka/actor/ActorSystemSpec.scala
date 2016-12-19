@@ -115,7 +115,8 @@ object ActorSystemSpec {
       config.getInt("throughput"),
       config.getNanosDuration("throughput-deadline-time"),
       configureExecutor(),
-      config.getMillisDuration("shutdown-timeout")) {
+      config.getMillisDuration("shutdown-timeout")
+    ) {
       val doneIt = new Switch
       override protected[akka] def registerForExecution(
           mbox: Mailbox,
@@ -342,10 +343,10 @@ class ActorSystemSpec
 
       created filter
         (ref ⇒
-           !ref.isTerminated && !ref
-             .asInstanceOf[ActorRefWithCell]
-             .underlying
-             .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
+          !ref.isTerminated && !ref
+            .asInstanceOf[ActorRefWithCell]
+            .underlying
+            .isInstanceOf[UnstartedCell]) should ===(Seq.empty[ActorRef])
     }
 
     "shut down when /user fails" in {

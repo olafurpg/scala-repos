@@ -109,7 +109,8 @@ trait FindersApiTest
         |
         | it should "change name" in {}
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
     checkSelection(3, 10, fileName, Set("should run test with correct name"))
 

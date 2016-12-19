@@ -78,18 +78,20 @@ class ClusterClientTest
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster
-    Await.result(Future.collect(
-                   (0 to 4) map { _ =>
-                     TestMemcachedServer.start() match {
-                       case Some(server) =>
-                         testServers :+= server
-                         pool { zkServerSetCluster.join(server.address) }
-                       case None =>
-                         fail("could not start TestMemcachedServer")
-                     }
-                   }
-                 ),
-                 TimeOut)
+    Await.result(
+      Future.collect(
+        (0 to 4) map { _ =>
+          TestMemcachedServer.start() match {
+            case Some(server) =>
+              testServers :+= server
+              pool { zkServerSetCluster.join(server.address) }
+            case None =>
+              fail("could not start TestMemcachedServer")
+          }
+        }
+      ),
+      TimeOut
+    )
 
     if (!testServers.isEmpty) {
       // set cache pool config node data

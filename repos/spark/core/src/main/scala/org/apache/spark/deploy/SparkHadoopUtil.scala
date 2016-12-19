@@ -274,11 +274,14 @@ class SparkHadoopUtil extends Logging {
           name.startsWith(prefix) && !name.endsWith(exclusionSuffix)
         }
       })
-      Arrays.sort(fileStatuses, new Comparator[FileStatus] {
-        override def compare(o1: FileStatus, o2: FileStatus): Int = {
-          Longs.compare(o1.getModificationTime, o2.getModificationTime)
+      Arrays.sort(
+        fileStatuses,
+        new Comparator[FileStatus] {
+          override def compare(o1: FileStatus, o2: FileStatus): Int = {
+            Longs.compare(o1.getModificationTime, o2.getModificationTime)
+          }
         }
-      })
+      )
       fileStatuses
     } catch {
       case NonFatal(e) =>

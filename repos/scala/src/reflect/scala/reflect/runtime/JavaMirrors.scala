@@ -233,8 +233,8 @@ private[scala] trait JavaMirrors
       override lazy val assocs: List[(Name, ClassfileAnnotArg)] =
         (jann.annotationType.getDeclaredMethods.sortBy(_.getName).toList map
           (m =>
-             TermName(m.getName) -> toAnnotArg(
-               m.getReturnType -> m.invoke(jann))))
+            TermName(m.getName) -> toAnnotArg(
+              m.getReturnType -> m.invoke(jann))))
     }
 
     def reflect[T: ClassTag](obj: T): InstanceMirror =
@@ -618,8 +618,8 @@ private[scala] trait JavaMirrors
           val arg = args(i)
           args1(i) =
             (if (i >= paramCount) arg // don't transform varargs
-             else if (isByName(i))
-               () => arg // don't transform by-name value class params
+             else if (isByName(i))() =>
+               arg // don't transform by-name value class params
              else if (isDerivedValueClass(i))
                paramUnboxers(i).invoke(arg) // do get the underlying value
              else arg // don't molest anything else
@@ -1291,7 +1291,8 @@ private[scala] trait JavaMirrors
           cls.isType,
           (if (cls != NoSymbol) s"not a type: symbol $cls"
            else "no symbol could be") +
-            s" loaded from $jclazz in $owner with name $simpleName and classloader $classLoader")
+            s" loaded from $jclazz in $owner with name $simpleName and classloader $classLoader"
+        )
 
         cls.asClass
       }

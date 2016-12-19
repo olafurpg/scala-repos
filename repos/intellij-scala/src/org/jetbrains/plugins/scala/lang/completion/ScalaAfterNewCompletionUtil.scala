@@ -53,7 +53,8 @@ object ScalaAfterNewCompletionUtil {
       classOf[ScConstructor],
       classOf[ScClassParents],
       classOf[ScExtendsBlock],
-      classOf[ScNewTemplateDefinition])
+      classOf[ScNewTemplateDefinition]
+    )
 
   def expectedTypesAfterNew(
       position: PsiElement,
@@ -175,7 +176,8 @@ object ScalaAfterNewCompletionUtil {
       tp: ScType,
       psiClass: PsiClass,
       subst: ScSubstitutor,
-      renderer: (ScType, PsiClass,
+      renderer: (ScType,
+                 PsiClass,
                  ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
@@ -224,7 +226,8 @@ object ScalaAfterNewCompletionUtil {
       tp: ScType,
       place: PsiElement,
       addedClasses: mutable.HashSet[String],
-      renderer: (ScType, PsiClass,
+      renderer: (ScType,
+                 PsiClass,
                  ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
@@ -262,7 +265,8 @@ object ScalaAfterNewCompletionUtil {
       place: PsiElement,
       addedClasses: mutable.HashSet[String],
       result: CompletionResultSet,
-      renderer: (ScType, PsiClass,
+      renderer: (ScType,
+                 PsiClass,
                  ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)]) {

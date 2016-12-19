@@ -141,17 +141,21 @@ class HoistClientOps extends Phase {
               (br2, repl)
             } else (br, Map.empty)
           if ((bl2 ne bl) || (br2 ne br)) {
-            val from3 = from2.copy(left = bl2, right = br2, on = on1.replace {
-              case Select(Ref(s), f) if s == sl1 && (bl2 ne bl) =>
-                val (wrap, f2) = lrepl(f)
-                wrap(Select(Ref(s), f2))
-              case Select(Ref(s), f) if s == sr1 && (br2 ne br) =>
-                val (wrap, f2) = rrepl(f)
-                wrap(Select(Ref(s), f2))
-              case Ref(s)
-                  if (s == sl1 && (bl2 ne bl)) || (s == sr1 && (br2 ne br)) =>
-                Ref(s)
-            })
+            val from3 = from2.copy(
+              left = bl2,
+              right = br2,
+              on = on1.replace {
+                case Select(Ref(s), f) if s == sl1 && (bl2 ne bl) =>
+                  val (wrap, f2) = lrepl(f)
+                  wrap(Select(Ref(s), f2))
+                case Select(Ref(s), f) if s == sr1 && (br2 ne br) =>
+                  val (wrap, f2) = rrepl(f)
+                  wrap(Select(Ref(s), f2))
+                case Ref(s)
+                    if (s == sl1 && (bl2 ne bl)) || (s == sr1 && (br2 ne br)) =>
+                  Ref(s)
+              }
+            )
             val sel2 = sel1.replace {
               case Select(Select(Ref(s), ElementSymbol(1)), f)
                   if s == s1 && (bl2 ne bl) =>
@@ -197,10 +201,14 @@ class HoistClientOps extends Phase {
                        Ellipsis(n.copy(from = from2), List(0, 0)))
           val s3 = new AnonSymbol
           val defs = elems1.iterator.toMap
-          val res = Bind(bs1, Filter(s3, bfrom1, pred1.replace {
-            case Select(Ref(s), f) if s == s1 =>
-              defs(f).replace { case Ref(s) if s == bs1 => Ref(s3) }
-          }), sel1.replace { case Ref(s) if s == bs1 => Ref(s) })
+          val res = Bind(
+            bs1,
+            Filter(s3, bfrom1, pred1.replace {
+              case Select(Ref(s), f) if s == s1 =>
+                defs(f).replace { case Ref(s) if s == bs1 => Ref(s3) }
+            }),
+            sel1.replace { case Ref(s) if s == bs1 => Ref(s) }
+          )
           logger.debug("Pulled Bind out of Filter", Ellipsis(res, List(0, 0)))
           res.infer()
         case from2 =>
@@ -247,18 +255,23 @@ class HoistClientOps extends Phase {
 
   /** Rewrite remaining `GetOrElse` operations in the server-side tree into conditionals. */
   def rewriteDBSide(tree: Node): Node =
-    tree.replace({
-      case GetOrElse(OptionApply(ch), _) => ch
-      case n @ GetOrElse(ch :@ OptionType(tpe), default) =>
-        logger.debug("Translating GetOrElse to IfNull", n)
-        val d = try default()
-        catch {
-          case NonFatal(ex) =>
-            throw new SlickException(
-              "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +
-                "This cannot be done lazily when the value is needed on the database side",
-              ex)
-        }
-        Library.IfNull.typed(tpe, ch, LiteralNode(tpe, d)).infer()
-    }, keepType = true, bottomUp = true)
+    tree.replace(
+      {
+        case GetOrElse(OptionApply(ch), _) => ch
+        case n @ GetOrElse(ch :@ OptionType(tpe), default) =>
+          logger.debug("Translating GetOrElse to IfNull", n)
+          val d = try default()
+          catch {
+            case NonFatal(ex) =>
+              throw new SlickException(
+                "Caught exception while computing default value for Rep[Option[_]].getOrElse -- " +
+                  "This cannot be done lazily when the value is needed on the database side",
+                ex
+              )
+          }
+          Library.IfNull.typed(tpe, ch, LiteralNode(tpe, d)).infer()
+      },
+      keepType = true,
+      bottomUp = true
+    )
 }

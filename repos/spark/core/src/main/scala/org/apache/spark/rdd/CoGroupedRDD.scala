@@ -129,7 +129,8 @@ class CoGroupedRDD[K: ClassTag](
                   Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
               }
           }
-          .toArray)
+          .toArray
+      )
     }
     array
   }

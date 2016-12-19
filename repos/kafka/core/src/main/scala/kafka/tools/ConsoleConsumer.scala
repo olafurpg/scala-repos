@@ -220,14 +220,18 @@ object ConsoleConsumer extends Logging {
               if (config.options.has(config.resetBeginningOpt)) "earliest"
               else "latest")
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.bootstrapServer)
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-              if (config.keyDeserializer != null) config.keyDeserializer
-              else
-                "org.apache.kafka.common.serialization.ByteArrayDeserializer")
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-              if (config.valueDeserializer != null) config.valueDeserializer
-              else
-                "org.apache.kafka.common.serialization.ByteArrayDeserializer")
+    props.put(
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+      if (config.keyDeserializer != null) config.keyDeserializer
+      else
+        "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+    )
+    props.put(
+      ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+      if (config.valueDeserializer != null) config.valueDeserializer
+      else
+        "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+    )
 
     props
   }
@@ -282,7 +286,8 @@ object ConsoleConsumer extends Logging {
     val resetBeginningOpt = parser.accepts(
       "from-beginning",
       "If the consumer does not already have an established offset to consume from, " +
-        "start with the earliest message present in the log rather than the latest message.")
+        "start with the earliest message present in the log rather than the latest message."
+    )
     val maxMessagesOpt = parser
       .accepts(
         "max-messages",

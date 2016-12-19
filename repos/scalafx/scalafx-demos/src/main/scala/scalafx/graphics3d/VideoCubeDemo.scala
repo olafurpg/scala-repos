@@ -102,7 +102,8 @@ object VideoCubeDemo extends JFXApp {
     "PROMETHEUS Trailer 2 - 2012 Movie - Official [HD].mp4",
     "RESIDENT EVIL 5 Retribution Trailer 2 - 2012 Movie - Official.mp4",
     "TED Movie Trailer 2012 - Official [HD].mp4",
-    "THE HOBBIT Trailer - 2012 Movie - Official [HD].mp4")
+    "THE HOBBIT Trailer - 2012 Movie - Official [HD].mp4"
+  )
 
   val mediaPlayers = vidFiles.map { filename =>
     {

@@ -97,7 +97,8 @@ private[clustering] trait LDAParams
     "docConcentration",
     "Concentration parameter (commonly named \"alpha\") for the prior placed on documents'" +
       " distributions over topics (\"theta\").",
-    (alpha: Array[Double]) => alpha.forall(_ >= 0.0))
+    (alpha: Array[Double]) => alpha.forall(_ >= 0.0)
+  )
 
   /** @group getParam */
   @Since("1.6.0")
@@ -141,7 +142,8 @@ private[clustering] trait LDAParams
     "topicConcentration",
     "Concentration parameter (commonly named \"beta\" or \"eta\") for the prior placed on topic'" +
       " distributions over terms.",
-    ParamValidators.gtEq(0))
+    ParamValidators.gtEq(0)
+  )
 
   /** @group getParam */
   @Since("1.6.0")
@@ -186,7 +188,8 @@ private[clustering] trait LDAParams
       " algorithm used to estimate the LDA model.  Supported: " +
       supportedOptimizers.mkString(", "),
     (o: String) =>
-      ParamValidators.inArray(supportedOptimizers).apply(o.toLowerCase))
+      ParamValidators.inArray(supportedOptimizers).apply(o.toLowerCase)
+  )
 
   /** @group getParam */
   @Since("1.6.0")
@@ -207,7 +210,8 @@ private[clustering] trait LDAParams
     "topicDistribution",
     "Output column" +
       " with estimates of the topic mixture distribution for each document (often called \"theta\"" +
-      " in the literature).  Returns a vector of zeros for an empty document.")
+      " in the literature).  Returns a vector of zeros for an empty document."
+  )
 
   setDefault(topicDistributionCol -> "topicDistribution")
 
@@ -228,7 +232,8 @@ private[clustering] trait LDAParams
     "learningOffset",
     "A (positive) learning" +
       " parameter that downweights early iterations. Larger values make early iterations count less.",
-    ParamValidators.gt(0))
+    ParamValidators.gt(0)
+  )
 
   /** @group expertGetParam */
   @Since("1.6.0")
@@ -248,7 +253,8 @@ private[clustering] trait LDAParams
     "Learning rate, set as an" +
       " exponential decay rate. This should be between (0.5, 1.0] to guarantee asymptotic" +
       " convergence.",
-    ParamValidators.gt(0))
+    ParamValidators.gt(0)
+  )
 
   /** @group expertGetParam */
   @Since("1.6.0")
@@ -275,7 +281,8 @@ private[clustering] trait LDAParams
     "Fraction of the corpus" +
       " to be sampled and used in each iteration of mini-batch gradient descent, in range (0, 1].",
     ParamValidators
-      .inRange(0.0, 1.0, lowerInclusive = false, upperInclusive = true))
+      .inRange(0.0, 1.0, lowerInclusive = false, upperInclusive = true)
+  )
 
   /** @group getParam */
   @Since("1.6.0")
@@ -293,7 +300,8 @@ private[clustering] trait LDAParams
     this,
     "optimizeDocConcentration",
     "Indicates whether the docConcentration (Dirichlet parameter for document-topic" +
-      " distribution) will be optimized during training.")
+      " distribution) will be optimized during training."
+  )
 
   /** @group expertGetParam */
   @Since("1.6.0")
@@ -311,7 +319,8 @@ private[clustering] trait LDAParams
           getDocConcentration.length == getK,
           s"LDA docConcentration was of length" +
             s" ${getDocConcentration.length}, but k = $getK.  docConcentration must be an array of" +
-            s" length either 1 (scalar) or k (num topics).")
+            s" length either 1 (scalar) or k (num topics)."
+        )
       }
       getOptimizer match {
         case "online" =>
@@ -769,14 +778,16 @@ class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("lda"))
 
-  setDefault(maxIter -> 20,
-             k -> 10,
-             optimizer -> "online",
-             checkpointInterval -> 10,
-             learningOffset -> 1024,
-             learningDecay -> 0.51,
-             subsamplingRate -> 0.05,
-             optimizeDocConcentration -> true)
+  setDefault(
+    maxIter -> 20,
+    k -> 10,
+    optimizer -> "online",
+    checkpointInterval -> 10,
+    learningOffset -> 1024,
+    learningDecay -> 0.51,
+    subsamplingRate -> 0.05,
+    optimizeDocConcentration -> true
+  )
 
   /**
     * The features for LDA should be a [[Vector]] representing the word counts in a document.

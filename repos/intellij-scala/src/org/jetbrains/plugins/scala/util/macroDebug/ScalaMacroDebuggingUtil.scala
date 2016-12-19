@@ -199,25 +199,29 @@ object ScalaMacroDebuggingUtil {
       }
       if (macroCall != null) {
         //        extensions.inWriteAction {
-        WriteCommandAction.runWriteCommandAction(project, new Runnable {
-          override def run() {
-            val macroExpansion = """
+        WriteCommandAction.runWriteCommandAction(
+          project,
+          new Runnable {
+            override def run() {
+              val macroExpansion = """
                 |val eval$1: String = "world"
                 |print("hello ")
                 |print(eval$1)
                 |print("!")
                 |()
               """.stripMargin
-            val expansion = ScalaPsiElementFactory
-              .createBlockExpressionWithoutBracesFromText(
-                s"{$macroExpansion}",
-                PsiManager.getInstance(project))
-            var statement = macroCall.getParent.addAfter(expansion, macroCall)
-            macroCall.delete()
-            statement =
-              CodeStyleManager.getInstance(project).reformat(statement)
+              val expansion = ScalaPsiElementFactory
+                .createBlockExpressionWithoutBracesFromText(
+                  s"{$macroExpansion}",
+                  PsiManager.getInstance(project))
+              var statement =
+                macroCall.getParent.addAfter(expansion, macroCall)
+              macroCall.delete()
+              statement =
+                CodeStyleManager.getInstance(project).reformat(statement)
+            }
           }
-        })
+        )
       }
     }
   }

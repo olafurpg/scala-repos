@@ -72,18 +72,19 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
             _.getClass == classOf[GenericDebuggerRunner]
           }
           .get
-        processHandler = runProcess(mainClass,
-                                    getModule,
-                                    classOf[DefaultDebugExecutor],
-                                    new ProcessAdapter {
-                                      override def onTextAvailable(
-                                          event: ProcessEvent,
-                                          outputType: Key[_]) {
-                                        val text = event.getText
-                                        if (debug) print(text)
-                                      }
-                                    },
-                                    runner)
+        processHandler = runProcess(
+          mainClass,
+          getModule,
+          classOf[DefaultDebugExecutor],
+          new ProcessAdapter {
+            override def onTextAvailable(event: ProcessEvent,
+                                         outputType: Key[_]) {
+              val text = event.getText
+              if (debug) print(text)
+            }
+          },
+          runner
+        )
       }
     })
     callback
@@ -114,15 +115,18 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     val processHandler: AtomicReference[ProcessHandler] =
       new AtomicReference[ProcessHandler]
     runner
-      .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-        def processStarted(descriptor: RunContentDescriptor) {
-          val handler: ProcessHandler = descriptor.getProcessHandler
-          assert(handler != null)
-          handler.addProcessListener(listener)
-          processHandler.set(handler)
-          semaphore.up()
+      .execute(
+        executionEnvironmentBuilder.build,
+        new ProgramRunner.Callback {
+          def processStarted(descriptor: RunContentDescriptor) {
+            val handler: ProcessHandler = descriptor.getProcessHandler
+            assert(handler != null)
+            handler.addProcessListener(listener)
+            processHandler.set(handler)
+            semaphore.up()
+          }
         }
-      })
+      )
     semaphore.waitFor()
     processHandler.get
   }

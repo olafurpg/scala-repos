@@ -14,7 +14,8 @@ object PlayInternalKeys {
     "The classpath containing all the jar dependencies of the project")
   val playReloaderClasspath = TaskKey[Classpath](
     "playReloaderClasspath",
-    "The application classpath, containing all projects in this build that are dependencies of this project, including this project")
+    "The application classpath, containing all projects in this build that are dependencies of this project, including this project"
+  )
   val playCommonClassloader = TaskKey[ClassLoader](
     "playCommonClassloader",
     "The common classloader, is used to hold H2 to ensure in memory databases don't get lost between invocations of run")

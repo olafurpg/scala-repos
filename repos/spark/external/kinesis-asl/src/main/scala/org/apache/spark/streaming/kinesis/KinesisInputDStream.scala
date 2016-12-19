@@ -63,16 +63,17 @@ private[kinesis] class KinesisInputDStream[T: ClassTag](
       logDebug(
         s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
           s"seq number ranges: ${seqNumRanges.mkString(", ")} ")
-      new KinesisBackedBlockRDD(context.sc,
-                                regionName,
-                                endpointUrl,
-                                blockIds,
-                                seqNumRanges,
-                                isBlockIdValid = isBlockIdValid,
-                                retryTimeoutMs =
-                                  ssc.graph.batchDuration.milliseconds.toInt,
-                                messageHandler = messageHandler,
-                                awsCredentialsOption = awsCredentialsOption)
+      new KinesisBackedBlockRDD(
+        context.sc,
+        regionName,
+        endpointUrl,
+        blockIds,
+        seqNumRanges,
+        isBlockIdValid = isBlockIdValid,
+        retryTimeoutMs = ssc.graph.batchDuration.milliseconds.toInt,
+        messageHandler = messageHandler,
+        awsCredentialsOption = awsCredentialsOption
+      )
     } else {
       logWarning(
         "Kinesis sequence number information was not present with some block metadata," +

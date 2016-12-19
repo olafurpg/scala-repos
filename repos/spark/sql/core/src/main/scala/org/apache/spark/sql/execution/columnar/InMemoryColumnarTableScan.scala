@@ -165,7 +165,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
               assert(
                 row.numFields == columnBuilders.length,
                 s"Row column number mismatch, expected ${output.size} columns, " +
-                  s"but got ${row.numFields}." + s"\nRow content: $row")
+                  s"but got ${row.numFields}." + s"\nRow content: $row"
+              )
 
               var i = 0
               totalSize = 0

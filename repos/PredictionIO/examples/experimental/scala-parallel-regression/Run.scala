@@ -78,10 +78,12 @@ case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
 
 object RegressionEngineFactory extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[ParallelDataSource],
-               classOf[IdentityPreparator[RDD[LabeledPoint]]],
-               Map("SGD" -> classOf[ParallelSGDAlgorithm]),
-               LAverageServing(classOf[ParallelSGDAlgorithm]))
+    new Engine(
+      classOf[ParallelDataSource],
+      classOf[IdentityPreparator[RDD[LabeledPoint]]],
+      Map("SGD" -> classOf[ParallelSGDAlgorithm]),
+      LAverageServing(classOf[ParallelSGDAlgorithm])
+    )
   }
 }
 
@@ -94,18 +96,16 @@ object Run {
                                   (SGD, AlgorithmParams(stepSize = 0.2)),
                                   (SGD, AlgorithmParams(stepSize = 0.4)))
 
-    Workflow.run(dataSourceClassOpt = Some(classOf[ParallelDataSource]),
-                 dataSourceParams = dataSourceParams,
-                 preparatorClassOpt =
-                   Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
-                 algorithmClassMapOpt =
-                   Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
-                 algorithmParamsList = algorithmParamsList,
-                 servingClassOpt =
-                   Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
-                 evaluatorClassOpt = Some(classOf[MeanSquareError]),
-                 params =
-                   WorkflowParams(batch = "Imagine: Parallel Regression"))
+    Workflow.run(
+      dataSourceClassOpt = Some(classOf[ParallelDataSource]),
+      dataSourceParams = dataSourceParams,
+      preparatorClassOpt = Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
+      algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
+      algorithmParamsList = algorithmParamsList,
+      servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
+      evaluatorClassOpt = Some(classOf[MeanSquareError]),
+      params = WorkflowParams(batch = "Imagine: Parallel Regression")
+    )
   }
 }
 

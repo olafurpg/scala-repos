@@ -57,7 +57,8 @@ final class Env(config: Config,
       },
       timeToLive = 30.seconds,
       default = Net.AssetVersion,
-      logger = lila.log("assetVersion"))
+      logger = lila.log("assetVersion")
+    )
     def get = cache get true
   }
 
@@ -93,16 +94,19 @@ final class Env(config: Config,
   val userGameApi = new UserGameApi(bookmarkApi = bookmarkApi)
 
   val roundApi = new RoundApiBalancer(
-    api = new RoundApi(jsonView = roundJsonView,
-                       noteApi = noteApi,
-                       forecastApi = forecastApi,
-                       analysisApi = analysisApi,
-                       bookmarkApi = bookmarkApi,
-                       getTourAndRanks = getTourAndRanks,
-                       getSimul = getSimul,
-                       lightUser = userEnv.lightUser),
+    api = new RoundApi(
+      jsonView = roundJsonView,
+      noteApi = noteApi,
+      forecastApi = forecastApi,
+      analysisApi = analysisApi,
+      bookmarkApi = bookmarkApi,
+      getTourAndRanks = getTourAndRanks,
+      getSimul = getSimul,
+      lightUser = userEnv.lightUser
+    ),
     system = system,
-    nbActors = math.max(1, Runtime.getRuntime.availableProcessors - 1))
+    nbActors = math.max(1, Runtime.getRuntime.availableProcessors - 1)
+  )
 
   val lobbyApi = new LobbyApi(lobby = lobbyEnv.lobby,
                               lobbyVersion = () => lobbyEnv.history.version,

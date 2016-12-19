@@ -38,12 +38,14 @@ class HiveExplainSuite
                    "== Parsed Logical Plan ==",
                    "== Analyzed Logical Plan ==",
                    "== Optimized Logical Plan ==")
-    checkExistence(sql(" explain   extended select * from src where key=123 "),
-                   true,
-                   "== Parsed Logical Plan ==",
-                   "== Analyzed Logical Plan ==",
-                   "== Optimized Logical Plan ==",
-                   "== Physical Plan ==")
+    checkExistence(
+      sql(" explain   extended select * from src where key=123 "),
+      true,
+      "== Parsed Logical Plan ==",
+      "== Analyzed Logical Plan ==",
+      "== Optimized Logical Plan ==",
+      "== Physical Plan =="
+    )
   }
 
   test("explain create table command") {
@@ -66,7 +68,8 @@ class HiveExplainSuite
       "CreateTableAsSelect",
       "InsertIntoHiveTable",
       "Limit",
-      "src")
+      "src"
+    )
 
     checkExistence(
       sql("""

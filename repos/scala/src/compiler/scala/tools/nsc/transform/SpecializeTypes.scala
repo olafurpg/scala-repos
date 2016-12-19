@@ -430,9 +430,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     // zip the keys with each permutation to create a TypeEnv.
     // If we don't exclude the "all AnyRef" specialization, we will
     // incur duplicate members and crash during mixin.
-    loop(keys map concreteTypes) filterNot (_ forall (_ <:< AnyRefTpe)) map (xss =>
-                                                                               Map(
-                                                                                 keys zip xss: _*))
+    loop(keys map concreteTypes) filterNot (_ forall (_ <:< AnyRefTpe)) map (
+        xss => Map(keys zip xss: _*))
   }
 
   /** Does the given 'sym' need to be specialized in the environment 'env'?
@@ -1059,7 +1058,7 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
     val specname = specializedName(nameSymbol orElse sym, env)
     (sym.cloneSymbol(owner, newFlags, newName = specname)
       modifyInfo (info =>
-                    subst(env, info.asSeenFrom(owner.thisType, sym.owner))))
+        subst(env, info.asSeenFrom(owner.thisType, sym.owner))))
   }
 
   /** For each method m that overrides an inherited method m', add a special
@@ -1092,7 +1091,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                 reporter.error(
                   derivedTvar.pos,
                   "Type parameter has to be specialized at least for the same types as in the overridden method. Missing "
-                    + "types: " + missing.mkString("", ", ", ""))
+                    + "types: " + missing.mkString("", ", ", "")
+                )
               }
           }
         }
@@ -1318,9 +1318,9 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
 
   private def subst(env: TypeEnv)(decl: Symbol): Symbol =
     decl modifyInfo (info =>
-                       if (decl.isConstructor)
-                         MethodType(subst(env, info).params, decl.owner.tpe_*)
-                       else subst(env, info))
+      if (decl.isConstructor)
+        MethodType(subst(env, info).params, decl.owner.tpe_*)
+      else subst(env, info))
 
   private def unspecializableClass(tp: Type) = (
     isRepeatedParamType(tp) // ???
@@ -1842,7 +1842,8 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
               tree,
               parents1 /*currentOwner.info.parents.map(tpe => TypeTree(tpe) setPos parents.head.pos)*/,
               self,
-              atOwner(currentOwner)(transformTrees(body ::: specMembers)))
+              atOwner(currentOwner)(transformTrees(body ::: specMembers))
+            )
           }
           transformTemplate
 
@@ -1906,19 +1907,22 @@ abstract class SpecializeTypes extends InfoTransform with TypingTransformers {
                   debuglog(
                     "completing specialized " + symbol.fullName + " calling " + original)
                   debuglog("special overload " + original + " -> " + env)
-                  val t = DefDef(symbol, { vparamss: List[List[Symbol]] =>
-                    val fun = Apply(Select(This(symbol.owner), original),
-                                    makeArguments(original, vparamss.head))
+                  val t = DefDef(
+                    symbol, { vparamss: List[List[Symbol]] =>
+                      val fun = Apply(Select(This(symbol.owner), original),
+                                      makeArguments(original, vparamss.head))
 
-                    debuglog(
-                      "inside defdef: " + symbol + "; type: " + symbol.tpe + "; owner: " + symbol.owner)
-                    gen.maybeMkAsInstanceOf(
-                      fun,
-                      symbol.owner.thisType.memberType(symbol).finalResultType,
-                      symbol.owner.thisType
-                        .memberType(original)
-                        .finalResultType)
-                  })
+                      debuglog(
+                        "inside defdef: " + symbol + "; type: " + symbol.tpe + "; owner: " + symbol.owner)
+                      gen.maybeMkAsInstanceOf(fun,
+                                              symbol.owner.thisType
+                                                .memberType(symbol)
+                                                .finalResultType,
+                                              symbol.owner.thisType
+                                                .memberType(original)
+                                                .finalResultType)
+                    }
+                  )
                   debuglog("created special overload tree " + t)
                   debuglog("created " + t)
                   reportError {

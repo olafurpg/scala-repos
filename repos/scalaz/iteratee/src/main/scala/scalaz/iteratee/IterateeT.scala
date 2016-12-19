@@ -42,19 +42,17 @@ sealed abstract class IterateeT[E, F[_], A] {
       implicit F: Monad[F]): IterateeT[E, F, B] = {
     def through(x: IterateeT[E, F, A]): IterateeT[E, F, B] =
       iterateeT(
-        F.bind(x.value)(
-          (s: StepT[E, F, A]) =>
-            s.fold[F[StepT[E, F, B]]](
-              cont = k => F.point(StepT.scont(u => through(k(u)))),
-              done = (a, i) =>
-                if (i.isEmpty) f(a).value
-                else
-                  F.bind(f(a).value)(
-                    _.fold(
-                      cont = kk => kk(i).value,
-                      done = (aa, _) => F.point(StepT.sdone[E, F, B](aa, i))
-                    ))
-          )))
+        F.bind(x.value)((s: StepT[E, F, A]) =>
+          s.fold[F[StepT[E, F, B]]](
+            cont = k => F.point(StepT.scont(u => through(k(u)))),
+            done = (a, i) =>
+              if (i.isEmpty) f(a).value
+              else
+                F.bind(f(a).value)(_.fold(
+                  cont = kk => kk(i).value,
+                  done = (aa, _) => F.point(StepT.sdone[E, F, B](aa, i))
+                ))
+        )))
     through(this)
   }
 

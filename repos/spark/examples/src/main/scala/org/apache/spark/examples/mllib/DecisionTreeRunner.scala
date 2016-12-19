@@ -295,16 +295,17 @@ object DecisionTreeRunner {
 
     params.checkpointDir.foreach(sc.setCheckpointDir)
 
-    val strategy = new Strategy(algo = params.algo,
-                                impurity = impurityCalculator,
-                                maxDepth = params.maxDepth,
-                                maxBins = params.maxBins,
-                                numClasses = numClasses,
-                                minInstancesPerNode =
-                                  params.minInstancesPerNode,
-                                minInfoGain = params.minInfoGain,
-                                useNodeIdCache = params.useNodeIdCache,
-                                checkpointInterval = params.checkpointInterval)
+    val strategy = new Strategy(
+      algo = params.algo,
+      impurity = impurityCalculator,
+      maxDepth = params.maxDepth,
+      maxBins = params.maxBins,
+      numClasses = numClasses,
+      minInstancesPerNode = params.minInstancesPerNode,
+      minInfoGain = params.minInfoGain,
+      useNodeIdCache = params.useNodeIdCache,
+      checkpointInterval = params.checkpointInterval
+    )
     if (params.numTrees == 1) {
       val startTime = System.nanoTime()
       val model = DecisionTree.train(training, strategy)

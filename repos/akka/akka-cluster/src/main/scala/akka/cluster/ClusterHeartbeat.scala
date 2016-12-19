@@ -86,7 +86,8 @@ private[cluster] final class ClusterHeartbeatSender
                              Set.empty,
                              MonitoredByNrOfMembers),
     oldReceiversNowUnreachable = Set.empty[UniqueAddress],
-    failureDetector)
+    failureDetector
+  )
 
   // start periodic heartbeat to other nodes in cluster
   val heartbeatTask = scheduler.schedule(

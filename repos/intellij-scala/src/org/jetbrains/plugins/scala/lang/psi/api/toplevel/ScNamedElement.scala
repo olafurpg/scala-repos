@@ -108,6 +108,7 @@ trait ScNamedElement
                                              classOf[ScMember])))
             .map(new LocalSearchScope(_))
         case _ => None
-      })
+      }
+    )
   }
 }

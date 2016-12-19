@@ -196,8 +196,8 @@ private[netty4] class SimpleChannelSnooper(val name: String)
 }
 
 private[netty4] object ChannelSnooper {
-  def apply(name: String)(thePrinter: (String,
-                                       Throwable) => Unit): ChannelSnooper = {
+  def apply(name: String)(
+      thePrinter: (String, Throwable) => Unit): ChannelSnooper = {
     new SimpleChannelSnooper(name) {
       override def printer(message: String, exc: Throwable = null): Unit =
         thePrinter(message, exc)

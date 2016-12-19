@@ -30,8 +30,8 @@ class ClientCancellationSpec
       }, // TLS client does full-close, no need for the connection:close header
       addressTls.getHostName,
       addressTls.getPort,
-      connectionContext = ConnectionContext.https(SSLContext.getDefault))(
-      noncheckedMaterializer)
+      connectionContext = ConnectionContext.https(SSLContext.getDefault)
+    )(noncheckedMaterializer)
 
     def testCase(connection: Flow[HttpRequest, HttpResponse, Any]): Unit =
       Utils.assertAllStagesStopped {

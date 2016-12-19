@@ -91,7 +91,8 @@ object JsonQueryExamples extends Specification {
       Server("192.168.2.125", 453423),
       Server("192.168.2.126", 214312),
       Server("192.168.1.126", 189822),
-      Server("192.168.1.125", 150123))
+      Server("192.168.1.125", 150123)
+    )
   }
 
   "Clusters administered by liza" in {

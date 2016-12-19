@@ -37,7 +37,8 @@ private[datasources] object CompressionCodecs {
     "deflate" -> classOf[DeflateCodec].getName,
     "gzip" -> classOf[GzipCodec].getName,
     "lz4" -> classOf[Lz4Codec].getName,
-    "snappy" -> classOf[SnappyCodec].getName)
+    "snappy" -> classOf[SnappyCodec].getName
+  )
 
   /**
     * Return the full version of the given codec class.

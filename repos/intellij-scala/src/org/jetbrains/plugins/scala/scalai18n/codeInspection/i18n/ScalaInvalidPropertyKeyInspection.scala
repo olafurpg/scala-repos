@@ -195,7 +195,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
                                 param),
                               onTheFly,
                               new Array[LocalQuickFix](0),
-                              ProblemHighlightType.GENERIC_ERROR))
+                              ProblemHighlightType.GENERIC_ERROR
+                            ))
                         }
                         flag = false
                       }

@@ -62,7 +62,8 @@ private[regression] trait GeneralizedLinearRegressionBase
     "The name of family which is a description of the error distribution to be used in the " +
       "model. Supported options: gaussian(default), binomial, poisson and gamma.",
     ParamValidators.inArray[String](
-      GeneralizedLinearRegression.supportedFamilyNames.toArray))
+      GeneralizedLinearRegression.supportedFamilyNames.toArray)
+  )
 
   /** @group getParam */
   @Since("2.0.0")
@@ -83,7 +84,8 @@ private[regression] trait GeneralizedLinearRegressionBase
       "distribution function. Supported options: identity, log, inverse, logit, probit, " +
       "cloglog and sqrt.",
     ParamValidators.inArray[String](
-      GeneralizedLinearRegression.supportedLinkNames.toArray))
+      GeneralizedLinearRegression.supportedLinkNames.toArray)
+  )
 
   /** @group getParam */
   @Since("2.0.0")
@@ -104,7 +106,8 @@ private[regression] trait GeneralizedLinearRegressionBase
         supportedFamilyAndLinkPairs.contains(
           Family.fromName($(family)) -> Link.fromName($(link))),
         "Generalized Linear Regression " +
-          s"with ${$(family)} family does not support ${$(link)} link function.")
+          s"with ${$(family)} family does not support ${$(link)} link function."
+      )
     }
     super.validateAndTransformSchema(schema, fitting, featuresDataType)
   }
@@ -373,8 +376,7 @@ object GeneralizedLinearRegression
       * The reweight function used to update offsets and weights
       * at each iteration of [[IterativelyReweightedLeastSquares]].
       */
-    val reweightFunc: (Instance,
-                       WeightedLeastSquaresModel) => (Double, Double) = {
+    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double, Double) = {
       (instance: Instance, model: WeightedLeastSquaresModel) =>
         {
           val eta = model.predict(instance.features)

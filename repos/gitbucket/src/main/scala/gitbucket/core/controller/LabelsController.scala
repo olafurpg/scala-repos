@@ -39,15 +39,17 @@ trait LabelsControllerBase extends ControllerBase {
   )(LabelForm.apply)
 
   get("/:owner/:repository/issues/labels")(referrersOnly { repository =>
-    html.list(getLabels(repository.owner, repository.name),
-              countIssueGroupByLabels(repository.owner,
-                                      repository.name,
-                                      IssuesService.IssueSearchCondition(),
-                                      Map.empty),
-              repository,
-              hasWritePermission(repository.owner,
-                                 repository.name,
-                                 context.loginAccount))
+    html.list(
+      getLabels(repository.owner, repository.name),
+      countIssueGroupByLabels(repository.owner,
+                              repository.name,
+                              IssuesService.IssueSearchCondition(),
+                              Map.empty),
+      repository,
+      hasWritePermission(repository.owner,
+                         repository.name,
+                         context.loginAccount)
+    )
   })
 
   ajaxGet("/:owner/:repository/issues/labels/new")(collaboratorsOnly {
@@ -61,16 +63,18 @@ trait LabelsControllerBase extends ControllerBase {
                                 repository.name,
                                 form.labelName,
                                 form.color.substring(1))
-      html.label(getLabel(repository.owner, repository.name, labelId).get,
-                 // TODO futility
-                 countIssueGroupByLabels(repository.owner,
-                                         repository.name,
-                                         IssuesService.IssueSearchCondition(),
-                                         Map.empty),
-                 repository,
-                 hasWritePermission(repository.owner,
-                                    repository.name,
-                                    context.loginAccount))
+      html.label(
+        getLabel(repository.owner, repository.name, labelId).get,
+        // TODO futility
+        countIssueGroupByLabels(repository.owner,
+                                repository.name,
+                                IssuesService.IssueSearchCondition(),
+                                Map.empty),
+        repository,
+        hasWritePermission(repository.owner,
+                           repository.name,
+                           context.loginAccount)
+      )
     })
 
   ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(
@@ -88,18 +92,18 @@ trait LabelsControllerBase extends ControllerBase {
                   params("labelId").toInt,
                   form.labelName,
                   form.color.substring(1))
-      html.label(getLabel(repository.owner,
-                          repository.name,
-                          params("labelId").toInt).get,
-                 // TODO futility
-                 countIssueGroupByLabels(repository.owner,
-                                         repository.name,
-                                         IssuesService.IssueSearchCondition(),
-                                         Map.empty),
-                 repository,
-                 hasWritePermission(repository.owner,
-                                    repository.name,
-                                    context.loginAccount))
+      html.label(
+        getLabel(repository.owner, repository.name, params("labelId").toInt).get,
+        // TODO futility
+        countIssueGroupByLabels(repository.owner,
+                                repository.name,
+                                IssuesService.IssueSearchCondition(),
+                                Map.empty),
+        repository,
+        hasWritePermission(repository.owner,
+                           repository.name,
+                           context.loginAccount)
+      )
     })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/delete")(

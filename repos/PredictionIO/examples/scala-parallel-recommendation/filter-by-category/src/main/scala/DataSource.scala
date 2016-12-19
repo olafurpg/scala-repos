@@ -50,7 +50,8 @@ class DataSource(val dsp: DataSourceParams)
       entityType = Some("user"),
       eventNames = Some(List("rate", "buy")), // read "rate" and "buy" event
       // targetEntityType is optional field of an event.
-      targetEntityType = Some(Some("item")))(sc)
+      targetEntityType = Some(Some("item"))
+    )(sc)
 
     val ratingsRDD: RDD[Rating] = rateEventsRDD
       .map { event =>

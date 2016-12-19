@@ -144,7 +144,8 @@ private case class Feature(name: String,
               new EnableFeatureFix(module.scalaCompilerSettings,
                                    it,
                                    name,
-                                   enable))
+                                   enable)
+            )
           }
         }
       }

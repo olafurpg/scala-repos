@@ -165,7 +165,8 @@ private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
     require(
       allStatsSize == other.allStatsSize,
       s"DTStatsAggregator.merge requires that both aggregators have the same length stats vectors." +
-        s" This aggregator is of length $allStatsSize, but the other is ${other.allStatsSize}.")
+        s" This aggregator is of length $allStatsSize, but the other is ${other.allStatsSize}."
+    )
     var i = 0
     // TODO: Test BLAS.axpy
     while (i < allStatsSize) {
@@ -177,7 +178,8 @@ private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
       statsSize == other.statsSize,
       s"DTStatsAggregator.merge requires that both aggregators have the same length parent " +
         s"stats vectors. This aggregator's parent stats are length $statsSize, " +
-        s"but the other is ${other.statsSize}.")
+        s"but the other is ${other.statsSize}."
+    )
     var j = 0
     while (j < statsSize) {
       parentStats(j) += other.parentStats(j)

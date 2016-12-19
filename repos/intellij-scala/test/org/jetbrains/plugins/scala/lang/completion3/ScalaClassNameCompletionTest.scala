@@ -84,7 +84,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           case _ => false
         }
         .get,
-      '\t')
+      '\t'
+    )
     checkResultByText(resultText)
   }
 
@@ -123,7 +124,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           case _ => false
         }
         .get,
-      '\t')
+      '\t'
+    )
     checkResultByText(resultText)
   }
 
@@ -167,7 +169,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
             case _ => false
           }
           .get,
-        '\t')
+        '\t'
+      )
       checkResultByText(resultText)
     } catch {
       case t: Exception => settings.setImportsWithPrefix(oldValue)
@@ -211,7 +214,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           case _ => false
         }
         .get,
-      '\t')
+      '\t'
+    )
     checkResultByText(resultText)
   }
 

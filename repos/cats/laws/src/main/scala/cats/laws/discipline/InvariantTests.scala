@@ -20,7 +20,8 @@ trait InvariantTests[F[_]] extends Laws {
       name = "invariant",
       parent = None,
       "invariant identity" -> forAll(laws.invariantIdentity[A] _),
-      "invariant composition" -> forAll(laws.invariantComposition[A, B, C] _))
+      "invariant composition" -> forAll(laws.invariantComposition[A, B, C] _)
+    )
   }
 }
 

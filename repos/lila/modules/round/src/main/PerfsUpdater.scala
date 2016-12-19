@@ -80,13 +80,15 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
         val perfsB = mkPerfs(ratingsB, black.perfs, game)
         def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
         resetGameRatings.fold(
-          GameRepo.setRatingAndDiffs(game.id,
-                                     intRatingLens(white.perfs) ->
-                                       (intRatingLens(perfsW) -
-                                         intRatingLens(white.perfs)),
-                                     intRatingLens(black.perfs) ->
-                                       (intRatingLens(perfsB) -
-                                         intRatingLens(black.perfs))),
+          GameRepo.setRatingAndDiffs(
+            game.id,
+            intRatingLens(white.perfs) ->
+              (intRatingLens(perfsW) -
+                intRatingLens(white.perfs)),
+            intRatingLens(black.perfs) ->
+              (intRatingLens(perfsB) -
+                intRatingLens(black.perfs))
+          ),
           GameRepo.setRatingDiffs(game.id,
                                   intRatingLens(perfsW) -
                                     intRatingLens(white.perfs),
@@ -118,18 +120,20 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
                                    correspondence: Rating)
 
   private def mkRatings(perfs: Perfs) =
-    new Ratings(chess960 = perfs.chess960.toRating,
-                kingOfTheHill = perfs.kingOfTheHill.toRating,
-                threeCheck = perfs.threeCheck.toRating,
-                antichess = perfs.antichess.toRating,
-                atomic = perfs.atomic.toRating,
-                horde = perfs.horde.toRating,
-                racingKings = perfs.racingKings.toRating,
-                crazyhouse = perfs.crazyhouse.toRating,
-                bullet = perfs.bullet.toRating,
-                blitz = perfs.blitz.toRating,
-                classical = perfs.classical.toRating,
-                correspondence = perfs.correspondence.toRating)
+    new Ratings(
+      chess960 = perfs.chess960.toRating,
+      kingOfTheHill = perfs.kingOfTheHill.toRating,
+      threeCheck = perfs.threeCheck.toRating,
+      antichess = perfs.antichess.toRating,
+      atomic = perfs.atomic.toRating,
+      horde = perfs.horde.toRating,
+      racingKings = perfs.racingKings.toRating,
+      crazyhouse = perfs.crazyhouse.toRating,
+      bullet = perfs.bullet.toRating,
+      blitz = perfs.blitz.toRating,
+      classical = perfs.classical.toRating,
+      correspondence = perfs.correspondence.toRating
+    )
 
   private def resultOf(game: Game): Glicko.Result =
     game.winnerColor match {

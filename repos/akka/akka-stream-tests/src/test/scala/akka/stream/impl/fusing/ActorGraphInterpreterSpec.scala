@@ -258,13 +258,16 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
             inheritedAttributes: Attributes): GraphStageLogic =
           new GraphStageLogic(shape) {
 
-            setHandler(shape.out, new OutHandler {
-              override def onPull(): Unit = {
-                completeStage()
-                // This cannot be propagated now since the stage is already closed
-                push(shape.out, -1)
+            setHandler(
+              shape.out,
+              new OutHandler {
+                override def onPull(): Unit = {
+                  completeStage()
+                  // This cannot be propagated now since the stage is already closed
+                  push(shape.out, -1)
+                }
               }
-            })
+            )
           }
       }
 

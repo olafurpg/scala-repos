@@ -579,26 +579,28 @@ class TaskMetricsSuite extends SparkFunSuite {
     // updates from unregistered accumulators. In practice, all accumulators created
     // on the driver, internal or not, should be registered with `Accumulators` at some point.
     val param = IntAccumulatorParam
-    val registeredAccums = Seq(new Accumulator(0,
-                                               param,
-                                               Some("a"),
-                                               internal = true,
-                                               countFailedValues = true),
-                               new Accumulator(0,
-                                               param,
-                                               Some("b"),
-                                               internal = true,
-                                               countFailedValues = false),
-                               new Accumulator(0,
-                                               param,
-                                               Some("c"),
-                                               internal = false,
-                                               countFailedValues = true),
-                               new Accumulator(0,
-                                               param,
-                                               Some("d"),
-                                               internal = false,
-                                               countFailedValues = false))
+    val registeredAccums = Seq(
+      new Accumulator(0,
+                      param,
+                      Some("a"),
+                      internal = true,
+                      countFailedValues = true),
+      new Accumulator(0,
+                      param,
+                      Some("b"),
+                      internal = true,
+                      countFailedValues = false),
+      new Accumulator(0,
+                      param,
+                      Some("c"),
+                      internal = false,
+                      countFailedValues = true),
+      new Accumulator(0,
+                      param,
+                      Some("d"),
+                      internal = false,
+                      countFailedValues = false)
+    )
     val unregisteredAccums =
       Seq(new Accumulator(0,
                           param,

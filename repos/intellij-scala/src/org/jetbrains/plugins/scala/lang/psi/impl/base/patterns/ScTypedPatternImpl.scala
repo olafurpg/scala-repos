@@ -89,7 +89,8 @@ class ScTypedPatternImpl(node: ASTNode)
                                                lowerBound,
                                                upperBound)
                             case (tp: ScType, param: ScTypeParam) => tp
-                          }).unpackedType
+                          }
+                      ).unpackedType
                     case _ => tp
                   }
                 case Some((clazz: PsiClass, subst)) =>
@@ -127,7 +128,8 @@ class ScTypedPatternImpl(node: ASTNode)
                                                lowerBound,
                                                upperBound)
                             case (tp: ScType, _) => tp
-                          }).unpackedType
+                          }
+                      ).unpackedType
                     case _ => tp
                   }
                 case _ => tp

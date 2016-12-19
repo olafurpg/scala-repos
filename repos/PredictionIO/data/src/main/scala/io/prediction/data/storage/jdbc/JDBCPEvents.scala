@@ -143,19 +143,21 @@ class JDBCPEvents(client: String,
 
     val tableName = JDBCUtils.eventTableName(namespace, appId, channelId)
 
-    val eventTableColumns = Seq[String]("id",
-                                        "event",
-                                        "entityType",
-                                        "entityId",
-                                        "targetEntityType",
-                                        "targetEntityId",
-                                        "properties",
-                                        "eventTime",
-                                        "eventTimeZone",
-                                        "tags",
-                                        "prId",
-                                        "creationTime",
-                                        "creationTimeZone")
+    val eventTableColumns = Seq[String](
+      "id",
+      "event",
+      "entityType",
+      "entityId",
+      "targetEntityType",
+      "targetEntityId",
+      "properties",
+      "eventTime",
+      "eventTimeZone",
+      "tags",
+      "prId",
+      "creationTime",
+      "creationTimeZone"
+    )
 
     val eventDF = events
       .map { event =>

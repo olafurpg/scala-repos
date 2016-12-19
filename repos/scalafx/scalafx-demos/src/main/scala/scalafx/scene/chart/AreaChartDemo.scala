@@ -46,7 +46,8 @@ object AreaChartDemo extends JFXApp {
           xySeries("Series 2",
                    Seq((0, 8), (2, 2), (4, 9), (6, 7), (8, 5), (10, 7))),
           xySeries("Series 3",
-                   Seq((0, 2), (2, 5), (4, 8), (6, 6), (8, 9), (10, 7))))
+                   Seq((0, 2), (2, 5), (4, 8), (6, 6), (8, 9), (10, 7)))
+        )
       }
     }
   }

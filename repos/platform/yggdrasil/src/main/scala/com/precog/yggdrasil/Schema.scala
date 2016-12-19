@@ -496,12 +496,15 @@ object Schema {
     case JArrayFixedT(elements) => {
       val indices = elements.keySet
       indices.forall { i =>
-        subsumes(ctpes.collect {
-          case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
-            (CPath(tail: _*), elemType)
-          case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
-            (CPath(tail: _*), ctpe)
-        }, elements(i))
+        subsumes(
+          ctpes.collect {
+            case (CPath(CPathArray, tail @ _ *), CArrayType(elemType)) =>
+              (CPath(tail: _*), elemType)
+            case (CPath(CPathIndex(`i`), tail @ _ *), ctpe) =>
+              (CPath(tail: _*), ctpe)
+          },
+          elements(i)
+        )
       }
     }
     case JArrayHomogeneousT(jElemType) =>

@@ -70,14 +70,16 @@ class HBPEvents(client: HBClient,
     conf.set(TableInputFormat.INPUT_TABLE,
              HBEventsUtil.tableName(namespace, appId, channelId))
 
-    val scan = HBEventsUtil.createScan(startTime = startTime,
-                                       untilTime = untilTime,
-                                       entityType = entityType,
-                                       entityId = entityId,
-                                       eventNames = eventNames,
-                                       targetEntityType = targetEntityType,
-                                       targetEntityId = targetEntityId,
-                                       reversed = None)
+    val scan = HBEventsUtil.createScan(
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId,
+      reversed = None
+    )
     scan.setCaching(500) // TODO
     scan.setCacheBlocks(false) // TODO
 

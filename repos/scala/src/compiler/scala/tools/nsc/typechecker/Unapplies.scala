@@ -127,15 +127,17 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
                          parents: List[Tree] = Nil,
                          body: List[Tree] = Nil): ModuleDef =
     atPos(cdef.pos.focus) {
-      ModuleDef(Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
-                          cdef.mods.privateWithin),
-                cdef.name.toTermName,
-                gen.mkTemplate(parents,
-                               noSelfType,
-                               NoMods,
-                               Nil,
-                               body,
-                               cdef.impl.pos.focus))
+      ModuleDef(
+        Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
+                  cdef.mods.privateWithin),
+        cdef.name.toTermName,
+        gen.mkTemplate(parents,
+                       noSelfType,
+                       NoMods,
+                       Nil,
+                       body,
+                       cdef.impl.pos.focus)
+      )
     }
 
   /** The apply method corresponding to a case class

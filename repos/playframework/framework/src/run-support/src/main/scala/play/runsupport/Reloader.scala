@@ -40,16 +40,19 @@ object Reloader {
     val thread = Thread.currentThread
     val oldLoader = thread.getContextClassLoader
     // we use accessControlContext & AccessController to avoid a ClassLoader leak (ProtectionDomain class)
-    AccessController.doPrivileged(new PrivilegedAction[T]() {
-      def run: T = {
-        try {
-          thread.setContextClassLoader(classOf[Reloader].getClassLoader)
-          f
-        } finally {
-          thread.setContextClassLoader(oldLoader)
+    AccessController.doPrivileged(
+      new PrivilegedAction[T]() {
+        def run: T = {
+          try {
+            thread.setContextClassLoader(classOf[Reloader].getClassLoader)
+            f
+          } finally {
+            thread.setContextClassLoader(oldLoader)
+          }
         }
-      }
-    }, accessControlContext)
+      },
+      accessControlContext
+    )
   }
 
   /**
@@ -119,9 +122,9 @@ object Reloader {
   val createURLClassLoader: ClassLoaderCreator = (name, urls, parent) =>
     new NamedURLClassLoader(name, urls, parent)
 
-  val createDelegatedResourcesClassLoader: ClassLoaderCreator = (name, urls,
-                                                                 parent) =>
-    new DelegatedResourcesClassLoader(name, urls, parent)
+  val createDelegatedResourcesClassLoader: ClassLoaderCreator =
+    (name, urls, parent) =>
+      new DelegatedResourcesClassLoader(name, urls, parent)
 
   def assetsClassLoader(allAssets: Seq[(String, File)])(
       parent: ClassLoader): ClassLoader =

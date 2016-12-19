@@ -68,7 +68,8 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
           .add("b4", DoubleType)
           .add("b5",
                new StructType().add("b5a", IntegerType).add("b5b", StringType))
-          .add("b6", StringType))
+          .add("b6", StringType)
+      )
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(outerStruct))

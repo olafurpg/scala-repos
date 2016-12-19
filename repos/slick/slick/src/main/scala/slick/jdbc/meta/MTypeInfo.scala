@@ -26,10 +26,27 @@ case class MTypeInfo(typeName: String,
 
 object MTypeInfo {
   def getTypeInfo = ResultSetAction[MTypeInfo](_.metaData.getTypeInfo()) { r =>
-    MTypeInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match {
-      case DatabaseMetaData.columnNoNulls => Some(false)
-      case DatabaseMetaData.columnNullable => Some(true)
-      case _ => None
-    }, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
+    MTypeInfo(
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.nextInt match {
+        case DatabaseMetaData.columnNoNulls => Some(false)
+        case DatabaseMetaData.columnNullable => Some(true)
+        case _ => None
+      },
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<,
+      r.<<
+    )
   }
 }

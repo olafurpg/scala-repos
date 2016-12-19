@@ -84,9 +84,9 @@ object StormTestRun {
 
   def simpleRun[T, K, V: Semigroup](
       original: List[T],
-      mkJob: (Producer[Storm, T],
-              Storm#Store[K, V]) => TailProducer[Storm, Any])
-    : TestStore[K, V] = {
+      mkJob: (
+          Producer[Storm, T],
+          Storm#Store[K, V]) => TailProducer[Storm, Any]): TestStore[K, V] = {
 
     implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
 

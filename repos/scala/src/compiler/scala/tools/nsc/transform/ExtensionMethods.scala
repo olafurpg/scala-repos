@@ -78,8 +78,9 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       val matching =
         candidates filter
           (alt => normalize(alt.tpe, imeth.owner) matches imeth.tpe)
-      assert(matching.nonEmpty,
-             sm"""|no extension method found for:
+      assert(
+        matching.nonEmpty,
+        sm"""|no extension method found for:
            |
            |  $imeth:${imeth.tpe}
            |
@@ -90,10 +91,11 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
            | Candidates (signatures normalized):
            |
            | ${candidates
-               .map(c => c.name + ":" + normalize(c.tpe, imeth.owner))
-               .mkString("\n")}
+          .map(c => c.name + ":" + normalize(c.tpe, imeth.owner))
+          .mkString("\n")}
            |
-           | Eligible Names: ${extensionNames(imeth).mkString(",")}" """)
+           | Eligible Names: ${extensionNames(imeth).mkString(",")}" """
+      )
       matching.head
     }
 
@@ -312,8 +314,8 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
             case Some(defns) =>
               defns.toList map
                 (defn =>
-                   atOwner(md.symbol)(
-                     localTyper.typedPos(md.pos.focus)(defn.duplicate)))
+                  atOwner(md.symbol)(
+                    localTyper.typedPos(md.pos.focus)(defn.duplicate)))
             case _ => Nil
           }
           if (extraStats.isEmpty) md

@@ -289,7 +289,8 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
     32 -~ longValue ^^ (java.lang.Double.longBitsToDouble),
     33 -~ nameRef,
     34 -^ null,
-    35 -~ typeRef)
+    35 -~ typeRef
+  )
 
   lazy val attributeInfo =
     40 -~ symbolRef ~ typeRef ~ (constantRef ?) ~ (nameRef ~ constantRef *) ^~~~^ AttributeInfo // sym_Ref info_Ref {constant_Ref} {nameRef constantRef}

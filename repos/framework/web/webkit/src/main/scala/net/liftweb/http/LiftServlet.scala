@@ -606,7 +606,8 @@ class LiftServlet extends Loggable {
               ajaxPathPart.substring(separator + 1, ajaxPathPart.length - 1),
               36),
             Integer.parseInt(ajaxPathPart.substring(ajaxPathPart.length - 1),
-                             36))
+                             36)
+          )
         )
       else None
     }
@@ -887,11 +888,9 @@ class LiftServlet extends Loggable {
       answers =>
         request.request.resume(
           (request,
-           S.init(Box !! request, session)(
-             LiftRules.performTransform(
-               convertAnswersToCometResponse(session,
-                                             answers.toList,
-                                             actors))))))
+           S.init(Box !! request, session)(LiftRules.performTransform(
+             convertAnswersToCometResponse(session, answers.toList, actors)))))
+    )
 
     try {
       session.enterComet(cont -> request)
@@ -1036,19 +1035,18 @@ class LiftServlet extends Loggable {
     def fixHeaders(headers: List[(String, String)]) =
       headers map
         ((v) =>
-           v match {
-             case ("Location", uri) =>
-               val u = request
-               (v._1,
-                ((for (updated <- Full(
-                         (if (!LiftRules.excludePathFromContextPathRewriting
-                                .vend(uri)) u.contextPath
-                          else "") + uri).filter(ignore =>
-                         uri.startsWith("/"));
-                       rwf <- URLRewriter.rewriteFunc)
-                  yield rwf(updated)) openOr uri))
-             case _ => v
-           })
+          v match {
+            case ("Location", uri) =>
+              val u = request
+              (v._1,
+               ((for (updated <- Full(
+                        (if (!LiftRules.excludePathFromContextPathRewriting
+                               .vend(uri)) u.contextPath
+                         else "") + uri).filter(ignore => uri.startsWith("/"));
+                      rwf <- URLRewriter.rewriteFunc)
+                 yield rwf(updated)) openOr uri))
+            case _ => v
+          })
 
     def pairFromRequest(req: Req): (Box[Req], Box[String]) = {
       val acceptHeader = for (innerReq <- Box.legacyNullTest(req.request);
@@ -1085,7 +1083,8 @@ class LiftServlet extends Loggable {
           LiftRules
             .defaultHeaders(NodeSeq.Empty -> request) ::: /* List(("Content-Type",
         LiftRules.determineContentType(pairFromRequest(request)))) ::: */
-          (if (len >= 0) List(("Content-Length", len.toString)) else Nil))
+          (if (len >= 0) List(("Content-Length", len.toString)) else Nil)
+        )
 
     LiftRules.beforeSend.toList.foreach(f =>
       tryo(f(resp, response, header, Full(request))))

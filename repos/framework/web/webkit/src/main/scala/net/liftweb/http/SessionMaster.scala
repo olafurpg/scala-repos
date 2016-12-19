@@ -67,19 +67,19 @@ object SessionMaster extends LiftActor with Loggable {
   var sessionCheckFuncs: List[(Map[String, SessionInfo],
                                SessionInfo => Unit) => Unit] =
     ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) => {
-       val now = millis
+      val now = millis
 
-       for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
-         if (now - session.lastServiceTime > session.inactivityLength ||
-             session.markedForTermination) {
-           logger.info(" Session " + id + " expired")
-           destroyer(info)
-         } else {
-           session.doCometActorCleanup()
-           session.cleanupUnseenFuncs()
-         }
-       }
-     }) :: Nil
+      for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
+        if (now - session.lastServiceTime > session.inactivityLength ||
+            session.markedForTermination) {
+          logger.info(" Session " + id + " expired")
+          destroyer(info)
+        } else {
+          session.doCometActorCleanup()
+          session.cleanupUnseenFuncs()
+        }
+      }
+    }) :: Nil
 
   def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
     val dead = otherId.map(killedSessions.containsKey(_)) openOr false
@@ -231,20 +231,23 @@ object SessionMaster extends LiftActor with Loggable {
         case SessionInfo(s, _, _, _, _) =>
           killedSessions.put(s.underlyingId, Helpers.millis)
           s.markedForShutDown_? = true
-          Schedule.schedule(() => {
-            try {
-              s.doShutDown
+          Schedule.schedule(
+            () => {
               try {
-                s.httpSession.foreach(_.unlink(s))
+                s.doShutDown
+                try {
+                  s.httpSession.foreach(_.unlink(s))
+                } catch {
+                  case e: Exception =>
+                  // ignore... sometimes you can't do this and it's okay
+                }
               } catch {
                 case e: Exception =>
-                // ignore... sometimes you can't do this and it's okay
+                  logger.warn("Failure in remove session", e)
               }
-            } catch {
-              case e: Exception =>
-                logger.warn("Failure in remove session", e)
-            }
-          }, 0.seconds)
+            },
+            0.seconds
+          )
           lockWrite {
             nsessions.remove(sessionId)
           }
@@ -268,12 +271,15 @@ object SessionMaster extends LiftActor with Loggable {
         f <- sessionCheckFuncs
       } {
         if (Props.inGAE) {
-          f(ses, shutDown => {
-            if (!shutDown.session.markedForShutDown_?) {
-              shutDown.session.markedForShutDown_? = true
-              this.sendMsg(RemoveSession(shutDown.session.underlyingId))
+          f(
+            ses,
+            shutDown => {
+              if (!shutDown.session.markedForShutDown_?) {
+                shutDown.session.markedForShutDown_? = true
+                this.sendMsg(RemoveSession(shutDown.session.underlyingId))
+              }
             }
-          })
+          )
         } else {
           Schedule.schedule(
             () =>
@@ -284,7 +290,8 @@ object SessionMaster extends LiftActor with Loggable {
                   this ! RemoveSession(shutDown.session.underlyingId)
                 }
               }),
-            0.seconds)
+            0.seconds
+          )
         }
       }
 

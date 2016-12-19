@@ -130,12 +130,15 @@ class InteractionSuite
     val attrs = AttributeGroup.fromStructField(res.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a_up:b_foo"), Some(1)),
-                       new NumericAttribute(Some("a_up:b_bar"), Some(2)),
-                       new NumericAttribute(Some("a_down:b_foo"), Some(3)),
-                       new NumericAttribute(Some("a_down:b_bar"), Some(4)),
-                       new NumericAttribute(Some("a_left:b_foo"), Some(5)),
-                       new NumericAttribute(Some("a_left:b_bar"), Some(6))))
+      Array[Attribute](
+        new NumericAttribute(Some("a_up:b_foo"), Some(1)),
+        new NumericAttribute(Some("a_up:b_bar"), Some(2)),
+        new NumericAttribute(Some("a_down:b_foo"), Some(3)),
+        new NumericAttribute(Some("a_down:b_bar"), Some(4)),
+        new NumericAttribute(Some("a_left:b_foo"), Some(5)),
+        new NumericAttribute(Some("a_left:b_bar"), Some(6))
+      )
+    )
     assert(attrs === expectedAttrs)
   }
 
@@ -154,7 +157,8 @@ class InteractionSuite
       col("a").as("a",
                   NominalAttribute.defaultAttr.withNumValues(3).toMetadata()),
       col("b").as("b", groupAttr.toMetadata()),
-      col("c").as("c", NumericAttribute.defaultAttr.toMetadata()))
+      col("c").as("c", NumericAttribute.defaultAttr.toMetadata())
+    )
     val trans = new Interaction()
       .setInputCols(Array("a", "b", "c"))
       .setOutputCol("features")
@@ -175,15 +179,18 @@ class InteractionSuite
     val attrs = AttributeGroup.fromStructField(res.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a_0:b_0_0:c"), Some(1)),
-                       new NumericAttribute(Some("a_0:b_0_1:c"), Some(2)),
-                       new NumericAttribute(Some("a_0:b_1:c"), Some(3)),
-                       new NumericAttribute(Some("a_1:b_0_0:c"), Some(4)),
-                       new NumericAttribute(Some("a_1:b_0_1:c"), Some(5)),
-                       new NumericAttribute(Some("a_1:b_1:c"), Some(6)),
-                       new NumericAttribute(Some("a_2:b_0_0:c"), Some(7)),
-                       new NumericAttribute(Some("a_2:b_0_1:c"), Some(8)),
-                       new NumericAttribute(Some("a_2:b_1:c"), Some(9))))
+      Array[Attribute](
+        new NumericAttribute(Some("a_0:b_0_0:c"), Some(1)),
+        new NumericAttribute(Some("a_0:b_0_1:c"), Some(2)),
+        new NumericAttribute(Some("a_0:b_1:c"), Some(3)),
+        new NumericAttribute(Some("a_1:b_0_0:c"), Some(4)),
+        new NumericAttribute(Some("a_1:b_0_1:c"), Some(5)),
+        new NumericAttribute(Some("a_1:b_1:c"), Some(6)),
+        new NumericAttribute(Some("a_2:b_0_0:c"), Some(7)),
+        new NumericAttribute(Some("a_2:b_0_1:c"), Some(8)),
+        new NumericAttribute(Some("a_2:b_1:c"), Some(9))
+      )
+    )
     assert(attrs === expectedAttrs)
   }
 

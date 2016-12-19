@@ -33,7 +33,8 @@ object TestOptions {
       else kdc,
       editConfigurationFilePut("etc/config.properties",
                                "karaf.framework",
-                               "equinox"))
+                               "equinox")
+    )
   }
 
   def testBundles(): PaxOption = {
@@ -44,7 +45,8 @@ object TestOptions {
       mavenBundle("org.scalatest",
                   "scalatest_%s"
                     .format(scalaDepVersion)).versionAsInProject,
-      junitBundles)
+      junitBundles
+    )
   }
 
   def debugOptions(level: LogLevelOption.LogLevel =
@@ -78,6 +80,7 @@ object TestOptions {
         .`type`("xml")
         .classifier("features")
         .version(System.getProperty("project.version")),
-      feature)
+      feature
+    )
   }
 }

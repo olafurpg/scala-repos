@@ -11,7 +11,8 @@ trait ReviveOffersConfig extends ScallopConf {
     descrNo = "Disable reviveOffers for new or changed apps.",
     hidden = true,
     default = Some(true),
-    prefix = "disable_")
+    prefix = "disable_"
+  )
 
   lazy val minReviveOffersInterval = opt[Long](
     "min_revive_offers_interval",

@@ -30,11 +30,15 @@ object StablePriorityDispatcherSpec {
       }: Any ⇒ Int))
 
   class Bounded(settings: ActorSystem.Settings, config: Config)
-      extends BoundedStablePriorityMailbox(PriorityGenerator({
-        case i: Int if i <= 100 ⇒ i // Small integers have high priority
-        case i: Int ⇒ 101 // Don't care for other integers
-        case 'Result ⇒ Int.MaxValue
-      }: Any ⇒ Int), 1000, 10 seconds)
+      extends BoundedStablePriorityMailbox(
+        PriorityGenerator({
+          case i: Int if i <= 100 ⇒ i // Small integers have high priority
+          case i: Int ⇒ 101 // Don't care for other integers
+          case 'Result ⇒ Int.MaxValue
+        }: Any ⇒ Int),
+        1000,
+        10 seconds
+      )
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])

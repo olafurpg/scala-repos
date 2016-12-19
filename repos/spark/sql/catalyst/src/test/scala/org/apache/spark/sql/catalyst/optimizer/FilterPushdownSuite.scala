@@ -46,7 +46,8 @@ class FilterPushdownSuite extends PlanTest {
         PushPredicateThroughJoin,
         PushPredicateThroughGenerate,
         PushPredicateThroughAggregate,
-        CollapseProject) :: Nil
+        CollapseProject
+      ) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)

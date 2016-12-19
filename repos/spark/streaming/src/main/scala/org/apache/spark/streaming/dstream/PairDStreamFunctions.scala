@@ -73,8 +73,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
     ssc.withScope {
       val createCombiner = (v: V) => ArrayBuffer[V](v)
       val mergeValue = (c: ArrayBuffer[V], v: V) => (c += v)
-      val mergeCombiner = (c1: ArrayBuffer[V],
-                           c2: ArrayBuffer[V]) => (c1 ++ c2)
+      val mergeCombiner =
+        (c1: ArrayBuffer[V], c2: ArrayBuffer[V]) => (c1 ++ c2)
       combineByKey(createCombiner, mergeValue, mergeCombiner, partitioner)
         .asInstanceOf[DStream[(K, Iterable[V])]]
     }
@@ -203,8 +203,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
   ): DStream[(K, Iterable[V])] = ssc.withScope {
     val createCombiner = (v: Iterable[V]) => new ArrayBuffer[V] ++= v
     val mergeValue = (buf: ArrayBuffer[V], v: Iterable[V]) => buf ++= v
-    val mergeCombiner = (buf1: ArrayBuffer[V],
-                         buf2: ArrayBuffer[V]) => buf1 ++= buf2
+    val mergeCombiner =
+      (buf1: ArrayBuffer[V], buf2: ArrayBuffer[V]) => buf1 ++= buf2
     self
       .groupByKey(partitioner)
       .window(windowDuration, slideDuration)
@@ -668,8 +668,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
   ): DStream[(K, (V, Option[W]))] = ssc.withScope {
     self.transformWith(
       other,
-      (rdd1: RDD[(K, V)],
-       rdd2: RDD[(K, W)]) => rdd1.leftOuterJoin(rdd2, partitioner)
+      (rdd1: RDD[(K, V)], rdd2: RDD[(K, W)]) =>
+        rdd1.leftOuterJoin(rdd2, partitioner)
     )
   }
 
@@ -706,8 +706,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
   ): DStream[(K, (Option[V], W))] = ssc.withScope {
     self.transformWith(
       other,
-      (rdd1: RDD[(K, V)],
-       rdd2: RDD[(K, W)]) => rdd1.rightOuterJoin(rdd2, partitioner)
+      (rdd1: RDD[(K, V)], rdd2: RDD[(K, W)]) =>
+        rdd1.rightOuterJoin(rdd2, partitioner)
     )
   }
 
@@ -745,8 +745,8 @@ class PairDStreamFunctions[K, V](self: DStream[(K, V)])(
   ): DStream[(K, (Option[V], Option[W]))] = ssc.withScope {
     self.transformWith(
       other,
-      (rdd1: RDD[(K, V)],
-       rdd2: RDD[(K, W)]) => rdd1.fullOuterJoin(rdd2, partitioner)
+      (rdd1: RDD[(K, V)], rdd2: RDD[(K, W)]) =>
+        rdd1.fullOuterJoin(rdd2, partitioner)
     )
   }
 

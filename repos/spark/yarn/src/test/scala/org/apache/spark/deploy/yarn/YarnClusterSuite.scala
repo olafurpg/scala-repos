@@ -209,7 +209,8 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
       extraClassPath = Seq(originalJar.getPath()),
       extraJars = Seq("local:" + userJar.getPath()),
       extraConf = Map("spark.driver.userClassPathFirst" -> "true",
-                      "spark.executor.userClassPathFirst" -> "true"))
+                      "spark.executor.userClassPathFirst" -> "true")
+    )
     checkResult(finalState, driverResult, "OVERRIDDEN")
     checkResult(finalState, executorResult, "OVERRIDDEN")
   }

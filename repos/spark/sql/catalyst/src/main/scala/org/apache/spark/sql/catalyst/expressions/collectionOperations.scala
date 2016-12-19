@@ -199,10 +199,13 @@ case class ArrayContains(left: Expression, right: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (arr, value) => {
-      val i = ctx.freshName("i")
-      val getValue = ctx.getValue(arr, right.dataType, i)
-      s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (arr, value) => {
+        val i = ctx.freshName("i")
+        val getValue = ctx.getValue(arr, right.dataType, i)
+        s"""
       for (int $i = 0; $i < $arr.numElements(); $i ++) {
         if ($arr.isNullAt($i)) {
           ${ev.isNull} = true;
@@ -213,7 +216,8 @@ case class ArrayContains(left: Expression, right: Expression)
         }
       }
      """
-    })
+      }
+    )
   }
 
   override def prettyName: String = "array_contains"

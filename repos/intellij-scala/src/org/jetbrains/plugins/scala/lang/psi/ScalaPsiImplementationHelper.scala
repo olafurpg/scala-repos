@@ -33,23 +33,26 @@ object ScalaPsiImplementationHelper {
     if (fqn == null) return psiClass
     val classes: Array[PsiClass] = ScalaPsiManager
       .instance(project)
-      .getCachedClasses(new GlobalSearchScope((project)) {
-        def compare(file1: VirtualFile, file2: VirtualFile): Int = 0
-        def contains(file: VirtualFile): Boolean = {
-          val entries: List[OrderEntry] = idx.getOrderEntriesForFile(file)
-          var i: Int = 0
-          while (i < entries.size) {
-            {
-              val entry: OrderEntry = entries.get(i)
-              if (orderEntries.contains(entry)) return true
+      .getCachedClasses(
+        new GlobalSearchScope((project)) {
+          def compare(file1: VirtualFile, file2: VirtualFile): Int = 0
+          def contains(file: VirtualFile): Boolean = {
+            val entries: List[OrderEntry] = idx.getOrderEntriesForFile(file)
+            var i: Int = 0
+            while (i < entries.size) {
+              {
+                val entry: OrderEntry = entries.get(i)
+                if (orderEntries.contains(entry)) return true
+              }
+              i += 1
             }
-            i += 1
+            false
           }
-          false
-        }
-        def isSearchInModuleContent(aModule: Module): Boolean = false
-        def isSearchInLibraries: Boolean = true
-      }, fqn)
+          def isSearchInModuleContent(aModule: Module): Boolean = false
+          def isSearchInLibraries: Boolean = true
+        },
+        fqn
+      )
     if (classes.length == 0) psiClass
     else if (classes.length == 1) classes(0)
     else {

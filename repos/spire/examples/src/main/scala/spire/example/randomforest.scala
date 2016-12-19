@@ -263,11 +263,13 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
   private def fixOptions(size: Int,
                          options: RandomForestOptions): FixedOptions = {
     val defaults = defaultOptions(size)
-    FixedOptions(options.numAxesSample getOrElse defaults.numAxesSample,
-                 options.numPointsSample getOrElse defaults.numPointsSample,
-                 options.numTrees getOrElse defaults.numTrees,
-                 options.minSplitSize getOrElse defaults.minSplitSize,
-                 options.parallel)
+    FixedOptions(
+      options.numAxesSample getOrElse defaults.numAxesSample,
+      options.numPointsSample getOrElse defaults.numPointsSample,
+      options.numTrees getOrElse defaults.numTrees,
+      options.minSplitSize getOrElse defaults.minSplitSize,
+      options.parallel
+    )
   }
 
   def apply(data: Array[V], out: Array[K], options: RandomForestOptions) = {

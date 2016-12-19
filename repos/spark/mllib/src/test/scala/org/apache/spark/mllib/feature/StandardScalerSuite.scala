@@ -98,23 +98,32 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val summary2 = computeSummary(data2RDD)
     val summary3 = computeSummary(data3RDD)
 
-    assert((denseData, data1, data1RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data1, data1RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
-    assert((denseData, data2, data2RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data2, data2RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
-    assert((denseData, data3, data3RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data3, data3RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
     assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))
@@ -174,23 +183,32 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val summary2 = computeSummary(data2RDD)
     val summary3 = computeSummary(data3RDD)
 
-    assert((denseData, data1, data1RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data1, data1RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
-    assert((denseData, data2, data2RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data2, data2RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
-    assert((denseData, data3, data3RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (denseData, data3, data3RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
     assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))
@@ -261,11 +279,14 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val summary = computeSummary(data2RDD)
 
-    assert((sparseData, data2, data2RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (sparseData, data2, data2RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
     assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))
@@ -309,11 +330,14 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val summary = computeSummary(data2RDD)
 
-    assert((sparseData, data2, data2RDD.collect()).zipped.forall {
-      case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
-      case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
-      case _ => false
-    }, "The vector type should be preserved after standardization.")
+    assert(
+      (sparseData, data2, data2RDD.collect()).zipped.forall {
+        case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
+        case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
+        case _ => false
+      },
+      "The vector type should be preserved after standardization."
+    )
 
     assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
       v1 ~== v2 absTol 1E-5))

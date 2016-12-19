@@ -181,7 +181,8 @@ trait Config extends Serializable {
     val first: Seq[Class[_ <: HSerialization[_]]] = Seq(
       classOf[org.apache.hadoop.io.serializer.WritableSerialization],
       classOf[cascading.tuple.hadoop.TupleSerialization],
-      classOf[serialization.WrappedSerialization[_]])
+      classOf[serialization.WrappedSerialization[_]]
+    )
     // this must come last
     val last: Seq[Class[_ <: HSerialization[_]]] = Seq(
       classOf[com.twitter.chill.hadoop.KryoSerialization])
@@ -366,8 +367,8 @@ trait Config extends Serializable {
       .toList
 
   def addFlowStepStrategy(
-      flowStrategyProvider: (Mode,
-                             Config) => FlowStepStrategy[JobConf]): Config = {
+      flowStrategyProvider: (Mode, Config) => FlowStepStrategy[JobConf])
+    : Config = {
     val serializedListener = flowStepStrategiesSerializer(flowStrategyProvider)
     update(Config.FlowStepStrategies) {
       case None => (Some(serializedListener), ())

@@ -173,10 +173,14 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
   def collectEdges(edgeDirection: EdgeDirection): VertexRDD[Array[Edge[ED]]] = {
     edgeDirection match {
       case EdgeDirection.Either =>
-        graph.aggregateMessages[Array[Edge[ED]]](ctx => {
-          ctx.sendToSrc(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
-          ctx.sendToDst(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
-        }, (a, b) => a ++ b, TripletFields.EdgeOnly)
+        graph.aggregateMessages[Array[Edge[ED]]](
+          ctx => {
+            ctx.sendToSrc(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
+            ctx.sendToDst(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
+          },
+          (a, b) => a ++ b,
+          TripletFields.EdgeOnly
+        )
       case EdgeDirection.In =>
         graph.aggregateMessages[Array[Edge[ED]]](
           ctx =>

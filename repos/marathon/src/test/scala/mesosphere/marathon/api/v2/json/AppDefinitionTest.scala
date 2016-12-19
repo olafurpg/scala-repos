@@ -100,16 +100,14 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
       cmd = Some("true"),
       container = Some(
         Container(
-          docker = Some(
-            Docker(
-              image = "mesosphere/marathon",
-              network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-              portMappings = Some(
-                Seq(
-                  Docker.PortMapping(8080, 0, 0, "tcp", Some("foo")),
-                  Docker.PortMapping(8081, 0, 0, "tcp", Some("foo"))
-                ))
+          docker = Some(Docker(
+            image = "mesosphere/marathon",
+            network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+            portMappings = Some(Seq(
+              Docker.PortMapping(8080, 0, 0, "tcp", Some("foo")),
+              Docker.PortMapping(8081, 0, 0, "tcp", Some("foo"))
             ))
+          ))
         )),
       portDefinitions = Nil
     )
@@ -138,18 +136,17 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     app = correct.copy(
       container = Some(
         Container(
-          docker = Some(
-            Docker(
-              image = "mesosphere/marathon",
-              network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-              portMappings = Some(
-                Seq(
-                  Docker.PortMapping(8080, 0, 0, "tcp", Some("foo")),
-                  Docker.PortMapping(8081, 0, 0, "tcp", Some("bar"))
-                ))
+          docker = Some(Docker(
+            image = "mesosphere/marathon",
+            network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+            portMappings = Some(Seq(
+              Docker.PortMapping(8080, 0, 0, "tcp", Some("foo")),
+              Docker.PortMapping(8081, 0, 0, "tcp", Some("bar"))
             ))
+          ))
         )),
-      portDefinitions = Nil)
+      portDefinitions = Nil
+    )
     shouldNotViolate(
       app,
       "/container/docker/portMappings",
@@ -267,15 +264,13 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     app = correct.copy(
       container = Some(
         Container(
-          docker = Some(
-            Docker(
-              network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-              portMappings = Some(
-                Seq(
-                  Docker.PortMapping(8080, 0, 0, "tcp"),
-                  Docker.PortMapping(8081, 0, 0, "tcp")
-                ))
+          docker = Some(Docker(
+            network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+            portMappings = Some(Seq(
+              Docker.PortMapping(8080, 0, 0, "tcp"),
+              Docker.PortMapping(8081, 0, 0, "tcp")
             ))
+          ))
         )),
       portDefinitions = Nil,
       healthChecks = Set(HealthCheck(portIndex = Some(1)))
@@ -812,7 +807,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
       residency = Some(
         Residency(relaunchEscalationTimeoutSeconds = 3600,
                   taskLostBehavior =
-                    Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER)))
+                    Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER))
+    )
     val proto = app.toProto
 
     proto.hasResidency shouldBe true

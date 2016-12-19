@@ -428,7 +428,8 @@ abstract class HiveComparisonTest
                       new SQLBuilder(originalQuery.analyzed, TestHive).toSQL
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Cannot convert the following HiveQL query plan back to SQL query string:
+                        fail(
+                          s"""Cannot convert the following HiveQL query plan back to SQL query string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -436,7 +437,8 @@ abstract class HiveComparisonTest
                         |# Resolved query plan:
                         |${originalQuery.analyzed.treeString}
                      """.stripMargin,
-                             e)
+                          e
+                        )
                     }
 
                     try {
@@ -447,7 +449,8 @@ abstract class HiveComparisonTest
                       queryExecution
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Failed to analyze the converted SQL string:
+                        fail(
+                          s"""Failed to analyze the converted SQL string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -458,7 +461,8 @@ abstract class HiveComparisonTest
                         |# Converted SQL query string:
                         |$convertedSQL
                      """.stripMargin,
-                             e)
+                          e
+                        )
                     }
                   }
                 }

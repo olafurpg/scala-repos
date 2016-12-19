@@ -411,11 +411,11 @@ abstract class Delambdafy
 
         bridgeMethod foreach
           (bm =>
-             // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
-             //      rather than the method+bridge pair.
-             if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
-               erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
-                                                   bm.symbol))
+            // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
+            //      rather than the method+bridge pair.
+            if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
+              erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
+                                                  bm.symbol))
 
         val body = members ++ List(constr, applyMethodDef) ++ bridgeMethod
 

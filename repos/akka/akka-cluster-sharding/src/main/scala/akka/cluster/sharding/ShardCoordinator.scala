@@ -888,7 +888,8 @@ class PersistentShardCoordinator(
               "ShardRegionTerminated, but region {} was not registered. This inconsistency is due to that " +
                 " some stored ActorRef in Akka v2.3.0 and v2.3.1 did not contain full address information. It will be " +
                 "removed by later watch.",
-              region)
+              region
+            )
           }
         case ShardRegionProxyTerminated(proxy) ⇒
           if (state.regionProxies.contains(proxy)) state = state.updated(evt)
@@ -990,7 +991,8 @@ class DDataShardCoordinator(
       case GetFailure(CoordinatorStateKey, _) ⇒
         log.error(
           "The ShardCoordinator was unable to get an initial state within 'waiting-for-state-timeout' (was retrying): {} millis",
-          waitingForStateTimeout.toMillis)
+          waitingForStateTimeout.toMillis
+        )
         // repeat until GetSuccess
         getState()
 
@@ -1024,7 +1026,8 @@ class DDataShardCoordinator(
       log.error(
         "The ShardCoordinator was unable to update a distributed state within 'updating-state-timeout'={} millis (was retrying), event={}",
         updatingStateTimeout.toMillis,
-        evt)
+        evt
+      )
       // repeat until UpdateSuccess
       sendUpdate(evt)
 

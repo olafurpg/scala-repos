@@ -104,7 +104,8 @@ private[round] final class Rematcher(messenger: Messenger,
           },
           clock = pov.game.clock map (_.reset),
           turns = situation ?? (_.turns),
-          startedAtTurn = situation ?? (_.turns)),
+          startedAtTurn = situation ?? (_.turns)
+        ),
         whitePlayer = returnPlayer(pov.game, White, users),
         blackPlayer = returnPlayer(pov.game, Black, users),
         mode =
@@ -113,7 +114,8 @@ private[round] final class Rematcher(messenger: Messenger,
         variant = pov.game.variant,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
-        pgnImport = None)
+        pgnImport = None
+      )
 
   private def returnPlayer(game: Game,
                            color: ChessColor,
@@ -134,9 +136,11 @@ private[round] final class Rematcher(messenger: Messenger,
   private def redirectEvents(game: Game): Events = {
     val whiteId = game fullIdOf White
     val blackId = game fullIdOf Black
-    List(Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
-         Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
-         // tell spectators to reload
-         Event.Reload)
+    List(
+      Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
+      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
+      // tell spectators to reload
+      Event.Reload
+    )
   }
 }

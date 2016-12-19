@@ -49,7 +49,8 @@ private final class ApnsActor(certificate: InputStream, password: String)
       null, // Optional: custom ExecutorService for calling listeners
       null, // Optional: custom BlockingQueue implementation
       new PushManagerConfiguration(),
-      "ApplePushManager")
+      "ApplePushManager"
+    )
 
     m.registerRejectedNotificationListener(
       new RejectedNotificationListener[SimpleApnsPushNotification] {

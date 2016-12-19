@@ -216,11 +216,13 @@ object AdminClient {
               Type.LIST,
               Importance.HIGH,
               CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
-      .define(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
-              ConfigDef.Type.STRING,
-              CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
-              ConfigDef.Importance.MEDIUM,
-              CommonClientConfigs.SECURITY_PROTOCOL_DOC)
+      .define(
+        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
+        ConfigDef.Type.STRING,
+        CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
+        ConfigDef.Importance.MEDIUM,
+        CommonClientConfigs.SECURITY_PROTOCOL_DOC
+      )
       .withClientSslSupport()
       .withClientSaslSupport()
     config
@@ -266,7 +268,8 @@ object AdminClient {
       DefaultSendBufferBytes,
       DefaultReceiveBufferBytes,
       DefaultRequestTimeoutMs,
-      time)
+      time
+    )
 
     val highLevelClient = new ConsumerNetworkClient(networkClient,
                                                     metadata,

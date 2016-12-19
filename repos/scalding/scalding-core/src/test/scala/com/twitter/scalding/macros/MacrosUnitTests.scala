@@ -280,7 +280,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
         SampleClassB(SampleClassA(23, "ck"), SampleClassA(13, "dafk"), "xcv"),
         SampleClassB(SampleClassA(34, "were"),
                      SampleClassA(654, "power"),
-                     "adsfmx"))
+                     "adsfmx")
+      )
       val setter = implicitly[TupleSetter[SampleClassC]]
       val tup = setter(input)
       assert(tup.size == 19)

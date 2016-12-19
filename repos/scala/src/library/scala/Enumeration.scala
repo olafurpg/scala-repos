@@ -172,9 +172,9 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     val methods: Array[JMethod] =
       getClass.getMethods filter
         (m =>
-           m.getParameterTypes.isEmpty &&
-             classOf[Value].isAssignableFrom(m.getReturnType) &&
-             m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
+          m.getParameterTypes.isEmpty &&
+            classOf[Value].isAssignableFrom(m.getReturnType) &&
+            m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
     methods foreach { m =>
       val name = m.getName
       // invoke method to obtain actual `Value` instance

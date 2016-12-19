@@ -35,12 +35,14 @@ trait MilestonesControllerBase extends ControllerBase {
   )(MilestoneForm.apply)
 
   get("/:owner/:repository/issues/milestones")(referrersOnly { repository =>
-    html.list(params.getOrElse("state", "open"),
-              getMilestonesWithIssueCount(repository.owner, repository.name),
-              repository,
-              hasWritePermission(repository.owner,
-                                 repository.name,
-                                 context.loginAccount))
+    html.list(
+      params.getOrElse("state", "open"),
+      getMilestonesWithIssueCount(repository.owner, repository.name),
+      repository,
+      hasWritePermission(repository.owner,
+                         repository.name,
+                         context.loginAccount)
+    )
   })
 
   get("/:owner/:repository/issues/milestones/new")(collaboratorsOnly {

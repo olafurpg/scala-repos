@@ -33,7 +33,8 @@ private[testadapter] object EventSerializers {
         Status.valueOf(obj.fld[String]("status")),
         obj.opt[RemoteException]("throwable"),
         (obj.fld[Int]("durationMS").toLong << 32) |
-          (obj.fld[Int]("durationLS").toLong & 0xffffffffL))
+          (obj.fld[Int]("durationLS").toLong & 0xffffffffL)
+      )
     }
   }
 

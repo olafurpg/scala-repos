@@ -102,7 +102,8 @@ class ImportTextCreatorTest extends TestCase {
       textCreator.getImportText(info,
                                 isUnicodeArrow = false,
                                 spacesInImports = true,
-                                sortLexicografically = true))
+                                sortLexicografically = true)
+    )
   }
 
   def testGetImportText_No_Sorting(): Unit = {
@@ -119,6 +120,7 @@ class ImportTextCreatorTest extends TestCase {
       textCreator.getImportText(info,
                                 isUnicodeArrow = false,
                                 spacesInImports = false,
-                                sortLexicografically = false))
+                                sortLexicografically = false)
+    )
   }
 }

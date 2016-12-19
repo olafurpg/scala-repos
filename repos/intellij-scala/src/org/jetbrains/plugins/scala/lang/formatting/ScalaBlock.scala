@@ -124,7 +124,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
                      .getElementType == ScalaElementTypes.CASE_CLAUSES)
             Indent.getSpaceIndent(2 * indentSize)
           else Indent.getNormalIndent,
-          null)
+          null
+        )
       case scope if isBlockOnlyScope(scope) =>
         new ChildAttributes(
           if (scope.getNode.getElementType == ScalaTokenTypes.tLBRACE &&
@@ -135,12 +136,14 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case _: ScBlock =>
         val grandParent = parent.getParent
-        new ChildAttributes(if (grandParent != null &&
-                                (grandParent.isInstanceOf[ScCaseClause] ||
-                                grandParent.isInstanceOf[ScFunctionExpr]))
-                              Indent.getNormalIndent
-                            else Indent.getNoneIndent,
-                            null)
+        new ChildAttributes(
+          if (grandParent != null &&
+              (grandParent.isInstanceOf[ScCaseClause] ||
+              grandParent.isInstanceOf[ScFunctionExpr]))
+            Indent.getNormalIndent
+          else Indent.getNoneIndent,
+          null
+        )
       case _: ScIfStmt =>
         new ChildAttributes(
           Indent.getNormalIndent(scalaSettings.ALIGN_IF_ELSE),

@@ -26,19 +26,22 @@ class TracerTest extends FunSuite {
       BroadcastTracer(
         Seq(TestTracer(Some(true)), TestTracer(Some(false)), TestTracer(None))
       ).sampleTrace(id) == Some(true),
-      "If one Some(true) returns Some(true)")
+      "If one Some(true) returns Some(true)"
+    )
 
     assert(BroadcastTracer(
              Seq(TestTracer(None), TestTracer(Some(false)), TestTracer(None))
            ).sampleTrace(id) == None,
            "If one Some(false) returns None")
 
-    assert(BroadcastTracer(
-             Seq(TestTracer(Some(false)),
-                 TestTracer(Some(false)),
-                 TestTracer(Some(false)))
-           ).sampleTrace(id) == Some(false),
-           "If all Some(false) returns Some(false)")
+    assert(
+      BroadcastTracer(
+        Seq(TestTracer(Some(false)),
+            TestTracer(Some(false)),
+            TestTracer(Some(false)))
+      ).sampleTrace(id) == Some(false),
+      "If all Some(false) returns Some(false)"
+    )
   }
 
   test("check equality of tracers") {

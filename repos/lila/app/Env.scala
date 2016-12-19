@@ -27,7 +27,8 @@ final class Env(config: Config,
     countRounds = Env.round.count,
     lobbyApi = Env.api.lobbyApi,
     getPlayban = Env.playban.api.currentBan _,
-    lightUser = Env.user.lightUser)
+    lightUser = Env.user.lightUser
+  )
 
   lazy val userInfo = mashup.UserInfo(
     countUsers = () => Env.user.countEnabled,
@@ -42,7 +43,8 @@ final class Env(config: Config,
     isDonor = Env.donation.isDonor,
     isHostingSimul = Env.simul.isHosting,
     isStreamer = Env.tv.isStreamer.apply,
-    insightShare = Env.insight.share) _
+    insightShare = Env.insight.share
+  ) _
 
   system.actorOf(Props(new actor.Renderer), name = RendererName)
 
@@ -99,11 +101,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "app" boot new Env(config = lila.common.PlayApp.loadConfig,
-                       scheduler = lila.common.PlayApp.scheduler,
-                       system = lila.common.PlayApp.system,
-                       appPath = lila.common.PlayApp withApp
-                           (_.path.getCanonicalPath))
+    "app" boot new Env(
+      config = lila.common.PlayApp.loadConfig,
+      scheduler = lila.common.PlayApp.scheduler,
+      system = lila.common.PlayApp.system,
+      appPath = lila.common.PlayApp withApp
+          (_.path.getCanonicalPath)
+    )
 
   def api = lila.api.Env.current
   def db = lila.db.Env.current

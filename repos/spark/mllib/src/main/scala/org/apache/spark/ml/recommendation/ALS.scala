@@ -185,18 +185,20 @@ private[recommendation] trait ALSParams
   /** @group getParam */
   def getNonnegative: Boolean = $(nonnegative)
 
-  setDefault(rank -> 10,
-             maxIter -> 10,
-             regParam -> 0.1,
-             numUserBlocks -> 10,
-             numItemBlocks -> 10,
-             implicitPrefs -> false,
-             alpha -> 1.0,
-             userCol -> "user",
-             itemCol -> "item",
-             ratingCol -> "rating",
-             nonnegative -> false,
-             checkpointInterval -> 10)
+  setDefault(
+    rank -> 10,
+    maxIter -> 10,
+    regParam -> 0.1,
+    numUserBlocks -> 10,
+    numItemBlocks -> 10,
+    implicitPrefs -> false,
+    alpha -> 1.0,
+    userCol -> "user",
+    itemCol -> "item",
+    ratingCol -> "rating",
+    nonnegative -> false,
+    checkpointInterval -> 10
+  )
 
   /**
     * Validates and transforms the input schema.
@@ -455,7 +457,8 @@ class ALS(@Since("1.4.0") override val uid: String)
       alpha = $(alpha),
       nonnegative = $(nonnegative),
       checkpointInterval = $(checkpointInterval),
-      seed = $(seed))
+      seed = $(seed)
+    )
     val userDF = userFactors.toDF("id", "features")
     val itemDF = itemFactors.toDF("id", "features")
     val model = new ALSModel(uid, $(rank), userDF, itemDF).setParent(this)
@@ -784,14 +787,17 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     val userIdAndFactors = userInBlocks
       .mapValues(_.srcIds)
       .join(userFactors)
-      .mapPartitions({ items =>
-        items.flatMap {
-          case (_, (ids, factors)) =>
-            ids.view.zip(factors)
-        }
-      // Preserve the partitioning because IDs are consistent with the partitioners in userInBlocks
-      // and userFactors.
-      }, preservesPartitioning = true)
+      .mapPartitions(
+        { items =>
+          items.flatMap {
+            case (_, (ids, factors)) =>
+              ids.view.zip(factors)
+          }
+        // Preserve the partitioning because IDs are consistent with the partitioners in userInBlocks
+        // and userFactors.
+        },
+        preservesPartitioning = true
+      )
       .setName("userFactors")
       .persist(finalRDDStorageLevel)
     val itemIdAndFactors = itemInBlocks

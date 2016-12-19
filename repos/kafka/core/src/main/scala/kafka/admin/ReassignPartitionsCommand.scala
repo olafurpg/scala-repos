@@ -280,7 +280,8 @@ object ReassignPartitionsCommand extends Logging {
     val generateOpt = parser.accepts(
       "generate",
       "Generate a candidate partition reassignment configuration." +
-        " Note that this only generates a candidate assignment, it does not execute it.")
+        " Note that this only generates a candidate assignment, it does not execute it."
+    )
     val executeOpt = parser.accepts(
       "execute",
       "Kick off the reassignment as specified by the --reassignment-json-file option.")
@@ -292,7 +293,8 @@ object ReassignPartitionsCommand extends Logging {
         "reassignment-json-file",
         "The JSON file with the partition reassignment configuration" +
           "The format to use is - \n" +
-          "{\"partitions\":\n\t[{\"topic\": \"foo\",\n\t  \"partition\": 1,\n\t  \"replicas\": [1,2,3] }],\n\"version\":1\n}")
+          "{\"partitions\":\n\t[{\"topic\": \"foo\",\n\t  \"partition\": 1,\n\t  \"replicas\": [1,2,3] }],\n\"version\":1\n}"
+      )
       .withRequiredArg
       .describedAs("manual assignment json file path")
       .ofType(classOf[String])
@@ -301,7 +303,8 @@ object ReassignPartitionsCommand extends Logging {
         "topics-to-move-json-file",
         "Generate a reassignment configuration to move the partitions" +
           " of the specified topics to the list of brokers specified by the --broker-list option. The format to use is - \n" +
-          "{\"topics\":\n\t[{\"topic\": \"foo\"},{\"topic\": \"foo1\"}],\n\"version\":1\n}")
+          "{\"topics\":\n\t[{\"topic\": \"foo\"},{\"topic\": \"foo1\"}],\n\"version\":1\n}"
+      )
       .withRequiredArg
       .describedAs("topics to reassign json file path")
       .ofType(classOf[String])
@@ -309,7 +312,8 @@ object ReassignPartitionsCommand extends Logging {
       .accepts(
         "broker-list",
         "The list of brokers to which the partitions need to be reassigned" +
-          " in the form \"0,1,2\". This is required if --topics-to-move-json-file is used to generate reassignment configuration")
+          " in the form \"0,1,2\". This is required if --topics-to-move-json-file is used to generate reassignment configuration"
+      )
       .withRequiredArg
       .describedAs("brokerlist")
       .ofType(classOf[String])

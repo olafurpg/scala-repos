@@ -167,21 +167,25 @@ object PlayerFlags {
   implicit val playerFlagsBSONHandler = new BSON[PlayerFlags] {
 
     def reads(r: BSON.Reader): PlayerFlags =
-      PlayerFlags(suspiciousErrorRate = r boolD "ser",
-                  alwaysHasAdvantage = r boolD "aha",
-                  highBlurRate = r boolD "hbr",
-                  moderateBlurRate = r boolD "mbr",
-                  consistentMoveTimes = r boolD "cmt",
-                  noFastMoves = r boolD "nfm",
-                  suspiciousHoldAlert = r boolD "sha")
+      PlayerFlags(
+        suspiciousErrorRate = r boolD "ser",
+        alwaysHasAdvantage = r boolD "aha",
+        highBlurRate = r boolD "hbr",
+        moderateBlurRate = r boolD "mbr",
+        consistentMoveTimes = r boolD "cmt",
+        noFastMoves = r boolD "nfm",
+        suspiciousHoldAlert = r boolD "sha"
+      )
 
     def writes(w: BSON.Writer, o: PlayerFlags) =
-      BSONDocument("ser" -> w.boolO(o.suspiciousErrorRate),
-                   "aha" -> w.boolO(o.alwaysHasAdvantage),
-                   "hbr" -> w.boolO(o.highBlurRate),
-                   "mbr" -> w.boolO(o.moderateBlurRate),
-                   "cmt" -> w.boolO(o.consistentMoveTimes),
-                   "nfm" -> w.boolO(o.noFastMoves),
-                   "sha" -> w.boolO(o.suspiciousHoldAlert))
+      BSONDocument(
+        "ser" -> w.boolO(o.suspiciousErrorRate),
+        "aha" -> w.boolO(o.alwaysHasAdvantage),
+        "hbr" -> w.boolO(o.highBlurRate),
+        "mbr" -> w.boolO(o.moderateBlurRate),
+        "cmt" -> w.boolO(o.consistentMoveTimes),
+        "nfm" -> w.boolO(o.noFastMoves),
+        "sha" -> w.boolO(o.suspiciousHoldAlert)
+      )
   }
 }

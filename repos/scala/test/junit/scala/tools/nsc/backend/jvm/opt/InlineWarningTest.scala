@@ -68,7 +68,8 @@ class InlineWarningTest extends ClearAfterClass {
     val warns = Set(
       "C::m1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
       "T::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      "D::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
+      "D::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden"
+    )
     compile(code, allowMessage = i => {
       count += 1; warns.exists(i.msg contains _)
     })
@@ -145,7 +146,8 @@ class InlineWarningTest extends ClearAfterClass {
       """B::flop()I is annotated @inline but could not be inlined:
         |Failed to check if B::flop()I can be safely inlined to B without causing an IllegalAccessError. Checking instruction INVOKESTATIC A.bar ()I failed:
         |The method bar()I could not be found in the class A or any of its parents.
-        |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin)
+        |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin
+    )
 
     var c = 0
     val List(b) =

@@ -105,18 +105,20 @@ object BuildDef extends Build {
 
   lazy val util = coreProject("util")
     .dependsOn(actor, json, markdown)
-    .settings(description := "Utilities Library",
-              parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
-                Seq(scala_compiler(sv),
-                    joda_time,
-                    joda_convert,
-                    commons_codec,
-                    javamail,
-                    log4j,
-                    htmlparser,
-                    xerces)
-              })
+    .settings(
+      description := "Utilities Library",
+      parallelExecution in Test := false,
+      libraryDependencies <++= scalaVersion { sv =>
+        Seq(scala_compiler(sv),
+            joda_time,
+            joda_convert,
+            commons_codec,
+            javamail,
+            log4j,
+            htmlparser,
+            xerces)
+      }
+    )
 
   // Web Projects
   // ------------
@@ -181,13 +183,15 @@ object BuildDef extends Build {
 
   lazy val mapper = persistenceProject("mapper")
     .dependsOn(db, proto)
-    .settings(description := "Mapper Library",
-              parallelExecution in Test := false,
-              libraryDependencies ++= Seq(h2, derby),
-              initialize in Test <<= (crossTarget in Test) { ct =>
-                System.setProperty("derby.stream.error.file",
-                                   (ct / "derby.log").absolutePath)
-              })
+    .settings(
+      description := "Mapper Library",
+      parallelExecution in Test := false,
+      libraryDependencies ++= Seq(h2, derby),
+      initialize in Test <<= (crossTarget in Test) { ct =>
+        System.setProperty("derby.stream.error.file",
+                           (ct / "derby.log").absolutePath)
+      }
+    )
 
   lazy val record = persistenceProject("record").dependsOn(proto)
 
@@ -197,12 +201,14 @@ object BuildDef extends Build {
 
   lazy val mongodb = persistenceProject("mongodb")
     .dependsOn(json_ext, util)
-    .settings(parallelExecution in Test := false,
-              libraryDependencies += mongo_driver,
-              initialize in Test <<= (resourceDirectory in Test) { rd =>
-                System.setProperty("java.util.logging.config.file",
-                                   (rd / "logging.properties").absolutePath)
-              })
+    .settings(
+      parallelExecution in Test := false,
+      libraryDependencies += mongo_driver,
+      initialize in Test <<= (resourceDirectory in Test) { rd =>
+        System.setProperty("java.util.logging.config.file",
+                           (rd / "logging.properties").absolutePath)
+      }
+    )
 
   lazy val mongodb_record = persistenceProject("mongodb-record")
     .dependsOn(record, mongodb)

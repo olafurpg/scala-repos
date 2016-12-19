@@ -280,16 +280,19 @@ class MergeToComprehensions extends Phase {
           logger.debug(
             s"Mappings for `on` clause in Join $ls/$rs: " + mappingsM)
           val on2 = on1
-            .replace({
-              case p @ FwdPathOnTypeSymbol(ts, _ :: s :: Nil) =>
-                //logger.debug(s"Finding ($ts, $s)")
-                mappingsM.get((ts, s)) match {
-                  case Some(ElementSymbol(idx) :: ss) =>
-                    //logger.debug(s"Found $idx :: $ss")
-                    FwdPath((if (idx == 1) ls else rs) :: ss)
-                  case _ => p
-                }
-            }, bottomUp = true)
+            .replace(
+              {
+                case p @ FwdPathOnTypeSymbol(ts, _ :: s :: Nil) =>
+                  //logger.debug(s"Finding ($ts, $s)")
+                  mappingsM.get((ts, s)) match {
+                    case Some(ElementSymbol(idx) :: ss) =>
+                      //logger.debug(s"Found $idx :: $ss")
+                      FwdPath((if (idx == 1) ls else rs) :: ss)
+                    case _ => p
+                  }
+              },
+              bottomUp = true
+            )
             .infer(scope = Type.Scope(
                 j.leftGen -> l2.nodeType.asCollectionType.elementType) +
                 (j.rightGen -> r2.nodeType.asCollectionType.elementType))

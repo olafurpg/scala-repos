@@ -55,17 +55,19 @@ trait RandomLibrary extends Library {
     ns <- listOfN(2, identifier)
   } yield Reduction(Vector(ns: _*), n, op)
 
-  val reductions = Set(Reduction(Vector(), "count", 0x2000),
-                       Reduction(Vector(), "max", 0x2001),
-                       Reduction(Vector(), "min", 0x2004),
-                       Reduction(Vector(), "sum", 0x2002),
-                       Reduction(Vector(), "mean", 0x2013),
-                       Reduction(Vector(), "geometricMean", 0x2003),
-                       Reduction(Vector(), "sumSq", 0x2005),
-                       Reduction(Vector(), "variance", 0x2006),
-                       Reduction(Vector(), "stdDev", 0x2007),
-                       Reduction(Vector(), "median", 0x2008),
-                       Reduction(Vector(), "mode", 0x2009))
+  val reductions = Set(
+    Reduction(Vector(), "count", 0x2000),
+    Reduction(Vector(), "max", 0x2001),
+    Reduction(Vector(), "min", 0x2004),
+    Reduction(Vector(), "sum", 0x2002),
+    Reduction(Vector(), "mean", 0x2013),
+    Reduction(Vector(), "geometricMean", 0x2003),
+    Reduction(Vector(), "sumSq", 0x2005),
+    Reduction(Vector(), "variance", 0x2006),
+    Reduction(Vector(), "stdDev", 0x2007),
+    Reduction(Vector(), "median", 0x2008),
+    Reduction(Vector(), "mode", 0x2009)
+  )
 
   lazy val libMorphism1 =
     containerOfN[Set, Morphism1](30, genMorphism1).sample.get

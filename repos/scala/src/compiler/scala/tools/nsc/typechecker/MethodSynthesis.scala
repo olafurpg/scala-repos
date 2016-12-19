@@ -185,7 +185,8 @@ trait MethodSynthesis { self: Analyzer =>
       global.reporter.warning(
         ann.pos,
         s"no valid targets for annotation on ${tree.symbol} - it is discarded unused. " +
-          s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})")
+          s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})"
+      )
     }
 
     def addDerivedTrees(typer: Typer, stat: Tree): List[Tree] = stat match {
@@ -206,8 +207,8 @@ trait MethodSynthesis { self: Analyzer =>
         if (!mods.isParamAccessor)
           annotations foreach
             (ann =>
-               if (!trees.exists(_.symbol hasAnnotation ann.symbol))
-                 issueAnnotationWarning(vd, ann, GetterTargetClass))
+              if (!trees.exists(_.symbol hasAnnotation ann.symbol))
+                issueAnnotationWarning(vd, ann, GetterTargetClass))
 
         trees
       case vd: ValDef =>

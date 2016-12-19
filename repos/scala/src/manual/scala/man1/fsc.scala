@@ -31,7 +31,8 @@ object fsc extends Command {
     "The " & MBold("fsc") & " tool submits Scala compilation jobs to " & "a compilation daemon. " & "The first time it is executed, the daemon is started automatically. " & "On subsequent " & "runs, the same daemon can be reused, thus resulting in a faster compilation. " & "The tool is especially effective when repeatedly compiling with the same " & "class paths, because the compilation daemon can reuse a compiler instance.",
     "The compilation daemon is smart enough to flush its cached compiler " & "when the class path changes.  However, if the contents of the class path " & "change, for example due to upgrading a library, then the daemon " & "should be explicitly shut down with " & MBold(
       "-shutdown") & ".",
-    "Note that the " & Link(MBold("scala"), "scala.html") & " script runner " & "will also use " & "the offline compiler by default, with the same advantages and caveats.")
+    "Note that the " & Link(MBold("scala"), "scala.html") & " script runner " & "will also use " & "the offline compiler by default, with the same advantages and caveats."
+  )
 
   val options = Section(
     "OPTIONS",
@@ -42,14 +43,17 @@ object fsc extends Command {
       Definition(CmdOption("reset"), "Reset compile server caches."),
       Definition(
         CmdOption("shutdown"),
-        "Shut down the compilation daemon.  The daemon attempts to restart " & "itself as necessary, but sometimes an explicit shutdown is required. " & "A common example is if jars on the class path have changed."),
+        "Shut down the compilation daemon.  The daemon attempts to restart " & "itself as necessary, but sometimes an explicit shutdown is required. " & "A common example is if jars on the class path have changed."
+      ),
       Definition(
         CmdOption("server", Argument("hostname:portnumber")),
-        "Specify compile server host at port number.  Usually this option " & "is not needed.  Note that the hostname must be for a host that shares " & "the same filesystem."),
+        "Specify compile server host at port number.  Usually this option " & "is not needed.  Note that the hostname must be for a host that shares " & "the same filesystem."
+      ),
       Definition(
         CmdOptionBound("J", Argument("flag")),
         "Pass " & Mono(Argument("flag")) & " directly to the Java VM for the compilation daemon.")
-    ))
+    )
+  )
 
   val example = Section(
     "EXAMPLE",
@@ -81,18 +85,21 @@ object fsc extends Command {
         |
         |> fsc -verbose -shutdown
         |[Scala compile server exited]
-        |""".stripMargin))
+        |""".stripMargin)
+  )
 
   val environment = Section(
     "ENVIRONMENT",
     DefinitionList(
       Definition(
         MBold("JAVACMD"),
-        "Specify the " & MBold("java") & " command to be used " & "for running the Scala code.  Arguments may be specified " & "as part of the environment variable; spaces, quotation marks, " & "etc., will be passed directly to the shell for expansion."),
+        "Specify the " & MBold("java") & " command to be used " & "for running the Scala code.  Arguments may be specified " & "as part of the environment variable; spaces, quotation marks, " & "etc., will be passed directly to the shell for expansion."
+      ),
       Definition(
         MBold("JAVA_HOME"),
         "Specify JDK/JRE home directory. This directory is used to locate " & "the " & MBold(
-          "java") & " command unless " & MBold("JAVACMD") & " variable set."),
+          "java") & " command unless " & MBold("JAVACMD") & " variable set."
+      ),
       Definition(
         MBold("JAVA_OPTS"),
         SeqPara(
@@ -100,20 +107,25 @@ object fsc extends Command {
             "JAVACMD") & ".",
           "With Java 1.5 (or newer) one may for example configure the " & "memory usage of the JVM as follows: " & Mono(
             "JAVA_OPTS=\"-Xmx512M -Xms16M -Xss16M\"")
-        ))))
+        )
+      )
+    )
+  )
 
   val exitStatus = Section(
     "EXIT STATUS",
-    MBold(command) & " returns a zero exit status if it succeeds to " & "compile the specified input files. Non zero is returned in case " & "of failure.")
+    MBold(command) & " returns a zero exit status if it succeeds to " & "compile the specified input files. Non zero is returned in case " & "of failure."
+  )
 
   val seeAlso =
-    Section("SEE ALSO",
-            Link(Bold("scala") & "(1)", "scala.html") & ", " & Link(
-              Bold("scalac") & "(1)",
-              "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)",
-                                           "scaladoc.html") & ", " & Link(
-              Bold("scalap") & "(1)",
-              "scalap.html"))
+    Section(
+      "SEE ALSO",
+      Link(Bold("scala") & "(1)", "scala.html") & ", " & Link(
+        Bold("scalac") & "(1)",
+        "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)", "scaladoc.html") & ", " & Link(
+        Bold("scalap") & "(1)",
+        "scalap.html")
+    )
 
   def manpage = new Document {
     title = command

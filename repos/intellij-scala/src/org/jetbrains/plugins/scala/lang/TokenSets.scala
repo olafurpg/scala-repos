@@ -19,15 +19,17 @@ object TokenSets {
                                                   tDOC_COMMENT,
                                                   SCALA_DOC_COMMENT)
 
-  val MODIFIERS = TokenSet.create(ScalaTokenTypes.kCASE,
-                                  ScalaTokenTypes.kABSTRACT,
-                                  ScalaTokenTypes.kLAZY,
-                                  ScalaTokenTypes.kIMPLICIT,
-                                  ScalaTokenTypes.kFINAL,
-                                  ScalaTokenTypes.kOVERRIDE,
-                                  ScalaTokenTypes.kPROTECTED,
-                                  ScalaTokenTypes.kPRIVATE,
-                                  ScalaTokenTypes.kSEALED)
+  val MODIFIERS = TokenSet.create(
+    ScalaTokenTypes.kCASE,
+    ScalaTokenTypes.kABSTRACT,
+    ScalaTokenTypes.kLAZY,
+    ScalaTokenTypes.kIMPLICIT,
+    ScalaTokenTypes.kFINAL,
+    ScalaTokenTypes.kOVERRIDE,
+    ScalaTokenTypes.kPROTECTED,
+    ScalaTokenTypes.kPRIVATE,
+    ScalaTokenTypes.kSEALED
+  )
 
   val PROPERTY_NAMES = TokenSet.create(tIDENTIFIER)
 
@@ -54,23 +56,25 @@ object TokenSets {
                                              TYPE_DEFINITION,
                                              TYPE_DECLARATION)
 
-  val EXPR1_BIT_SET: TokenSet = TokenSet.create(IF_STMT,
-                                                FOR_STMT,
-                                                WHILE_STMT,
-                                                DO_STMT,
-                                                TRY_STMT,
-                                                TRY_BLOCK,
-                                                CATCH_BLOCK,
-                                                FINALLY_BLOCK,
-                                                RETURN_STMT,
-                                                THROW_STMT,
-                                                ASSIGN_STMT,
-                                                MATCH_STMT,
-                                                TYPED_EXPR_STMT,
-                                                POSTFIX_EXPR,
-                                                INFIX_EXPR,
-                                                PLACEHOLDER_EXPR,
-                                                PREFIX_EXPR)
+  val EXPR1_BIT_SET: TokenSet = TokenSet.create(
+    IF_STMT,
+    FOR_STMT,
+    WHILE_STMT,
+    DO_STMT,
+    TRY_STMT,
+    TRY_BLOCK,
+    CATCH_BLOCK,
+    FINALLY_BLOCK,
+    RETURN_STMT,
+    THROW_STMT,
+    ASSIGN_STMT,
+    MATCH_STMT,
+    TYPED_EXPR_STMT,
+    POSTFIX_EXPR,
+    INFIX_EXPR,
+    PLACEHOLDER_EXPR,
+    PREFIX_EXPR
+  )
 
   val STABLE_ID_BIT_SET = TokenSet.create(STABLE_ID, tIDENTIFIER)
 
@@ -85,32 +89,36 @@ object TokenSets {
                                                               TYPES,
                                                               COMPOSITE_TYPE))
 
-  val EXPRESSION_BIT_SET = TokenSet.orSet(EXPR1_BIT_SET,
-                                          TokenSet.create(LITERAL,
-                                                          STRING_LITERAL,
-                                                          BOOLEAN_LITERAL,
-                                                          PREFIX_EXPR,
-                                                          PREFIX,
-                                                          POSTFIX_EXPR,
-                                                          INFIX_EXPR,
-                                                          PLACEHOLDER_EXPR,
-                                                          EXPR1,
-                                                          FUNCTION_EXPR,
-                                                          AN_FUN,
-                                                          GENERATOR,
-                                                          ENUMERATOR,
-                                                          ENUMERATORS,
-                                                          EXPRS,
-                                                          ARG_EXPRS,
-                                                          BLOCK_EXPR,
-                                                          ERROR_STMT,
-                                                          BLOCK,
-                                                          PARENT_EXPR,
-                                                          METHOD_CALL,
-                                                          REFERENCE_EXPRESSION,
-                                                          THIS_REFERENCE,
-                                                          SUPER_REFERENCE,
-                                                          GENERIC_CALL))
+  val EXPRESSION_BIT_SET = TokenSet.orSet(
+    EXPR1_BIT_SET,
+    TokenSet.create(
+      LITERAL,
+      STRING_LITERAL,
+      BOOLEAN_LITERAL,
+      PREFIX_EXPR,
+      PREFIX,
+      POSTFIX_EXPR,
+      INFIX_EXPR,
+      PLACEHOLDER_EXPR,
+      EXPR1,
+      FUNCTION_EXPR,
+      AN_FUN,
+      GENERATOR,
+      ENUMERATOR,
+      ENUMERATORS,
+      EXPRS,
+      ARG_EXPRS,
+      BLOCK_EXPR,
+      ERROR_STMT,
+      BLOCK,
+      PARENT_EXPR,
+      METHOD_CALL,
+      REFERENCE_EXPRESSION,
+      THIS_REFERENCE,
+      SUPER_REFERENCE,
+      GENERIC_CALL
+    )
+  )
 
   val SIMPLE_EXPR_BIT_SET =
     TokenSet.create(PLACEHOLDER_EXPR, LITERAL, BLOCK_EXPR)
@@ -156,8 +164,10 @@ object TokenSets {
             )
           )
         )
-      )),
-    MemberElementTypesExtension.getAllElementTypes)
+      )
+    ),
+    MemberElementTypesExtension.getAllElementTypes
+  )
 
   val DECLARED_ELEMENTS_HOLDER =
     TokenSet.orSet(FUNCTIONS, TokenSet.orSet(VALUES, VARIABLES))

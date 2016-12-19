@@ -1286,7 +1286,8 @@ class KafkaController(val config: KafkaConfig,
             updatedLeaderIsrAndControllerEpoch,
             newAssignedReplicas.mkString(","),
             updatedLeaderIsrAndControllerEpoch.leaderAndIsr.leader,
-            topicAndPartition))
+            topicAndPartition
+          ))
       case None => // fail the reassignment
         stateChangeLogger.error(
           ("Controller %d epoch %d failed to send LeaderAndIsr request with new assigned replica list %s " +
@@ -1368,7 +1369,8 @@ class KafkaController(val config: KafkaConfig,
                                           topicAndPartition.partition),
         controllerContext
           .partitionsBeingReassigned(topicAndPartition)
-          .isrChangeListener)
+          .isrChangeListener
+      )
     }
     // read the current list of reassigned partitions from zookeeper
     val partitionsBeingReassigned = zkUtils.getPartitionsBeingReassigned()

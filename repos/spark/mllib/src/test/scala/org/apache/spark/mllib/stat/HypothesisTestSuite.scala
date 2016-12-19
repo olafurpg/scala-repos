@@ -136,12 +136,14 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // labels: 1.0 (2 / 6), 0.0 (4 / 6)
     // feature1: 0.5 (1 / 6), 1.5 (2 / 6), 3.5 (3 / 6)
     // feature2: 10.0 (1 / 6), 20.0 (1 / 6), 30.0 (2 / 6), 40.0 (2 / 6)
-    val data = Seq(LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
-                   LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
-                   LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
-                   LabeledPoint(1.0, Vectors.dense(3.5, 40.0)))
+    val data = Seq(
+      LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
+      LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
+      LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
+      LabeledPoint(1.0, Vectors.dense(3.5, 40.0))
+    )
     for (numParts <- List(2, 4, 6, 8)) {
       val chi = Statistics.chiSqTest(sc.parallelize(data, numParts))
       val feature1 = chi(0)

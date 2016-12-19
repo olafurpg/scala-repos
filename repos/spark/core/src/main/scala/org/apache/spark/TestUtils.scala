@@ -186,7 +186,8 @@ private[spark] object TestUtils {
       "public class " +
         className + extendsText + " implements java.io.Serializable {" +
         "  @Override public String toString() { return \"" + toStringValue +
-        "\"; }}")
+        "\"; }}"
+    )
     createCompiledClass(className, destDir, sourceFile, classpathUrls)
   }
 
